@@ -1,0 +1,5 @@
+{
+  "name": "SRT Subtitle Cleaner & Language Detector",
+  "description": "A powerful tool to clean SRT subtitle files by removing unwanted text, fixing formatting, and detecting foreign languages to prepare them for translation.",
+  "requestFramePermissions": []
+}
