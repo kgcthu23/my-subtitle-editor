@@ -5,7 +5,8 @@ export interface DetectedLanguageInfo {
 }
 
 export interface ForeignLanguageReport {
-  [lineNumber: number]: DetectedLanguageInfo;
+  // FIX: Changed index signature from `number` to `string`. This allows for correct type inference with `Object.entries` in consuming components.
+  [lineNumber: string]: DetectedLanguageInfo;
 }
 
 export interface ChangeSummary {
@@ -18,4 +19,23 @@ export interface ChangeSummary {
   myanmarCharsRemoved: number;
   dialoguesSplit: number;
   foreignLinesCount: number;
+}
+
+// New types for Income Tracker
+export interface IncomeEntry {
+  id: string;
+  date: string; // YYYY-MM-DD
+  timestamp: string; // ISO timestamp for exact time
+  lines: number;
+  rate: number;
+  amount: number;
+}
+
+export interface MonthData {
+  total: number;
+  entries: IncomeEntry[];
+}
+
+export interface IncomeData {
+  [month: string]: MonthData; // key is YYYY-MM
 }
