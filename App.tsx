@@ -407,7 +407,7 @@ export default function App() {
         const summaryData = getChangeSummary(content);
         setSummary(summaryData);
 
-        const reportData = detectForeignLanguages(content);
+        const reportData = detectForeignLanguages(cleaned);
         setForeignReport(reportData);
 
         const baseName = name.replace(/\.srt$/i, '');

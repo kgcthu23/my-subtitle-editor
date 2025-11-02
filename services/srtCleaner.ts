@@ -83,7 +83,7 @@ export const cleanSrtContent = (content: string): string => {
 
 export const getChangeSummary = (originalContent: string): ChangeSummary => {
     const cleanedContent = cleanSrtContent(originalContent);
-    const foreignLanguages = detectForeignLanguages(originalContent);
+    const foreignLanguages = detectForeignLanguages(cleanedContent);
 
     return {
         backslashesRemoved: (originalContent.match(/\\/g) || []).length,
