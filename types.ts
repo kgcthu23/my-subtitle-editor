@@ -15,10 +15,12 @@ export interface ChangeSummary {
   htmlTagsFixed: number;
   bracketsRemoved: number;
   parensRemoved: number;
+  speakerLabelsRemoved: number;
   hyphensRemoved: number;
   myanmarCharsRemoved: number;
   dialoguesSplit: number;
   foreignLinesCount: number;
+  formatFixes: number;
 }
 
 // New types for Income Tracker

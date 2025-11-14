@@ -108,11 +108,13 @@ const Preview: React.FC<PreviewProps> = ({ originalContent, cleanedContent, summ
 
 const ChangeSummaryDisplay: React.FC<{ summary: ChangeSummary }> = ({ summary }) => {
     const items = [
+        { label: 'SRT Format Corrected', value: summary.formatFixes },
         { label: 'Backslashes Removed', value: summary.backslashesRemoved },
         { label: 'Timestamps Fixed', value: summary.timestampsFixed },
         { label: 'HTML Tags Fixed', value: summary.htmlTagsFixed },
         { label: 'Square Brackets Removed', value: summary.bracketsRemoved },
         { label: 'Parentheses Removed', value: summary.parensRemoved },
+        { label: 'Speaker Labels Removed', value: summary.speakerLabelsRemoved },
         { label: 'Empty Hyphen Lines Removed', value: summary.hyphensRemoved },
         { label: 'Myanmar Characters Removed', value: summary.myanmarCharsRemoved },
         { label: 'Multi-dialogue Lines Split', value: summary.dialoguesSplit },
@@ -502,7 +504,7 @@ export default function App() {
                     {activeView === 'cleaner' ? cleanerView : <IncomeTracker />}
                 </main>
                  <footer className="text-center mt-12 text-sm text-slate-500 dark:text-slate-400">
-                    <p>Translator's Toolkit v3.0</p>
+                    <p>Translator's Toolkit v3.1</p>
                 </footer>
             </div>
         </div>
