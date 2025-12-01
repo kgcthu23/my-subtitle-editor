@@ -40,6 +40,25 @@ const DeleteIcon = () => (
     </svg>
 );
 
+const MailIcon = ({ className = "h-6 w-6" }: { className?: string }) => (
+    <svg xmlns="http://www.w3.org/2000/svg" className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+        <path strokeLinecap="round" strokeLinejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+    </svg>
+);
+
+const SendIcon = ({ className = "h-5 w-5 mr-2" }: { className?: string }) => (
+    <svg xmlns="http://www.w3.org/2000/svg" className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+        <path strokeLinecap="round" strokeLinejoin="round" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
+    </svg>
+);
+
+const LoadingSpinner = () => (
+    <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+    </svg>
+);
+
 
 // --- Child Components defined outside the main component to prevent re-renders ---
 
@@ -384,12 +403,150 @@ const IncomeTracker: React.FC = () => {
     );
 };
 
+// --- New Message Box Component ---
+const MessageBox: React.FC = () => {
+    const [subject, setSubject] = useState('');
+    const [body, setBody] = useState('');
+    const [status, setStatus] = useState<'idle' | 'sending' | 'success' | 'error'>('idle');
+
+    const handleSend = async (e: React.FormEvent) => {
+        e.preventDefault();
+        setStatus('sending');
+
+        try {
+            // Using FormSubmit.co AJAX endpoint to send email directly
+            const response = await fetch("https://formsubmit.co/ajax/kaungce@gmail.com", {
+                method: "POST",
+                headers: { 
+                    "Content-Type": "application/json",
+                    "Accept": "application/json"
+                },
+                body: JSON.stringify({
+                    _subject: subject || "New Message from Toolkit",
+                    message: body,
+                    _template: "table", // Optional: formats the email nicely
+                    _captcha: "false" 
+                })
+            });
+
+            if (response.ok) {
+                setStatus('success');
+                setSubject('');
+                setBody('');
+                // Reset status after 5 seconds
+                setTimeout(() => setStatus('idle'), 5000);
+            } else {
+                setStatus('error');
+            }
+        } catch (error) {
+            console.error("Error sending message:", error);
+            setStatus('error');
+        }
+    };
+
+    return (
+        <div className="max-w-2xl mx-auto animate-fade-in">
+             <div className="bg-white dark:bg-slate-800 p-8 rounded-xl shadow-lg border border-slate-200 dark:border-slate-700">
+                <div className="flex items-center mb-6 border-b border-slate-200 dark:border-slate-700 pb-4">
+                    <div className="p-3 bg-sky-100 dark:bg-sky-900/30 rounded-full mr-4">
+                        <MailIcon className="h-8 w-8 text-sky-600 dark:text-sky-400" />
+                    </div>
+                    <div>
+                        <h2 className="text-2xl font-bold text-slate-800 dark:text-slate-100">Message Box</h2>
+                        <p className="text-sm text-slate-500 dark:text-slate-400">Direct line to the developer</p>
+                    </div>
+                </div>
+                
+                <div className="bg-sky-50 dark:bg-sky-900/20 border-l-4 border-sky-500 p-4 mb-8 rounded-r-md">
+                    <p className="text-sky-800 dark:text-sky-200 font-medium">
+                        "Ask whatever you want to CC (work related only)."
+                    </p>
+                </div>
+
+                {status === 'success' && (
+                    <div className="mb-6 p-4 bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300 rounded-lg flex items-center animate-fade-in">
+                        <svg className="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                            <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                        </svg>
+                        Message sent successfully!
+                    </div>
+                )}
+
+                {status === 'error' && (
+                    <div className="mb-6 p-4 bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-300 rounded-lg flex items-center animate-fade-in">
+                        <svg className="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                            <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                        </svg>
+                        Failed to send message. Please try again later.
+                    </div>
+                )}
+
+                <form onSubmit={handleSend} className="space-y-6">
+                    <div>
+                        <label htmlFor="subject" className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">Subject</label>
+                        <input 
+                            type="text" 
+                            id="subject"
+                            value={subject}
+                            onChange={(e) => setSubject(e.target.value)}
+                            disabled={status === 'sending' || status === 'success'}
+                            className="w-full px-4 py-3 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-600 rounded-lg shadow-sm placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all disabled:opacity-50"
+                            placeholder="What is this regarding?"
+                        />
+                    </div>
+                    
+                    <div>
+                        <label htmlFor="message" className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">Message</label>
+                        <textarea 
+                            id="message"
+                            value={body}
+                            onChange={(e) => setBody(e.target.value)}
+                            rows={6}
+                            required
+                            disabled={status === 'sending' || status === 'success'}
+                            className="w-full px-4 py-3 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-600 rounded-lg shadow-sm placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all resize-none disabled:opacity-50"
+                            placeholder="Type your message here..."
+                        />
+                    </div>
+
+                    <button 
+                        type="submit" 
+                        disabled={status === 'sending' || status === 'success'}
+                        className={`w-full flex items-center justify-center px-6 py-3 text-base font-semibold text-white rounded-lg shadow-md transition-all transform hover:-translate-y-0.5 focus:ring-4 focus:ring-sky-500/50 
+                            ${status === 'sending' ? 'bg-sky-400 cursor-not-allowed' : 'bg-sky-600 hover:bg-sky-700'}
+                            ${status === 'success' ? 'bg-green-600 hover:bg-green-700' : ''}
+                        `}
+                    >
+                        {status === 'sending' ? (
+                            <>
+                                <LoadingSpinner />
+                                Sending...
+                            </>
+                        ) : (
+                            <>
+                                <SendIcon />
+                                Send Message
+                            </>
+                        )}
+                    </button>
+                    {status !== 'success' && status !== 'error' && (
+                         <p className="text-xs text-center text-slate-500 dark:text-slate-400 mt-4">
+                            Powered by FormSubmit
+                        </p>
+                    )}
+                   
+                </form>
+             </div>
+        </div>
+    );
+};
+
 
 // --- Main Application Component ---
 
 export default function App() {
     type AppState = 'idle' | 'preview';
-    type AppView = 'cleaner' | 'tracker';
+    type AppView = 'cleaner' | 'tracker' | 'message';
 
     const [appState, setAppState] = useState<AppState>('idle');
     const [activeView, setActiveView] = useState<AppView>('cleaner');
@@ -483,25 +640,30 @@ export default function App() {
                 <header className="text-center mb-10">
                     <h1 className="text-4xl sm:text-5xl font-extrabold text-slate-900 dark:text-white tracking-tight">Translator's Toolkit</h1>
                     
-                    <div className="mt-6 flex justify-center gap-2 sm:gap-4 p-1 bg-slate-200/50 dark:bg-slate-800/50 rounded-lg max-w-sm mx-auto">
-                        <button onClick={() => setActiveView('cleaner')} className={`w-full px-4 py-2 text-sm font-semibold rounded-md transition-all duration-200 ${activeView === 'cleaner' ? activeTabClasses : inactiveTabClasses}`}>
+                    <div className="mt-6 flex justify-center gap-2 sm:gap-4 p-1 bg-slate-200/50 dark:bg-slate-800/50 rounded-lg max-w-lg mx-auto">
+                        <button onClick={() => setActiveView('cleaner')} className={`flex-1 px-3 py-2 text-sm font-semibold rounded-md transition-all duration-200 ${activeView === 'cleaner' ? activeTabClasses : inactiveTabClasses}`}>
                             🎬 SRT Cleaner
                         </button>
-                         <button onClick={() => setActiveView('tracker')} className={`w-full px-4 py-2 text-sm font-semibold rounded-md transition-all duration-200 ${activeView === 'tracker' ? activeTabClasses : inactiveTabClasses}`}>
+                         <button onClick={() => setActiveView('tracker')} className={`flex-1 px-3 py-2 text-sm font-semibold rounded-md transition-all duration-200 ${activeView === 'tracker' ? activeTabClasses : inactiveTabClasses}`}>
                             💰 Income Tracker
+                        </button>
+                        <button onClick={() => setActiveView('message')} className={`flex-1 px-3 py-2 text-sm font-semibold rounded-md transition-all duration-200 ${activeView === 'message' ? activeTabClasses : inactiveTabClasses}`}>
+                            📬 Message Box
                         </button>
                     </div>
 
                     <p className="mt-4 text-lg text-slate-600 dark:text-slate-400 max-w-3xl mx-auto">
                         {activeView === 'cleaner' 
                             ? "An intelligent tool to clean, format, and prepare your SRT files for translation, with built-in foreign language detection."
-                            : "Track your translation income based on lines and rate, with a complete monthly history."
+                            : activeView === 'tracker'
+                            ? "Track your translation income based on lines and rate, with a complete monthly history."
+                            : "Directly contact the developer for work-related inquiries."
                         }
                     </p>
                 </header>
 
                 <main>
-                    {activeView === 'cleaner' ? cleanerView : <IncomeTracker />}
+                    {activeView === 'cleaner' ? cleanerView : activeView === 'tracker' ? <IncomeTracker /> : <MessageBox />}
                 </main>
                  <footer className="text-center mt-12 text-sm text-slate-500 dark:text-slate-400">
                     <p>Translator's Toolkit v3.1</p>
