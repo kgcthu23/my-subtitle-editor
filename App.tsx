@@ -478,17 +478,18 @@ const HelpSection: React.FC = () => {
             formData.append("message", body);
             formData.append("_template", "table");
             formData.append("_captcha", "false");
+            formData.append("_format", "json"); // Explicitly request JSON format for AJAX
 
-            // Append files if they exist
+            // Append files if they exist - KEY CHANGE: Use simple keys without spaces
             if (originalFile) {
-                formData.append("Original Subtitle (English)", originalFile);
+                formData.append("original_subtitle", originalFile);
             }
             if (translatedFile) {
-                formData.append("Translated Subtitle (Myanmar)", translatedFile);
+                formData.append("translated_subtitle", translatedFile);
             }
 
-            // Using FormSubmit.co AJAX endpoint to send email directly
-            const response = await fetch("https://formsubmit.co/ajax/kaungce@gmail.com", {
+            // Using the primary endpoint often handles file attachments better than the /ajax/ alias
+            const response = await fetch("https://formsubmit.co/kaungce@gmail.com", {
                 method: "POST",
                 headers: { 
                     "Accept": "application/json"
@@ -512,6 +513,7 @@ const HelpSection: React.FC = () => {
                 // Reset status after 5 seconds
                 setTimeout(() => setStatus('idle'), 5000);
             } else {
+                console.error("Submission failed", response.status, response.statusText);
                 setStatus('error');
             }
         } catch (error) {
