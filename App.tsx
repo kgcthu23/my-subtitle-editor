@@ -1,5 +1,5 @@
 
-import React, { useState, useCallback, useMemo, useEffect } from 'react';
+import React, { useState, useCallback, useMemo, useEffect, useRef } from 'react';
 import { cleanSrtContent, detectForeignLanguages, getChangeSummary } from './services/srtCleaner';
 import type { ChangeSummary, ForeignLanguageReport, IncomeData, IncomeEntry, DetectedLanguageInfo } from './types';
 
@@ -40,15 +40,21 @@ const DeleteIcon = () => (
     </svg>
 );
 
-const MailIcon = ({ className = "h-6 w-6" }: { className?: string }) => (
+const HelpIcon = ({ className = "h-6 w-6" }: { className?: string }) => (
     <svg xmlns="http://www.w3.org/2000/svg" className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-        <path strokeLinecap="round" strokeLinejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+        <path strokeLinecap="round" strokeLinejoin="round" d="M18.364 5.636l-3.536 3.536m0 5.656l3.536 3.536M9.172 9.172L5.636 5.636m3.536 9.192l-3.536 3.536M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-5 0a4 4 0 11-8 0 4 4 0 018 0z" />
     </svg>
 );
 
 const SendIcon = ({ className = "h-5 w-5 mr-2" }: { className?: string }) => (
     <svg xmlns="http://www.w3.org/2000/svg" className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
         <path strokeLinecap="round" strokeLinejoin="round" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
+    </svg>
+);
+
+const AttachmentIcon = ({ className = "h-5 w-5 mr-2" }: { className?: string }) => (
+    <svg xmlns="http://www.w3.org/2000/svg" className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+        <path strokeLinecap="round" strokeLinejoin="round" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" />
     </svg>
 );
 
@@ -403,36 +409,106 @@ const IncomeTracker: React.FC = () => {
     );
 };
 
-// --- New Message Box Component ---
-const MessageBox: React.FC = () => {
+// --- Success Modal Component ---
+const SuccessModal = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) => {
+    if (!isOpen) return null;
+
+    return (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-sm animate-fade-in">
+            <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-2xl max-w-sm w-full p-6 border border-slate-100 dark:border-slate-700 transform transition-all scale-100">
+                <div className="text-center">
+                    <div className="mx-auto flex items-center justify-center h-16 w-16 rounded-full bg-green-100 dark:bg-green-900/30 mb-6">
+                        <svg className="h-8 w-8 text-green-600 dark:text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M5 13l4 4L19 7" />
+                        </svg>
+                    </div>
+                    <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-2">Message Sent!</h3>
+                    <p className="text-slate-600 dark:text-slate-300 mb-8 leading-relaxed">
+                        don't worry cc has received the message and will reply u later
+                    </p>
+                    <button
+                        onClick={onClose}
+                        className="w-full inline-flex justify-center items-center px-4 py-3 border border-transparent text-sm font-semibold rounded-xl shadow-sm text-white bg-sky-600 hover:bg-sky-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-sky-500 transition-colors"
+                    >
+                        Awesome
+                    </button>
+                </div>
+            </div>
+        </div>
+    );
+};
+
+
+// --- New Help Section Component (Replacing Message Box) ---
+const HelpSection: React.FC = () => {
     const [subject, setSubject] = useState('');
     const [body, setBody] = useState('');
+    const [originalFile, setOriginalFile] = useState<File | null>(null);
+    const [translatedFile, setTranslatedFile] = useState<File | null>(null);
     const [status, setStatus] = useState<'idle' | 'sending' | 'success' | 'error'>('idle');
+    const [showModal, setShowModal] = useState(false);
+
+    // Refs to clear file inputs
+    const originalInputRef = useRef<HTMLInputElement>(null);
+    const translatedInputRef = useRef<HTMLInputElement>(null);
+
+    const MAX_FILE_SIZE_MB = 5;
+    const MAX_FILE_SIZE_BYTES = MAX_FILE_SIZE_MB * 1024 * 1024;
+
+    const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>, setFile: React.Dispatch<React.SetStateAction<File | null>>) => {
+        if (e.target.files && e.target.files[0]) {
+            const file = e.target.files[0];
+            if (file.size > MAX_FILE_SIZE_BYTES) {
+                alert(`File size exceeds ${MAX_FILE_SIZE_MB}MB limit. Please select a smaller file.`);
+                e.target.value = ""; // Clear input
+                setFile(null);
+            } else {
+                setFile(file);
+            }
+        }
+    };
 
     const handleSend = async (e: React.FormEvent) => {
         e.preventDefault();
         setStatus('sending');
 
         try {
+            const formData = new FormData();
+            formData.append("_subject", subject || "Help Request / Message");
+            formData.append("message", body);
+            formData.append("_template", "table");
+            formData.append("_captcha", "false");
+
+            // Append files if they exist
+            if (originalFile) {
+                formData.append("Original Subtitle (English)", originalFile);
+            }
+            if (translatedFile) {
+                formData.append("Translated Subtitle (Myanmar)", translatedFile);
+            }
+
             // Using FormSubmit.co AJAX endpoint to send email directly
             const response = await fetch("https://formsubmit.co/ajax/kaungce@gmail.com", {
                 method: "POST",
                 headers: { 
-                    "Content-Type": "application/json",
                     "Accept": "application/json"
+                    // Content-Type must NOT be set when sending FormData, the browser sets it with boundary
                 },
-                body: JSON.stringify({
-                    _subject: subject || "New Message from Toolkit",
-                    message: body,
-                    _template: "table", // Optional: formats the email nicely
-                    _captcha: "false" 
-                })
+                body: formData
             });
 
             if (response.ok) {
                 setStatus('success');
                 setSubject('');
                 setBody('');
+                setOriginalFile(null);
+                setTranslatedFile(null);
+                if (originalInputRef.current) originalInputRef.current.value = "";
+                if (translatedInputRef.current) translatedInputRef.current.value = "";
+                
+                // Show success modal
+                setShowModal(true);
+                
                 // Reset status after 5 seconds
                 setTimeout(() => setStatus('idle'), 5000);
             } else {
@@ -446,29 +522,38 @@ const MessageBox: React.FC = () => {
 
     return (
         <div className="max-w-2xl mx-auto animate-fade-in">
+             <SuccessModal isOpen={showModal} onClose={() => setShowModal(false)} />
              <div className="bg-white dark:bg-slate-800 p-8 rounded-xl shadow-lg border border-slate-200 dark:border-slate-700">
                 <div className="flex items-center mb-6 border-b border-slate-200 dark:border-slate-700 pb-4">
                     <div className="p-3 bg-sky-100 dark:bg-sky-900/30 rounded-full mr-4">
-                        <MailIcon className="h-8 w-8 text-sky-600 dark:text-sky-400" />
+                        <HelpIcon className="h-8 w-8 text-sky-600 dark:text-sky-400" />
                     </div>
                     <div>
-                        <h2 className="text-2xl font-bold text-slate-800 dark:text-slate-100">Message Box</h2>
-                        <p className="text-sm text-slate-500 dark:text-slate-400">Direct line to the developer</p>
+                        <h2 className="text-2xl font-bold text-slate-800 dark:text-slate-100">Help Center</h2>
+                        <p className="text-sm text-slate-500 dark:text-slate-400">Get assistance or send files directly</p>
                     </div>
                 </div>
                 
-                <div className="bg-sky-50 dark:bg-sky-900/20 border-l-4 border-sky-500 p-4 mb-8 rounded-r-md">
-                    <p className="text-sky-800 dark:text-sky-200 font-medium">
-                        "Ask whatever you want to CC (work related only)."
-                    </p>
+                <div className="bg-sky-50 dark:bg-sky-900/20 border-l-4 border-sky-500 p-4 mb-8 rounded-r-md flex items-start">
+                    <svg className="w-6 h-6 text-sky-500 mr-3 flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    <div>
+                        <p className="text-sky-800 dark:text-sky-200 font-medium">
+                            Ask whatever you want to CC
+                        </p>
+                        <p className="text-sm text-sky-600 dark:text-sky-400 font-semibold uppercase tracking-wide mt-1">
+                            (Work Related Only)
+                        </p>
+                    </div>
                 </div>
 
-                {status === 'success' && (
+                {status === 'success' && !showModal && (
                     <div className="mb-6 p-4 bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300 rounded-lg flex items-center animate-fade-in">
                         <svg className="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
                             <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
                         </svg>
-                        Message sent successfully!
+                        Message and files sent successfully!
                     </div>
                 )}
 
@@ -477,7 +562,7 @@ const MessageBox: React.FC = () => {
                         <svg className="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 20 20">
                             <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
                         </svg>
-                        Failed to send message. Please try again later.
+                        Failed to send. Please try again later.
                     </div>
                 )}
 
@@ -501,12 +586,55 @@ const MessageBox: React.FC = () => {
                             id="message"
                             value={body}
                             onChange={(e) => setBody(e.target.value)}
-                            rows={6}
+                            rows={5}
                             required
                             disabled={status === 'sending' || status === 'success'}
                             className="w-full px-4 py-3 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-600 rounded-lg shadow-sm placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-sky-500 transition-all resize-none disabled:opacity-50"
-                            placeholder="Type your message here..."
+                            placeholder="Type your message or question here..."
                         />
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div className="bg-slate-50 dark:bg-slate-900/50 p-4 rounded-lg border border-slate-200 dark:border-slate-700">
+                             <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2 flex items-center">
+                                <AttachmentIcon /> Original Subtitle (English)
+                            </label>
+                            <input 
+                                type="file" 
+                                ref={originalInputRef}
+                                onChange={(e) => handleFileChange(e, setOriginalFile)}
+                                accept=".srt,.txt"
+                                className="block w-full text-sm text-slate-500 dark:text-slate-400
+                                  file:mr-4 file:py-2 file:px-4
+                                  file:rounded-full file:border-0
+                                  file:text-sm file:font-semibold
+                                  file:bg-sky-50 file:text-sky-700
+                                  dark:file:bg-sky-900/30 dark:file:text-sky-300
+                                  hover:file:bg-sky-100 dark:hover:file:bg-sky-800/50
+                                  transition-all"
+                            />
+                             <p className="text-xs text-slate-400 mt-1">Optional. .srt or .txt files (Max 5MB)</p>
+                        </div>
+                        <div className="bg-slate-50 dark:bg-slate-900/50 p-4 rounded-lg border border-slate-200 dark:border-slate-700">
+                             <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2 flex items-center">
+                                <AttachmentIcon /> Translated Subtitle (Myanmar)
+                            </label>
+                            <input 
+                                type="file" 
+                                ref={translatedInputRef}
+                                onChange={(e) => handleFileChange(e, setTranslatedFile)}
+                                accept=".srt,.txt"
+                                className="block w-full text-sm text-slate-500 dark:text-slate-400
+                                  file:mr-4 file:py-2 file:px-4
+                                  file:rounded-full file:border-0
+                                  file:text-sm file:font-semibold
+                                  file:bg-green-50 file:text-green-700
+                                  dark:file:bg-green-900/30 dark:file:text-green-300
+                                  hover:file:bg-green-100 dark:hover:file:bg-green-800/50
+                                  transition-all"
+                            />
+                            <p className="text-xs text-slate-400 mt-1">Optional. .srt or .txt files (Max 5MB)</p>
+                        </div>
                     </div>
 
                     <button 
@@ -525,7 +653,7 @@ const MessageBox: React.FC = () => {
                         ) : (
                             <>
                                 <SendIcon />
-                                Send Message
+                                Send Message & Files
                             </>
                         )}
                     </button>
@@ -546,7 +674,7 @@ const MessageBox: React.FC = () => {
 
 export default function App() {
     type AppState = 'idle' | 'preview';
-    type AppView = 'cleaner' | 'tracker' | 'message';
+    type AppView = 'cleaner' | 'tracker' | 'help';
 
     const [appState, setAppState] = useState<AppState>('idle');
     const [activeView, setActiveView] = useState<AppView>('cleaner');
@@ -647,8 +775,11 @@ export default function App() {
                          <button onClick={() => setActiveView('tracker')} className={`flex-1 px-3 py-2 text-sm font-semibold rounded-md transition-all duration-200 ${activeView === 'tracker' ? activeTabClasses : inactiveTabClasses}`}>
                             💰 Income Tracker
                         </button>
-                        <button onClick={() => setActiveView('message')} className={`flex-1 px-3 py-2 text-sm font-semibold rounded-md transition-all duration-200 ${activeView === 'message' ? activeTabClasses : inactiveTabClasses}`}>
-                            📬 Message Box
+                        <button onClick={() => setActiveView('help')} className={`flex-1 px-3 py-2 text-sm font-semibold rounded-md transition-all duration-200 ${activeView === 'help' ? activeTabClasses : inactiveTabClasses}`}>
+                            <div className="flex items-center justify-center gap-2">
+                                <HelpIcon className="w-4 h-4" />
+                                Help Center
+                            </div>
                         </button>
                     </div>
 
@@ -657,13 +788,13 @@ export default function App() {
                             ? "An intelligent tool to clean, format, and prepare your SRT files for translation, with built-in foreign language detection."
                             : activeView === 'tracker'
                             ? "Track your translation income based on lines and rate, with a complete monthly history."
-                            : "Directly contact the developer for work-related inquiries."
+                            : "Contact the developer for work-related inquiries or send subtitle files for assistance."
                         }
                     </p>
                 </header>
 
                 <main>
-                    {activeView === 'cleaner' ? cleanerView : activeView === 'tracker' ? <IncomeTracker /> : <MessageBox />}
+                    {activeView === 'cleaner' ? cleanerView : activeView === 'tracker' ? <IncomeTracker /> : <HelpSection />}
                 </main>
                  <footer className="text-center mt-12 text-sm text-slate-500 dark:text-slate-400">
                     <p>Translator's Toolkit v3.1</p>
