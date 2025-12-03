@@ -224,6 +224,7 @@ const IncomeTracker: React.FC = () => {
     const [lines, setLines] = useState('');
     const [rate, setRate] = useState('');
     const [incomeData, setIncomeData] = useState<IncomeData>({});
+    const [showAllEntries, setShowAllEntries] = useState(false);
 
     useEffect(() => {
         try {
@@ -322,7 +323,26 @@ const IncomeTracker: React.FC = () => {
     };
 
     const currentMonthData = incomeData[currentMonthKey] ?? { total: 0, entries: [] };
-    const todaysEntries = currentMonthData.entries.filter(e => e.date === todayKey);
+    
+    // Determine displayed entries based on view all state
+    const displayedEntries = showAllEntries ? currentMonthData.entries : currentMonthData.entries.slice(0, 3);
+
+    // Group entries by date
+    const groupedEntries = useMemo(() => {
+        const groups: { [key: string]: IncomeEntry[] } = {};
+        if (displayedEntries) {
+            displayedEntries.forEach(entry => {
+                if (!groups[entry.date]) {
+                    groups[entry.date] = [];
+                }
+                groups[entry.date].push(entry);
+            });
+        }
+        return groups;
+    }, [displayedEntries]);
+
+    const sortedDates = Object.keys(groupedEntries).sort().reverse();
+    
     const historyMonths = Object.keys(incomeData)
         .filter(key => key !== currentMonthKey)
         .sort()
@@ -332,6 +352,21 @@ const IncomeTracker: React.FC = () => {
     const formatMonth = (monthKey: string) => {
         const [year, month] = monthKey.split('-');
         return new Date(parseInt(year), parseInt(month) - 1).toLocaleString('default', { month: 'long', year: 'numeric' });
+    };
+
+    const formatDateHeader = (dateStr: string) => {
+        if (dateStr === todayKey) return "Today";
+        
+        const date = new Date(dateStr);
+        const today = new Date(todayKey);
+        const yesterday = new Date(today);
+        yesterday.setDate(yesterday.getDate() - 1);
+        
+        const yesterdayKey = `${yesterday.getFullYear()}-${(yesterday.getMonth() + 1).toString().padStart(2, '0')}-${yesterday.getDate().toString().padStart(2, '0')}`;
+        
+        if (dateStr === yesterdayKey) return "Yesterday";
+        
+        return date.toLocaleDateString('default', { weekday: 'long', month: 'short', day: 'numeric' });
     };
 
     return (
@@ -361,32 +396,82 @@ const IncomeTracker: React.FC = () => {
                 </div>
                 <div className="lg:col-span-2 space-y-8">
                     <div className="bg-white dark:bg-slate-800 p-6 rounded-xl shadow-lg border border-slate-200 dark:border-slate-700">
-                        <h3 className="text-lg font-bold text-slate-800 dark:text-slate-100 mb-4">Today's Entries</h3>
-                        {todaysEntries.length > 0 ? (
-                            <ul className="space-y-3">
-                                {todaysEntries.map(entry => (
-                                    <li key={entry.id} className="flex justify-between items-center bg-slate-50 dark:bg-slate-900/50 p-3 rounded-md group transition-all hover:bg-slate-100 dark:hover:bg-slate-800/80">
-                                        <div>
-                                            <p className="font-semibold text-slate-700 dark:text-slate-200">{entry.lines.toLocaleString()} lines</p>
-                                            <p className="text-sm text-slate-500 dark:text-slate-400">@ {formatCurrency(entry.rate)} MMK/line</p>
-                                            <p className="text-xs text-slate-400 dark:text-slate-500 mt-1">{new Date(entry.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</p>
+                        <h3 className="text-lg font-bold text-slate-800 dark:text-slate-100 mb-4 flex items-center justify-between">
+                            <span>Entries for {new Date().toLocaleString('default', { month: 'long' })}</span>
+                            <span className="text-xs font-normal text-slate-500 bg-slate-100 dark:bg-slate-700 px-2 py-1 rounded-full">{currentMonthData.entries.length} entries</span>
+                        </h3>
+                        
+                        <div className="max-h-[600px] overflow-y-auto pr-2 custom-scrollbar space-y-6">
+                            {sortedDates.length > 0 ? (
+                                <>
+                                    {sortedDates.map(date => (
+                                        <div key={date}>
+                                            <h4 className="text-sm font-bold text-slate-400 dark:text-slate-500 mb-3 uppercase tracking-wide flex items-center gap-2">
+                                                {formatDateHeader(date)}
+                                                <div className="h-px bg-slate-200 dark:bg-slate-700 flex-grow"></div>
+                                            </h4>
+                                            <ul className="space-y-3">
+                                                {groupedEntries[date].map(entry => (
+                                                    <li key={entry.id} className="flex justify-between items-center bg-slate-50 dark:bg-slate-900/50 p-3 rounded-md group transition-all hover:bg-slate-100 dark:hover:bg-slate-800/80 hover:shadow-sm">
+                                                        <div>
+                                                            <p className="font-semibold text-slate-700 dark:text-slate-200">{entry.lines.toLocaleString()} lines</p>
+                                                            <div className="flex items-center gap-2 text-xs text-slate-500 dark:text-slate-400">
+                                                                <span>@ {formatCurrency(entry.rate)} MMK/line</span>
+                                                                <span>•</span>
+                                                                <span>{new Date(entry.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
+                                                            </div>
+                                                        </div>
+                                                        <div className="flex items-center gap-3">
+                                                            <p className="font-bold text-lg text-green-600 dark:text-green-400">{formatCurrency(entry.amount)}</p>
+                                                            <button 
+                                                                onClick={() => handleDeleteEntry(entry.id)} 
+                                                                className="opacity-0 group-hover:opacity-100 focus:opacity-100 text-slate-400 hover:text-red-500 transition-all p-1.5 rounded-full hover:bg-red-50 dark:hover:bg-red-900/30"
+                                                                aria-label="Delete entry"
+                                                                title="Delete entry"
+                                                            >
+                                                                <DeleteIcon />
+                                                            </button>
+                                                        </div>
+                                                    </li>
+                                                ))}
+                                            </ul>
                                         </div>
-                                        <div className="flex items-center gap-2">
-                                            <p className="font-bold text-lg text-green-600 dark:text-green-400">{formatCurrency(entry.amount)}</p>
-                                            <button 
-                                                onClick={() => handleDeleteEntry(entry.id)} 
-                                                className="opacity-0 group-hover:opacity-100 focus:opacity-100 text-red-500 hover:text-red-700 dark:hover:text-red-400 transition-opacity p-1 rounded-full hover:bg-red-100 dark:hover:bg-red-900/50"
-                                                aria-label="Delete entry"
-                                            >
-                                                <DeleteIcon />
-                                            </button>
-                                        </div>
-                                    </li>
-                                ))}
-                            </ul>
-                        ) : (
-                            <p className="text-slate-500 dark:text-slate-400 text-center py-4">No entries added for today.</p>
-                        )}
+                                    ))}
+
+                                    {!showAllEntries && currentMonthData.entries.length > 3 && (
+                                        <button 
+                                            onClick={() => setShowAllEntries(true)}
+                                            className="w-full py-3 mt-4 text-sm font-semibold text-sky-600 bg-sky-50 dark:bg-sky-900/20 hover:bg-sky-100 dark:hover:bg-sky-900/40 rounded-lg transition-colors border border-dashed border-sky-200 dark:border-sky-800 flex items-center justify-center gap-2"
+                                        >
+                                            View All {currentMonthData.entries.length} Entries
+                                            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                                            </svg>
+                                        </button>
+                                    )}
+
+                                    {showAllEntries && currentMonthData.entries.length > 3 && (
+                                        <button 
+                                            onClick={() => setShowAllEntries(false)}
+                                            className="w-full py-3 mt-4 text-sm font-semibold text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200 rounded-lg transition-colors flex items-center justify-center gap-2"
+                                        >
+                                            Show Less
+                                            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 15l7-7 7 7" />
+                                            </svg>
+                                        </button>
+                                    )}
+                                </>
+                            ) : (
+                                <div className="text-center py-12 flex flex-col items-center">
+                                    <div className="bg-slate-100 dark:bg-slate-800 p-4 rounded-full mb-3">
+                                        <CalendarIcon />
+                                    </div>
+                                    <p className="text-slate-500 dark:text-slate-400">No entries added for this month yet.</p>
+                                    <p className="text-xs text-slate-400 dark:text-slate-500 mt-1">Start by adding a new entry on the left.</p>
+                                </div>
+                            )}
+                        </div>
                     </div>
                      <div className="bg-white dark:bg-slate-800 p-6 rounded-xl shadow-lg border border-slate-200 dark:border-slate-700">
                         <h3 className="text-lg font-bold text-slate-800 dark:text-slate-100 mb-4 flex items-center"><CalendarIcon /> Monthly History</h3>
