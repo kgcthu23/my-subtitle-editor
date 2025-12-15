@@ -603,6 +603,10 @@ const HelpSection: React.FC = () => {
     const [translatedFile, setTranslatedFile] = useState<File | null>(null);
     const [status, setStatus] = useState<'idle' | 'sending' | 'success' | 'error'>('idle');
     const [showModal, setShowModal] = useState(false);
+    const [vpnCopied, setVpnCopied] = useState(false);
+
+    // VPN Key Constant
+    const VPN_KEY = "ss://YWVzLTI1Ni1nY206V0JBRFBJT2k5akAxMzkuMTgwLjIxNS4yMDE6MzYyMzA#Kev";
 
     // Refs to clear file inputs
     const originalInputRef = useRef<HTMLInputElement>(null);
@@ -622,6 +626,12 @@ const HelpSection: React.FC = () => {
                 setFile(file);
             }
         }
+    };
+
+    const handleCopyVpn = () => {
+        navigator.clipboard.writeText(VPN_KEY);
+        setVpnCopied(true);
+        setTimeout(() => setVpnCopied(false), 2000);
     };
 
     const handleSend = async (e: React.FormEvent) => {
@@ -689,6 +699,40 @@ const HelpSection: React.FC = () => {
                     <div>
                         <h2 className="text-2xl font-bold text-slate-800 dark:text-slate-100">Help Center</h2>
                         <p className="text-sm text-slate-500 dark:text-slate-400">Get assistance or send files directly</p>
+                    </div>
+                </div>
+
+                {/* NEW VPN ACCESS CARD */}
+                <div className="bg-indigo-50 dark:bg-indigo-900/20 border border-indigo-200 dark:border-indigo-700/50 rounded-xl p-6 mb-8 flex flex-col sm:flex-row items-start gap-4 shadow-sm relative overflow-hidden">
+                     <div className="p-3 bg-indigo-100 dark:bg-indigo-800 rounded-full flex-shrink-0 text-indigo-600 dark:text-indigo-300">
+                         <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z" />
+                        </svg>
+                    </div>
+                    <div className="flex-grow w-full">
+                         <h3 className="text-lg font-bold text-indigo-900 dark:text-indigo-100">VPN Access</h3>
+                         <p className="text-sm text-indigo-700 dark:text-indigo-300 mb-3">Outline vpn key on your pc</p>
+                         
+                         <div className="relative w-full">
+                            <div className="bg-white dark:bg-slate-950 p-3 pr-12 rounded-lg border border-indigo-200 dark:border-indigo-800 font-mono text-xs text-slate-600 dark:text-slate-300 break-all shadow-inner">
+                                {VPN_KEY}
+                            </div>
+                            <button 
+                                onClick={handleCopyVpn}
+                                className="absolute right-2 top-2 p-1.5 bg-white dark:bg-slate-800 rounded-md shadow-sm border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors text-slate-500"
+                                title="Copy Key"
+                            >
+                               {vpnCopied ? (
+                                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-green-500" viewBox="0 0 20 20" fill="currentColor">
+                                        <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                                    </svg>
+                               ) : (
+                                    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                                    </svg>
+                               )}
+                            </button>
+                         </div>
                     </div>
                 </div>
                 
