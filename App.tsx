@@ -1,4 +1,3 @@
-
 import React, { useState, useCallback, useMemo, useEffect, useRef } from 'react';
 import { cleanSrtContent, detectForeignLanguages, getChangeSummary } from './services/srtCleaner';
 import type { ChangeSummary, ForeignLanguageReport, IncomeData, IncomeEntry, DetectedLanguageInfo } from './types';
@@ -523,6 +522,78 @@ const SuccessModal = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => voi
     );
 };
 
+// --- Announcement Modal Component ---
+const AnnouncementModal = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) => {
+    const [copied, setCopied] = useState(false);
+    const key = "ss://YWVzLTI1Ni1nY206V0JBRFBJT2k5akAxMzkuMTgwLjIxNS4yMDE6MzYyMzA#Kev";
+
+    if (!isOpen) return null;
+
+    const handleCopy = async () => {
+        try {
+            await navigator.clipboard.writeText(key);
+            setCopied(true);
+            setTimeout(() => setCopied(false), 2000);
+        } catch (err) {
+            console.error('Failed to copy!', err);
+        }
+    };
+
+    return (
+        <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-slate-900/70 backdrop-blur-sm animate-fade-in">
+            <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-2xl max-w-lg w-full p-8 border border-slate-100 dark:border-slate-700 relative overflow-hidden">
+                <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-sky-400 to-blue-600"></div>
+                
+                <div className="text-center">
+                    <div className="mx-auto flex items-center justify-center h-16 w-16 rounded-full bg-sky-100 dark:bg-sky-900/30 mb-6">
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-sky-600 dark:text-sky-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5.882V19.24a1.76 1.76 0 01-3.417.592l-2.147-6.15M18 13a3 3 0 100-6M5.436 13.683A4.001 4.001 0 017 6h1.832c4.1 0 7.625-1.234 9.168-3v14c-1.543-1.766-5.067-3-9.168-3H7a3.988 3.988 0 01-1.564-.317z" />
+                        </svg>
+                    </div>
+                    
+                    <h3 className="text-2xl font-bold text-slate-900 dark:text-white mb-3">Important Update</h3>
+                    
+                    <div className="bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-700/50 rounded-lg p-4 mb-6">
+                        <p className="text-amber-800 dark:text-amber-200 font-medium">
+                            You need to delete the old server as it has expired.
+                        </p>
+                    </div>
+
+                    <p className="text-slate-600 dark:text-slate-300 mb-2 text-sm">Outline vpn key on your pc</p>
+                    
+                    <div className="relative mb-6">
+                        <div className="bg-slate-100 dark:bg-slate-950 p-4 rounded-lg text-xs break-all font-mono text-left border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 shadow-inner">
+                            {key}
+                        </div>
+                        <button 
+                            onClick={handleCopy}
+                            className="absolute right-2 top-2 p-2 bg-white dark:bg-slate-800 rounded-md shadow-sm border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors"
+                            title="Copy to clipboard"
+                        >
+                            {copied ? (
+                                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-green-500" viewBox="0 0 20 20" fill="currentColor">
+                                    <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                                </svg>
+                            ) : (
+                                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                                </svg>
+                            )}
+                        </button>
+                    </div>
+
+                    <button
+                        onClick={onClose}
+                        className="w-full inline-flex justify-center items-center px-6 py-3 border border-transparent text-base font-semibold rounded-xl shadow-md text-white bg-sky-600 hover:bg-sky-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-sky-500 transition-all transform hover:-translate-y-0.5"
+                    >
+                        I understand, close
+                    </button>
+                </div>
+            </div>
+        </div>
+    );
+};
+
 
 // --- New Help Section Component (Replacing Message Box) ---
 const HelpSection: React.FC = () => {
@@ -772,6 +843,23 @@ export default function App() {
     const [summary, setSummary] = useState<ChangeSummary | null>(null);
     const [foreignReport, setForeignReport] = useState<ForeignLanguageReport | null>(null);
 
+    // Announcement state
+    const [showAnnouncement, setShowAnnouncement] = useState(false);
+
+    useEffect(() => {
+        // Changed to v2 to reshow modal with new message
+        const hasSeenAnnouncement = localStorage.getItem('seen_announcement_kev_v2');
+        if (!hasSeenAnnouncement) {
+            setShowAnnouncement(true);
+        }
+    }, []);
+
+    const closeAnnouncement = () => {
+        // Changed to v2 to reshow modal with new message
+        localStorage.setItem('seen_announcement_kev_v2', 'true');
+        setShowAnnouncement(false);
+    };
+
     const handleFileSelect = useCallback((content: string, name: string) => {
         setOriginalContent(content);
         
@@ -851,6 +939,7 @@ export default function App() {
 
     return (
         <div className="min-h-screen text-slate-800 dark:text-slate-200 p-4 sm:p-6 lg:p-8">
+            <AnnouncementModal isOpen={showAnnouncement} onClose={closeAnnouncement} />
             <div className="max-w-7xl mx-auto">
                 <header className="text-center mb-10">
                     <h1 className="text-4xl sm:text-5xl font-extrabold text-slate-900 dark:text-white tracking-tight">Translator's Toolkit</h1>
