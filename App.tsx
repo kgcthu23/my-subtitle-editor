@@ -232,41 +232,19 @@ const ExamCountdownModal = ({ isOpen, onClose }: { isOpen: boolean; onClose: () 
 
     return (
         <div className="fixed inset-0 z-[70] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-md animate-fade-in">
-             <style>{`
-                @keyframes floatUp {
-                    0% { transform: translateY(100%) scale(0.5) rotate(0deg); opacity: 0; }
-                    10% { opacity: 0.8; }
-                    100% { transform: translateY(-300%) scale(1.2) rotate(20deg); opacity: 0; }
-                }
-                .emoji-float { position: absolute; bottom: -20px; animation: floatUp 4s infinite linear; pointer-events: none; z-index: 0; }
-                .delay-0 { animation-delay: 0s; left: 10%; }
-                .delay-1 { animation-delay: 0.8s; left: 30%; font-size: 1.5rem; }
-                .delay-2 { animation-delay: 1.5s; left: 50%; font-size: 1.2rem; }
-                .delay-3 { animation-delay: 2.5s; left: 70%; font-size: 1.8rem; }
-                .delay-4 { animation-delay: 3.2s; left: 85%; }
-                @keyframes soft-bounce {
-                    0%, 100% { transform: translateY(0); }
-                    50% { transform: translateY(-8px); }
-                }
-                .animate-soft-bounce { animation: soft-bounce 2s infinite ease-in-out; }
-            `}</style>
             <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-2xl max-w-md w-full p-8 border border-teal-100 dark:border-teal-900/30 relative overflow-hidden text-center transition-all">
-                {/* Floating Emojis Background */}
-                <div className="emoji-float delay-0">✨</div>
-                <div className="emoji-float delay-1">🎓</div>
-                <div className="emoji-float delay-2">⭐</div>
-                <div className="emoji-float delay-3">💪</div>
-                <div className="emoji-float delay-4">🎉</div>
-
+                
                 <div className="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-teal-400 via-emerald-500 to-teal-400 z-10"></div>
                 
-                <div className="relative z-10 mx-auto flex items-center justify-center h-16 w-16 rounded-full bg-teal-50 dark:bg-teal-900/20 mb-6 animate-soft-bounce">
-                     <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-teal-600 dark:text-teal-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" />
-                    </svg>
+                <div className="relative z-10 mx-auto w-40 h-40 mb-6">
+                    <img 
+                        src="https://media4.giphy.com/media/v1.Y2lkPTc5MGI3NjExOXZtcXo2OTM0c3RvcHE4em53YWsya2ExaW5jbnV0enY3OHhid252YyZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/0Rcmxg6VyLlIMo1Cwr/giphy.gif" 
+                        alt="Cute Cheering Cat" 
+                        className="w-full h-full object-cover rounded-xl shadow-sm"
+                    />
                 </div>
 
-                <h3 className="relative z-10 text-2xl font-bold text-slate-900 dark:text-white mb-1">Stay Focused!</h3>
+                <h3 className="relative z-10 text-2xl font-bold text-slate-900 dark:text-white mb-1">You can do it Pin Pin's Mother</h3>
                 <p className="relative z-10 text-slate-500 dark:text-slate-400 text-sm mb-6 font-medium tracking-wide uppercase">Exam Countdown: March 11, 2026</p>
 
                 <div className="relative z-10 grid grid-cols-4 gap-3 mb-8">
@@ -345,7 +323,7 @@ export default function App() {
     const [showExamModal, setShowExamModal] = useState(false);
 
     useEffect(() => {
-        const hasSeenExam = localStorage.getItem('seen_exam_countdown_2026_v7');
+        const hasSeenExam = localStorage.getItem('seen_exam_countdown_2026_v9');
         const examEndDate = new Date('2026-03-17T23:59:59');
         if (!hasSeenExam && new Date() < examEndDate) setShowExamModal(true);
     }, []);
@@ -369,7 +347,7 @@ export default function App() {
 
     return (
         <div className="min-h-screen text-slate-800 dark:text-slate-200 p-4 sm:p-6 lg:p-8">
-            <ExamCountdownModal isOpen={showExamModal} onClose={() => { localStorage.setItem('seen_exam_countdown_2026_v7', 'true'); setShowExamModal(false); }} />
+            <ExamCountdownModal isOpen={showExamModal} onClose={() => { localStorage.setItem('seen_exam_countdown_2026_v9', 'true'); setShowExamModal(false); }} />
             <div className="max-w-7xl mx-auto">
                 <header className="text-center mb-10">
                     <h1 className="text-4xl sm:text-5xl font-extrabold text-slate-900 dark:text-white">Translator's Toolkit</h1>
@@ -398,7 +376,7 @@ export default function App() {
                         )
                     ) : activeView === 'tracker' ? <IncomeTracker /> : <HelpSection />}
                 </main>
-                <footer className="text-center mt-12 text-xs text-slate-500"><p>Translator's Toolkit v3.7</p></footer>
+                <footer className="text-center mt-12 text-xs text-slate-500"><p>Translator's Toolkit v3.9</p></footer>
             </div>
         </div>
     );
