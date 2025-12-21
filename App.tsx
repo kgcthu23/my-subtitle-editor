@@ -323,9 +323,8 @@ export default function App() {
     const [showExamModal, setShowExamModal] = useState(false);
 
     useEffect(() => {
-        const hasSeenExam = localStorage.getItem('seen_exam_countdown_2026_v9');
         const examEndDate = new Date('2026-03-17T23:59:59');
-        if (!hasSeenExam && new Date() < examEndDate) setShowExamModal(true);
+        if (new Date() < examEndDate) setShowExamModal(true);
     }, []);
 
     const handleFileSelect = useCallback((content: string, name: string) => {
@@ -347,7 +346,7 @@ export default function App() {
 
     return (
         <div className="min-h-screen text-slate-800 dark:text-slate-200 p-4 sm:p-6 lg:p-8">
-            <ExamCountdownModal isOpen={showExamModal} onClose={() => { localStorage.setItem('seen_exam_countdown_2026_v9', 'true'); setShowExamModal(false); }} />
+            <ExamCountdownModal isOpen={showExamModal} onClose={() => { setShowExamModal(false); }} />
             <div className="max-w-7xl mx-auto">
                 <header className="text-center mb-10">
                     <h1 className="text-4xl sm:text-5xl font-extrabold text-slate-900 dark:text-white">Translator's Toolkit</h1>
@@ -376,7 +375,7 @@ export default function App() {
                         )
                     ) : activeView === 'tracker' ? <IncomeTracker /> : <HelpSection />}
                 </main>
-                <footer className="text-center mt-12 text-xs text-slate-500"><p>Translator's Toolkit v3.9</p></footer>
+                <footer className="text-center mt-12 text-xs text-slate-500"><p>Translator's Toolkit v4.0</p></footer>
             </div>
         </div>
     );
