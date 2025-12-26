@@ -211,33 +211,65 @@ const IncomeTracker: React.FC = () => {
     );
 };
 
-// --- Holiday/Exam Countdown Modal Component ---
+// --- Exam Countdown Modal Component ---
 const ExamCountdownModal = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) => {
-    // Replaced standard exam countdown logic for Christmas version as requested
-    
-    if (!isOpen) return null;
+    const targetDate = useMemo(() => new Date('2026-03-11T00:00:00').getTime(), []);
+    const [timeLeft, setTimeLeft] = useState<{ d: number, h: number, m: number, s: number } | null>(null);
+
+    useEffect(() => {
+        if (!isOpen) return;
+        const timer = setInterval(() => {
+            const now = new Date().getTime();
+            const diff = targetDate - now;
+            if (diff <= 0) { setTimeLeft(null); clearInterval(timer); } 
+            else {
+                setTimeLeft({
+                    d: Math.floor(diff / (1000 * 60 * 60 * 24)),
+                    h: Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)),
+                    m: Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60)),
+                    s: Math.floor((diff % (1000 * 60)) / 1000)
+                });
+            }
+        }, 1000);
+        return () => clearInterval(timer);
+    }, [isOpen, targetDate]);
+
+    if (!isOpen || !timeLeft) return null;
 
     return (
         <div className="fixed inset-0 z-[70] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-md animate-fade-in">
-            <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-2xl max-w-md w-full p-8 border border-red-100 dark:border-red-900/30 relative overflow-hidden text-center transition-all">
+            <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-2xl max-w-md w-full p-8 border border-teal-100 dark:border-teal-900/30 relative overflow-hidden text-center transition-all">
                 
-                {/* Christmas Gradient */}
-                <div className="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-red-500 via-green-500 to-red-500 z-10"></div>
+                <div className="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-teal-400 via-emerald-500 to-teal-400 z-10"></div>
                 
                 <div className="relative z-10 mx-auto w-40 h-40 mb-6">
                     <img 
-                        src="https://media1.giphy.com/media/v1.Y2lkPTc5MGI3NjExemplMXhrNW9xbWtwZ3p0MGZraDJtOXRzZWltcGcweGw2MDV3cXU4ZyZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/3stKGUOv4W779xzuQN/giphy.gif" 
-                        alt="Merry Christmas Snoopy" 
+                        src="https://media4.giphy.com/media/v1.Y2lkPTc5MGI3NjExOXZtcXo2OTM0c3RvcHE4em53YWsya2ExaW5jbnV0enY3OHhid252YyZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/0Rcmxg6VyLlIMo1Cwr/giphy.gif" 
+                        alt="Cute Cheering Cat" 
                         className="w-full h-full object-cover rounded-xl shadow-sm"
                     />
                 </div>
 
-                <h3 className="relative z-10 text-3xl font-bold text-red-600 dark:text-red-400 mb-2 font-serif">Merry X'mas, Thu Thu</h3>
-                <p className="relative z-10 text-slate-600 dark:text-slate-300 text-lg mb-8 italic">"May your Christmas be filled with warmth, love, and laughter"</p>
+                <h3 className="relative z-10 text-2xl font-bold text-slate-900 dark:text-white mb-1">You can do it Pin Pin's Mother</h3>
+                <p className="relative z-10 text-slate-500 dark:text-slate-400 text-sm mb-6 font-medium tracking-wide uppercase">Exam Countdown: March 11, 2026</p>
+
+                <div className="relative z-10 grid grid-cols-4 gap-3 mb-8">
+                    {[
+                        { label: 'Days', val: timeLeft.d },
+                        { label: 'Hrs', val: timeLeft.h },
+                        { label: 'Min', val: timeLeft.m },
+                        { label: 'Sec', val: timeLeft.s }
+                    ].map(t => (
+                        <div key={t.label} className="bg-slate-50 dark:bg-slate-900/50 py-3 rounded-xl border border-slate-100 dark:border-slate-700 shadow-sm backdrop-blur-sm">
+                            <span className="block text-2xl font-bold text-teal-600 dark:text-teal-400 leading-none">{t.val}</span>
+                            <span className="text-[10px] uppercase font-bold text-slate-400 dark:text-slate-500 mt-1">{t.label}</span>
+                        </div>
+                    ))}
+                </div>
 
                 <button
                     onClick={onClose}
-                    className="relative z-10 w-full py-3 px-6 text-white bg-rose-600 font-bold rounded-xl hover:bg-rose-700 transition-colors shadow-md active:scale-[0.98]"
+                    className="relative z-10 w-full py-3 px-6 text-white bg-teal-600 font-bold rounded-xl hover:bg-teal-700 transition-colors shadow-md active:scale-[0.98]"
                 >
                     Okay
                 </button>
@@ -297,9 +329,8 @@ export default function App() {
     const [showExamModal, setShowExamModal] = useState(false);
 
     useEffect(() => {
-        // Show the Christmas/Exam modal
-        // Logic modified to always show for now as per "only for tomorrow" request to replace it
-        setShowExamModal(true);
+        const examEndDate = new Date('2026-03-17T23:59:59');
+        if (new Date() < examEndDate) setShowExamModal(true);
     }, []);
 
     const handleFileSelect = useCallback((content: string, name: string) => {
@@ -350,7 +381,7 @@ export default function App() {
                         )
                     ) : activeView === 'tracker' ? <IncomeTracker /> : <HelpSection />}
                 </main>
-                <footer className="text-center mt-12 text-xs text-slate-500"><p>Translator's Toolkit v4.2 (Xmas Edition)</p></footer>
+                <footer className="text-center mt-12 text-xs text-slate-500"><p>Translator's Toolkit v4.3</p></footer>
             </div>
         </div>
     );
