@@ -27,12 +27,6 @@ const PlusIcon = () => (
     </svg>
 );
 
-const HelpIcon = ({ className = "h-6 w-6" }: { className?: string }) => (
-    <svg xmlns="http://www.w3.org/2000/svg" className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-        <path strokeLinecap="round" strokeLinejoin="round" d="M18.364 5.636l-3.536 3.536m0 5.656l3.536 3.536M9.172 9.172L5.636 5.636m3.536 9.192l-3.536 3.536M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-5 0a4 4 0 11-8 0 4 4 0 018 0z" />
-    </svg>
-);
-
 const LoadingSpinner = () => (
     <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
         <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
@@ -278,46 +272,10 @@ const ExamCountdownModal = ({ isOpen, onClose }: { isOpen: boolean; onClose: () 
     );
 };
 
-const HelpSection: React.FC = () => {
-    const [subject, setSubject] = useState('');
-    const [body, setBody] = useState('');
-    const [status, setStatus] = useState<'idle' | 'sending' | 'success' | 'error'>('idle');
-    const VPN_KEY = "ss://YWVzLTI1Ni1nY206V0JBRFBJT2k5akAxMzkuMTgwLjIxNS4yMDE6MzYyMzA#Kev";
-
-    const handleSend = async (e: React.FormEvent) => {
-        e.preventDefault(); setStatus('sending');
-        const formData = new FormData();
-        formData.append("_subject", subject); formData.append("message", body);
-        try {
-            const resp = await fetch("https://formsubmit.co/kaungce@gmail.com", { method: "POST", body: formData });
-            if (resp.ok) { setStatus('success'); setSubject(''); setBody(''); } else setStatus('error');
-        } catch (e) { setStatus('error'); }
-    };
-
-    return (
-        <div className="max-w-2xl mx-auto space-y-6">
-            <div className="bg-white dark:bg-slate-800 p-8 rounded-xl shadow-lg border border-slate-200 dark:border-slate-700">
-                <h2 className="text-2xl font-bold mb-6">Help Center</h2>
-                <div className="bg-indigo-50 dark:bg-indigo-900/20 p-5 rounded-xl mb-8 border border-indigo-200 dark:border-indigo-800">
-                    <p className="font-bold text-sm mb-2">VPN Access Key</p>
-                    <code className="block p-3 bg-white dark:bg-slate-950 rounded border text-[10px] break-all">{VPN_KEY}</code>
-                    <button onClick={() => navigator.clipboard.writeText(VPN_KEY)} className="mt-2 text-xs text-sky-600 font-bold">Copy Key</button>
-                </div>
-                <form onSubmit={handleSend} className="space-y-4">
-                    <input type="text" value={subject} onChange={e => setSubject(e.target.value)} placeholder="Subject" className="w-full px-4 py-2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg" required />
-                    <textarea value={body} onChange={e => setBody(e.target.value)} placeholder="Message" rows={4} className="w-full px-4 py-2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg" required />
-                    <button type="submit" disabled={status === 'sending'} className="w-full py-3 bg-sky-600 text-white font-bold rounded-lg">{status === 'sending' ? 'Sending...' : 'Send Message'}</button>
-                    {status === 'success' && <p className="text-green-600 text-sm text-center">Sent successfully!</p>}
-                </form>
-            </div>
-        </div>
-    );
-};
-
 // --- Main Application ---
 export default function App() {
     type AppState = 'idle' | 'preview';
-    type AppView = 'cleaner' | 'tracker' | 'help';
+    type AppView = 'cleaner' | 'tracker';
     const [appState, setAppState] = useState<AppState>('idle');
     const [activeView, setActiveView] = useState<AppView>('cleaner');
     const [originalContent, setOriginalContent] = useState<string | null>(null);
@@ -357,9 +315,9 @@ export default function App() {
                 <header className="text-center mb-10">
                     <h1 className="text-4xl sm:text-5xl font-extrabold text-slate-900 dark:text-white">Translator's Toolkit</h1>
                     <div className="mt-6 flex justify-center gap-2 p-1 bg-slate-200/50 dark:bg-slate-800/50 rounded-lg max-w-lg mx-auto">
-                        {['cleaner', 'tracker', 'help'].map((view) => (
+                        {['cleaner', 'tracker'].map((view) => (
                             <button key={view} onClick={() => setActiveView(view as AppView)} className={`flex-1 px-3 py-2 text-sm font-semibold rounded-md transition-all ${activeView === view ? "bg-white dark:bg-slate-900 text-sky-600 shadow-sm" : "text-slate-600 dark:text-slate-300 hover:bg-white/50"}`}>
-                                {view === 'cleaner' ? '🎬 Cleaner' : view === 'tracker' ? '💰 Tracker' : '🎯 Help'}
+                                {view === 'cleaner' ? '🎬 Cleaner' : '💰 Tracker'}
                             </button>
                         ))}
                     </div>
@@ -379,9 +337,9 @@ export default function App() {
                                 <Preview originalContent={originalContent} cleanedContent={cleanedContent} summary={summary} foreignReport={foreignReport} />
                             </div>
                         )
-                    ) : activeView === 'tracker' ? <IncomeTracker /> : <HelpSection />}
+                    ) : <IncomeTracker />}
                 </main>
-                <footer className="text-center mt-12 text-xs text-slate-500"><p>Translator's Toolkit v4.3</p></footer>
+                <footer className="text-center mt-12 text-xs text-slate-500"><p>Translator's Toolkit v4.4</p></footer>
             </div>
         </div>
     );
