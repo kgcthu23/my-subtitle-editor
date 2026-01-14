@@ -21,19 +21,6 @@ const WarningIcon = () => (
     </svg>
 );
 
-const PlusIcon = () => (
-    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor">
-        <path fillRule="evenodd" d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z" clipRule="evenodd" />
-    </svg>
-);
-
-const LoadingSpinner = () => (
-    <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-    </svg>
-);
-
 // --- Child Components ---
 
 const FileUpload: React.FC<{ onFileSelect: (content: string, fileName: string) => void; disabled: boolean }> = ({ onFileSelect, disabled }) => {
@@ -205,73 +192,6 @@ const IncomeTracker: React.FC = () => {
     );
 };
 
-// --- Exam Countdown Modal Component ---
-const ExamCountdownModal = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) => {
-    const targetDate = useMemo(() => new Date('2026-03-11T00:00:00').getTime(), []);
-    const [timeLeft, setTimeLeft] = useState<{ d: number, h: number, m: number, s: number } | null>(null);
-
-    useEffect(() => {
-        if (!isOpen) return;
-        const timer = setInterval(() => {
-            const now = new Date().getTime();
-            const diff = targetDate - now;
-            if (diff <= 0) { setTimeLeft(null); clearInterval(timer); } 
-            else {
-                setTimeLeft({
-                    d: Math.floor(diff / (1000 * 60 * 60 * 24)),
-                    h: Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)),
-                    m: Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60)),
-                    s: Math.floor((diff % (1000 * 60)) / 1000)
-                });
-            }
-        }, 1000);
-        return () => clearInterval(timer);
-    }, [isOpen, targetDate]);
-
-    if (!isOpen || !timeLeft) return null;
-
-    return (
-        <div className="fixed inset-0 z-[70] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-md animate-fade-in">
-            <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-2xl max-w-md w-full p-8 border border-teal-100 dark:border-teal-900/30 relative overflow-hidden text-center transition-all">
-                
-                <div className="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-teal-400 via-emerald-500 to-teal-400 z-10"></div>
-                
-                <div className="relative z-10 mx-auto w-40 h-40 mb-6">
-                    <img 
-                        src="https://media4.giphy.com/media/v1.Y2lkPTc5MGI3NjExOXZtcXo2OTM0c3RvcHE4em53YWsya2ExaW5jbnV0enY3OHhid252YyZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/0Rcmxg6VyLlIMo1Cwr/giphy.gif" 
-                        alt="Cute Cheering Cat" 
-                        className="w-full h-full object-cover rounded-xl shadow-sm"
-                    />
-                </div>
-
-                <h3 className="relative z-10 text-2xl font-bold text-slate-900 dark:text-white mb-1">You can do it Pin Pin's Mother</h3>
-                <p className="relative z-10 text-slate-500 dark:text-slate-400 text-sm mb-6 font-medium tracking-wide uppercase">Exam Countdown: March 11, 2026</p>
-
-                <div className="relative z-10 grid grid-cols-4 gap-3 mb-8">
-                    {[
-                        { label: 'Days', val: timeLeft.d },
-                        { label: 'Hrs', val: timeLeft.h },
-                        { label: 'Min', val: timeLeft.m },
-                        { label: 'Sec', val: timeLeft.s }
-                    ].map(t => (
-                        <div key={t.label} className="bg-slate-50 dark:bg-slate-900/50 py-3 rounded-xl border border-slate-100 dark:border-slate-700 shadow-sm backdrop-blur-sm">
-                            <span className="block text-2xl font-bold text-teal-600 dark:text-teal-400 leading-none">{t.val}</span>
-                            <span className="text-[10px] uppercase font-bold text-slate-400 dark:text-slate-500 mt-1">{t.label}</span>
-                        </div>
-                    ))}
-                </div>
-
-                <button
-                    onClick={onClose}
-                    className="relative z-10 w-full py-3 px-6 text-white bg-teal-600 font-bold rounded-xl hover:bg-teal-700 transition-colors shadow-md active:scale-[0.98]"
-                >
-                    Okay
-                </button>
-            </div>
-        </div>
-    );
-};
-
 // --- Main Application ---
 export default function App() {
     type AppState = 'idle' | 'preview';
@@ -283,13 +203,6 @@ export default function App() {
     const [fileName, setFileName] = useState<string>('cleaned.srt');
     const [summary, setSummary] = useState<ChangeSummary | null>(null);
     const [foreignReport, setForeignReport] = useState<ForeignLanguageReport | null>(null);
-
-    const [showExamModal, setShowExamModal] = useState(false);
-
-    useEffect(() => {
-        const examEndDate = new Date('2026-03-17T23:59:59');
-        if (new Date() < examEndDate) setShowExamModal(true);
-    }, []);
 
     const handleFileSelect = useCallback((content: string, name: string) => {
         setOriginalContent(content);
@@ -310,37 +223,46 @@ export default function App() {
 
     return (
         <div className="min-h-screen text-slate-800 dark:text-slate-200 p-4 sm:p-6 lg:p-8">
-            <ExamCountdownModal isOpen={showExamModal} onClose={() => { setShowExamModal(false); }} />
             <div className="max-w-7xl mx-auto">
                 <header className="text-center mb-10">
                     <h1 className="text-4xl sm:text-5xl font-extrabold text-slate-900 dark:text-white">Translator's Toolkit</h1>
-                    <div className="mt-6 flex justify-center gap-2 p-1 bg-slate-200/50 dark:bg-slate-800/50 rounded-lg max-w-lg mx-auto">
-                        {['cleaner', 'tracker'].map((view) => (
-                            <button key={view} onClick={() => setActiveView(view as AppView)} className={`flex-1 px-3 py-2 text-sm font-semibold rounded-md transition-all ${activeView === view ? "bg-white dark:bg-slate-900 text-sky-600 shadow-sm" : "text-slate-600 dark:text-slate-300 hover:bg-white/50"}`}>
-                                {view === 'cleaner' ? '🎬 Cleaner' : '💰 Tracker'}
+                    <div className="mt-6 flex justify-center gap-2 p-1 bg-slate-200/50 dark:bg-slate-800/50 rounded-lg max-w-sm mx-auto shadow-inner">
+                        {(['cleaner', 'tracker'] as AppView[]).map((view) => (
+                            <button 
+                                key={view} 
+                                onClick={() => setActiveView(view)} 
+                                className={`flex-1 px-3 py-2 text-sm font-semibold rounded-md transition-all flex items-center justify-center ${activeView === view ? "bg-white dark:bg-slate-900 text-sky-600 shadow-sm" : "text-slate-600 dark:text-slate-300 hover:bg-white/50"}`}
+                            >
+                                {view === 'cleaner' && '🎬 Cleaner'}
+                                {view === 'tracker' && '💰 Tracker'}
                             </button>
                         ))}
                     </div>
                 </header>
                 <main>
-                    {activeView === 'cleaner' ? (
+                    {activeView === 'cleaner' && (
                         appState === 'idle' ? <FileUpload onFileSelect={handleFileSelect} disabled={false} /> :
                         originalContent && cleanedContent && summary && foreignReport && (
-                            <div className="space-y-8">
+                            <div className="space-y-8 animate-fade-in">
                                 <div className="bg-white/80 dark:bg-slate-800/50 backdrop-blur-sm p-6 rounded-xl shadow-lg border border-slate-200 dark:border-slate-700 sticky top-4 z-10 flex flex-col sm:flex-row justify-between items-center gap-4">
                                     <h2 className="text-xl font-bold">Review Changes</h2>
                                     <div className="flex gap-3">
                                         <button onClick={() => setAppState('idle')} className="px-4 py-2 text-sm font-semibold bg-slate-200 dark:bg-slate-700 rounded-md">Clean Another</button>
-                                        <button onClick={handleDownload} className="px-5 py-2 text-sm font-semibold text-white bg-sky-600 rounded-md hover:bg-sky-700 shadow-md">Download Cleaned</button>
+                                        <button onClick={handleDownload} className="px-5 py-2 text-sm font-semibold text-white bg-sky-600 rounded-md hover:bg-sky-700 shadow-md flex items-center"><DownloadIcon /> Download</button>
                                     </div>
                                 </div>
                                 <Preview originalContent={originalContent} cleanedContent={cleanedContent} summary={summary} foreignReport={foreignReport} />
                             </div>
                         )
-                    ) : <IncomeTracker />}
+                    )}
+                    {activeView === 'tracker' && <IncomeTracker />}
                 </main>
-                <footer className="text-center mt-12 text-xs text-slate-500"><p>Translator's Toolkit v4.4</p></footer>
+                <footer className="text-center mt-12 text-xs text-slate-500"><p>Translator's Toolkit v4.6</p></footer>
             </div>
+            <style>{`
+                @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+                .animate-fade-in { animation: fadeIn 0.4s ease-out forwards; }
+            `}</style>
         </div>
     );
 }

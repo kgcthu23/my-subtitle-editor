@@ -43,37 +43,56 @@ const fixSrtFormat = (content: string): { fixedContent: string, count: number } 
     while (i < lines.length) {
         const line = lines[i].trim();
         
-        // Case 1: number, timestamp, and text are on the same line
+        // Helper to check if we need to insert a separator before a new block.
+        // This prevents "stacking" by ensuring there is at least one blank line 
+        // before a new number block starts (unless it's the very first line).
+        const ensureBlockSeparator = () => {
+             if (formattedLines.length > 0 && formattedLines[formattedLines.length - 1] !== '') {
+                 formattedLines.push('');
+             }
+        };
+
+        // Case 1: number, timestamp, and text are on the same line (Merged Line)
         const fullMatch = line.match(/^(\d+)\s+((?:\d{2}:){2}\d{2},\d{3}\s*-->\s*(?:\d{2}:){2}\d{2},\d{3})\s*(.*)$/);
         if (fullMatch) {
+            ensureBlockSeparator();
             fixesCount++;
             const [, num, timestamp, text] = fullMatch;
             formattedLines.push(num, timestamp.trim());
             if (text.trim()) formattedLines.push(text.trim());
-            formattedLines.push('');
             i++;
             continue;
         }
 
-        // Case 2: line is a number, and the next line contains both timestamp and text
+        // Case 2: line is a number, and the next line contains timestamp
         if (line.match(/^\d+$/) && i + 1 < lines.length) {
             const nextLine = lines[i + 1].trim();
-            const tsTextMatch = nextLine.match(/^((?:\d{2}:){2}\d{2},\d{3}\s*-->\s*(?:\d{2}:){2}\d{2},\d{3})\s*(.*)$/);
-            if(tsTextMatch) {
-                fixesCount++;
-                const [, timestamp, text] = tsTextMatch;
-                formattedLines.push(line, timestamp.trim());
-                if (text.trim()) formattedLines.push(text.trim());
-                formattedLines.push('');
+            const tsMatch = nextLine.match(/^((?:\d{2}:){2}\d{2},\d{3}\s*-->\s*(?:\d{2}:){2}\d{2},\d{3})\s*(.*)$/);
+            if(tsMatch) {
+                ensureBlockSeparator();
+                
+                const [, timestamp, text] = tsMatch;
+                
+                if (text.trim()) {
+                    // Text is on the timestamp line - this is a fix
+                    fixesCount++;
+                    formattedLines.push(line, timestamp.trim(), text.trim());
+                } else {
+                    // Standard format: Number \n Timestamp
+                    formattedLines.push(line, timestamp.trim());
+                }
+
                 i += 2;
                 continue;
             }
         }
         
-        formattedLines.push(lines[i]);
+        // Push the line (trimmed to avoid whitespace issues)
+        formattedLines.push(line);
         i++;
     }
     
+    // Join with newlines and normalize multiple blank lines to a single blank line
     const fixedContent = formattedLines.join('\n').replace(/(\r\n|\n|\r){3,}/g, '\n\n').trim();
     return { fixedContent, count: fixesCount };
 };
@@ -127,6 +146,26 @@ export const cleanSrtContent = (content: string): string => {
     
     // 7. Remove lines containing ONLY hyphens
     cleaned = cleaned.replace(/^[-\s]*$/gm, '');
+
+    // 7.5. Safety: Remove empty lines immediately following a timestamp
+    // This fixes issues where a blank line is improperly inserted between timestamp and text
+    const lines = cleaned.split('\n');
+    const compactLines: string[] = [];
+    for (let i = 0; i < lines.length; i++) {
+        const currentLine = lines[i];
+        const prevLine = i > 0 ? lines[i-1] : '';
+        
+        // If current line is empty (or whitespace only)
+        if (!currentLine.trim()) {
+            // Check if previous line was a timestamp
+            if (prevLine.includes('-->')) {
+                // Skip this empty line
+                continue;
+            }
+        }
+        compactLines.push(currentLine);
+    }
+    cleaned = compactLines.join('\n');
 
     // 8. Final cleanup of multiple empty lines
     cleaned = cleaned.replace(/\n\s*\n/g, '\n\n');
