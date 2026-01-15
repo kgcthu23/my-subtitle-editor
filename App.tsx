@@ -198,7 +198,7 @@ const Guide: React.FC = () => {
              {/* New Intro Text */}
              <div className="bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-lg p-4 text-center">
                 <p className="text-slate-600 dark:text-slate-400 text-sm font-medium italic">
-                    "I'm doing a bare minimum to make sure this section has all the resources and error fixing techniques you might need."
+                    "I'm just doing a bare minimum."
                 </p>
              </div>
 
