@@ -193,13 +193,82 @@ const IncomeTracker: React.FC = () => {
 };
 
 const Guide: React.FC = () => {
+    const [copied, setCopied] = useState(false);
+    const outlineKey = "ss://Y2hhY2hhMjAtaWV0Zi1wb2x5MTMwNTpYQXJBZ0RWTEY4MkhWMzBaMDdReDNs@194.56.225.72:36763/?outline=1#Feb 19 𝙆𝙚𝙮";
+
+    const handleCopy = () => {
+        navigator.clipboard.writeText(outlineKey);
+        setCopied(true);
+        setTimeout(() => setCopied(false), 2000);
+    };
+
     return (
         <div className="max-w-4xl mx-auto space-y-8 animate-fade-in">
-             {/* New Intro Text */}
+             {/* Intro Text */}
              <div className="bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-lg p-4 text-center">
                 <p className="text-slate-600 dark:text-slate-400 text-sm font-medium italic">
-                    "I'm just doing a bare minimum."
+                    "This guide includes vpn recommendation, error fixing and apps recommendation"
                 </p>
+             </div>
+
+             {/* VPN Section - Moved to Top */}
+             <div className="bg-white dark:bg-slate-800 p-6 sm:p-8 rounded-xl shadow-lg border border-slate-200 dark:border-slate-700 relative overflow-hidden">
+                <div className="absolute top-0 right-0 p-4 opacity-10">
+                    <svg className="w-32 h-32" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/></svg>
+                </div>
+                
+                <h2 className="text-2xl font-bold mb-6 text-slate-800 dark:text-white flex items-center relative z-10">
+                    <span className="bg-orange-100 dark:bg-orange-900/30 text-orange-600 dark:text-orange-400 p-2 rounded-lg mr-3">
+                         <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11.536 9.464 9.536 11.464 7.464 9.464M6.343 11.657A8 8 0 1018.657 5.657L6.343 11.657z" /></svg>
+                    </span>
+                    VPN Access
+                </h2>
+
+                <div className="relative z-10 space-y-6">
+                    {/* Outline Key Section */}
+                    <div className="bg-slate-50 dark:bg-slate-900/50 p-5 rounded-xl border border-slate-200 dark:border-slate-700">
+                         <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-3 gap-2">
+                            <div className="flex items-center gap-2">
+                                <h3 className="font-bold text-slate-700 dark:text-slate-200">Outline VPN Key</h3>
+                                <span className="text-xs font-mono bg-sky-100 text-sky-700 dark:bg-sky-900 dark:text-sky-300 px-2 py-1 rounded">Feb 19 Update</span>
+                            </div>
+                             <div className="text-xs text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-900/20 px-2 py-1 rounded border border-amber-100 dark:border-amber-800/30 flex items-center">
+                                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" viewBox="0 0 20 20" fill="currentColor">
+                                    <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
+                                </svg>
+                                <span>Note: Remove non-working keys first. Valid for 1 month only.</span>
+                            </div>
+                        </div>
+                        <div className="flex gap-2">
+                            <code className="flex-1 bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-lg p-3 text-xs sm:text-sm font-mono text-slate-500 break-all h-24 overflow-y-auto select-all">
+                                {outlineKey}
+                            </code>
+                            <button 
+                                onClick={handleCopy}
+                                className={`flex flex-col items-center justify-center px-4 rounded-lg font-bold text-sm transition-all duration-200 border ${copied ? 'bg-green-50 border-green-200 text-green-600' : 'bg-white hover:bg-slate-50 border-slate-200 text-slate-600'}`}
+                            >
+                                {copied ? (
+                                    <>
+                                        <svg className="w-5 h-5 mb-1" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" /></svg>
+                                        Copied
+                                    </>
+                                ) : (
+                                    <>
+                                        <svg className="w-5 h-5 mb-1" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3" /></svg>
+                                        Copy
+                                    </>
+                                )}
+                            </button>
+                        </div>
+                    </div>
+
+                    {/* X-VPN Section */}
+                    <div className="text-sm text-slate-600 dark:text-slate-400 bg-orange-50 dark:bg-orange-900/10 p-4 rounded-lg border border-orange-100 dark:border-orange-800/30">
+                        <p>
+                            <span className="font-bold text-orange-700 dark:text-orange-400">Alternative:</span> If you don't get access to Outline VPN, you can try X-VPN which you likely already have installed. If not, <a href="https://drive.google.com/drive/folders/16j0H2tw4-xbK2Vb9VAzqzmZa9Edxprju" target="_blank" rel="noopener noreferrer" className="text-sky-600 dark:text-sky-400 font-bold hover:underline decoration-2 underline-offset-2">click here to download</a>.
+                        </p>
+                    </div>
+                </div>
              </div>
 
              <div className="bg-gradient-to-r from-sky-500 to-indigo-600 rounded-xl p-6 text-white shadow-lg">
@@ -408,7 +477,7 @@ export default function App() {
                     {activeView === 'tracker' && <IncomeTracker />}
                     {activeView === 'guide' && <Guide />}
                 </main>
-                <footer className="text-center mt-12 text-xs text-slate-500"><p>Translator's Toolkit final update 14.01.2026</p></footer>
+                <footer className="text-center mt-12 text-xs text-slate-500"><p>Translator's Toolkit update {new Date().toLocaleDateString('en-GB').replace(/\//g, '.')}</p></footer>
             </div>
             <style>{`
                 @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
