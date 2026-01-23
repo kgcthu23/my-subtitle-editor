@@ -477,7 +477,7 @@ export default function App() {
                     {activeView === 'tracker' && <IncomeTracker />}
                     {activeView === 'guide' && <Guide />}
                 </main>
-                <footer className="text-center mt-12 text-xs text-slate-500"><p>Translator's Toolkit update {new Date().toLocaleDateString('en-GB').replace(/\//g, '.')}</p></footer>
+                <footer className="text-center mt-12 text-xs text-slate-500"><p>Translator's Toolkit update 23.01.2026</p></footer>
             </div>
             <style>{`
                 @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
