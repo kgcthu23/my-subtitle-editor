@@ -204,6 +204,30 @@ const Guide: React.FC = () => {
 
     return (
         <div className="max-w-4xl mx-auto space-y-8 animate-fade-in">
+             {/* Useful Resources - Now at the Top */}
+            <div className="bg-white dark:bg-slate-800 p-8 rounded-xl shadow-lg border border-slate-200 dark:border-slate-700">
+                <h2 className="text-2xl font-bold mb-6 text-slate-800 dark:text-white flex items-center">
+                    <span className="bg-indigo-100 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 p-2 rounded-lg mr-3">
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
+                        </svg>
+                    </span>
+                    Useful Resources
+                </h2>
+
+                <div className="grid gap-6">
+                    <a href="https://drive.google.com/drive/u/1/folders/16j0H2tw4-xbK2Vb9VAzqzmZa9Edxprju" target="_blank" rel="noopener noreferrer" className="flex items-center p-4 bg-pink-50 dark:bg-pink-900/20 rounded-lg hover:bg-pink-100 dark:hover:bg-pink-900/40 transition-colors group">
+                        <div className="bg-pink-500 text-white p-2 rounded-full mr-4">
+                            <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z" /><path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z" /></svg>
+                        </div>
+                        <div>
+                            <h3 className="font-bold text-slate-800 dark:text-white group-hover:text-pink-600 dark:group-hover:text-pink-400">Click to access</h3>
+                            <p className="text-xs text-slate-500 dark:text-slate-400">View on Google Drive</p>
+                        </div>
+                    </a>
+                </div>
+            </div>
+
              {/* Intro Text */}
              <div className="bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-lg p-4 text-center">
                 <p className="text-slate-600 dark:text-slate-400 text-sm font-medium italic">
@@ -211,7 +235,7 @@ const Guide: React.FC = () => {
                 </p>
              </div>
 
-             {/* VPN Section - Moved to Top */}
+             {/* VPN Section */}
              <div className="bg-white dark:bg-slate-800 p-6 sm:p-8 rounded-xl shadow-lg border border-slate-200 dark:border-slate-700 relative overflow-hidden">
                 <div className="absolute top-0 right-0 p-4 opacity-10">
                     <svg className="w-32 h-32" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/></svg>
@@ -381,45 +405,6 @@ const Guide: React.FC = () => {
                             </div>
                         </div>
                     </div>
-                </div>
-            </div>
-
-            {/* Resources Section */}
-            <div className="bg-white dark:bg-slate-800 p-8 rounded-xl shadow-lg border border-slate-200 dark:border-slate-700">
-                <h2 className="text-2xl font-bold mb-6 text-slate-800 dark:text-white flex items-center">
-                    <span className="bg-indigo-100 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 p-2 rounded-lg mr-3">
-                        <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
-                        </svg>
-                    </span>
-                    Useful Resources
-                </h2>
-
-                <div className="grid gap-6">
-                    <a href="https://transwithme.org/" target="_blank" rel="noopener noreferrer" className="group block bg-slate-50 dark:bg-slate-900/50 p-6 rounded-xl border border-slate-200 dark:border-slate-700 hover:border-indigo-400 dark:hover:border-indigo-500 transition-colors">
-                        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-3">
-                            <h3 className="text-lg font-bold text-slate-800 dark:text-white group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">TransWithMe</h3>
-                            <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-indigo-100 text-indigo-800 dark:bg-indigo-900 dark:text-indigo-200 mt-2 sm:mt-0">
-                                Recommended App
-                            </span>
-                        </div>
-                        <p className="text-slate-600 dark:text-slate-300 text-sm leading-relaxed mb-3">
-                            Check this app out! It is currently not available on the Play Store, but you can download it directly from their website. While it is still under development (translating one line at a time), it has great potential to be a powerful tool in the future.
-                        </p>
-                        <span className="text-indigo-600 dark:text-indigo-400 text-sm font-medium flex items-center">
-                            Visit Website &rarr;
-                        </span>
-                    </a>
-
-                    <a href="https://www.facebook.com/profile.php?id=61585680184834" target="_blank" rel="noopener noreferrer" className="flex items-center p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg hover:bg-blue-100 dark:hover:bg-blue-900/40 transition-colors group">
-                        <div className="bg-blue-500 text-white p-2 rounded-full mr-4">
-                            <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
-                        </div>
-                        <div>
-                            <h3 className="font-bold text-slate-800 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400">Follow on Facebook</h3>
-                            <p className="text-xs text-slate-500 dark:text-slate-400">Get updates and join the community</p>
-                        </div>
-                    </a>
                 </div>
             </div>
         </div>
