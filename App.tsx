@@ -23,33 +23,6 @@ const WarningIcon = () => (
 
 // --- Child Components ---
 
-const UpdateModal: React.FC<{ isOpen: boolean; onClose: () => void }> = ({ isOpen, onClose }) => {
-    if (!isOpen) return null;
-    return (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-in fade-in duration-300">
-            <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-2xl max-w-sm w-full p-8 border border-slate-200 dark:border-slate-700 transform animate-in zoom-in-95 duration-300">
-                <div className="flex flex-col items-center text-center">
-                    <div className="bg-sky-100 dark:bg-sky-900/30 p-4 rounded-full mb-6">
-                        <svg xmlns="http://www.w3.org/2000/svg" className="h-10 w-10 text-sky-600 dark:text-sky-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
-                        </svg>
-                    </div>
-                    <h2 className="text-2xl font-black text-slate-900 dark:text-white mb-3">Notice</h2>
-                    <p className="text-slate-600 dark:text-slate-400 font-medium mb-8 leading-relaxed">
-                        This website was updated.
-                    </p>
-                    <button 
-                        onClick={onClose}
-                        className="w-full py-3 bg-sky-600 hover:bg-sky-700 text-white font-bold rounded-xl shadow-lg shadow-sky-500/30 transition-all duration-200 active:scale-95"
-                    >
-                        Got it!
-                    </button>
-                </div>
-            </div>
-        </div>
-    );
-};
-
 const FileUpload: React.FC<{ onFileSelect: (content: string, fileName: string) => void; disabled: boolean }> = ({ onFileSelect, disabled }) => {
     const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         const file = event.target.files?.[0];
@@ -87,7 +60,7 @@ const Preview: React.FC<{ originalContent: string; cleanedContent: string; summa
                 </div>
                 <div className="bg-white dark:bg-slate-800 p-4 rounded-lg shadow-md">
                     <h3 className="text-lg font-bold text-green-600 dark:text-green-400 mb-2 border-b border-slate-200 dark:border-slate-700 pb-2">Cleaned</h3>
-                    <pre className="text-xs text-green-700 dark:text-green-300 overflow-x-auto p-2 bg-green-50 dark:bg-green-900/20 rounded-md">
+                    <pre className="text-xs text-green-700 text-green-600 dark:text-green-300 overflow-x-auto p-2 bg-green-50 dark:bg-green-900/20 rounded-md">
                         {cleanedLines.map((line, i) => <div key={i}>{line || '[EMPTY LINE]'}</div>)}
                     </pre>
                 </div>
@@ -220,14 +193,15 @@ const IncomeTracker: React.FC = () => {
 };
 
 const Guide: React.FC = () => {
-    const [copied, setCopied] = useState(false);
-    const hiddifyKey = "vless://897b11cf-aa86-4fa0-9a6b-87d6c2a3cc5a@my.edumailme.com:443?alpn=h2%2Chttp%2F1.1&encryption=none&fp=chrome&host=my.edumailme.com&path=%2Fxray&security=tls&sni=my.edumailme.com&type=ws#SINGAPORE-50.00GB%F0%9F%93%8A-30D%E2%8F%B3";
+    const [copiedId, setCopiedId] = useState<string | null>(null);
+    const hiddifyKeyVless = "vless://897b11cf-aa86-4fa0-9a6b-87d6c2a3cc5a@my.edumailme.com:443?alpn=h2%2Chttp%2F1.1&encryption=none&fp=chrome&host=my.edumailme.com&path=%2Fxray&security=tls&sni=my.edumailme.com&type=ws#SINGAPORE-50.00GB%F0%9F%93%8A-30D%E2%8F%B3";
+    const hiddifyKeyVmess = "vmess://ewogICJhZGQiOiAibXkuZWR1bWFpbG1lLmNvbSIsCiAgImFsbG93SW5zZWN1cmUiOiBmYWxzZSwKICAiYWxwbiI6ICJoMixodHRwLzEuMSIsCiAgImZwIjogImNocm9tZSIsCiAgImhvc3QiOiAibXkuZWR1bWFpbG1lLmNvbSIsCiAgImlkIjogImRiYjNjNTUxLTFkNGQtNGRhMC1hNGFkLTQxYWU2NjY1ZjFlOCIsCiAgIm5ldCI6ICJ3cyIsCiAgInBhdGgiOiAiL3hyYXkiLAogICJwb3J0IjogMjA4MywKICAicHMiOiAiU0lOR0FQT1JFLTUwLjAwR0Lwn5OKLTMwROKPsyIsCiAgInNjeSI6ICJhdXRvIiwKICAic25pIjogIm15LmVkdW1haWxtZS5jb20iLAogICJ0bHMiOiAidGxzIiwKICAidHlwZSI6ICJub25lIiwKICAidiI6ICIyIgp9";
     const driveLink = "https://drive.google.com/drive/u/0/folders/16j0H2tw4-xbK2Vb9VAzqzmZa9Edxprju";
 
-    const handleCopy = () => {
-        navigator.clipboard.writeText(hiddifyKey);
-        setCopied(true);
-        setTimeout(() => setCopied(false), 2000);
+    const handleCopy = (text: string, id: string) => {
+        navigator.clipboard.writeText(text);
+        setCopiedId(id);
+        setTimeout(() => setCopiedId(null), 2000);
     };
 
     return (
@@ -308,25 +282,55 @@ const Guide: React.FC = () => {
                     <div className="bg-slate-50 dark:bg-slate-900/50 p-5 rounded-xl border border-slate-200 dark:border-slate-700">
                          <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-3 gap-2">
                             <div className="flex items-center gap-2">
-                                <h3 className="font-bold text-slate-700 dark:text-slate-200">Hiddify Key (VLESS)</h3>
+                                <h3 className="font-bold text-slate-700 dark:text-slate-200">Hiddify Key 1 (VLESS)</h3>
                                 <span className="text-xs font-mono bg-violet-100 text-violet-700 dark:bg-violet-900 dark:text-violet-300 px-2 py-1 rounded">Latest Update</span>
                             </div>
                              <div className="text-xs text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-900/20 px-2 py-1 rounded border border-amber-100 dark:border-amber-800/30 flex items-center">
                                 <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" viewBox="0 0 20 20" fill="currentColor">
                                     <path fillRule="evenodd" d="M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25zM12.75 6a.75.75 0 00-1.5 0v6c0 .414.336.75.75.75h4.5a.75.75 0 000-1.5h-3.75V6z" clipRule="evenodd" />
                                 </svg>
-                                <span>Valid for 1 month. Regularly refreshed.</span>
+                                <span>Refreshed: 2026-01-28</span>
                             </div>
                         </div>
                         <div className="flex gap-2">
                             <code className="flex-1 bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-lg p-3 text-xs sm:text-sm font-mono text-slate-500 break-all h-24 overflow-y-auto select-all leading-relaxed">
-                                {hiddifyKey}
+                                {hiddifyKeyVless}
                             </code>
                             <button 
-                                onClick={handleCopy}
-                                className={`flex flex-col items-center justify-center px-4 rounded-lg font-bold text-sm transition-all duration-200 border min-w-[100px] ${copied ? 'bg-green-50 border-green-200 text-green-600' : 'bg-white hover:bg-slate-50 border-slate-200 text-slate-600'}`}
+                                onClick={() => handleCopy(hiddifyKeyVless, 'vless')}
+                                className={`flex flex-col items-center justify-center px-4 rounded-lg font-bold text-sm transition-all duration-200 border min-w-[100px] ${copiedId === 'vless' ? 'bg-green-50 border-green-200 text-green-600' : 'bg-white hover:bg-slate-50 border-slate-200 text-slate-600'}`}
                             >
-                                {copied ? (
+                                {copiedId === 'vless' ? (
+                                    <>
+                                        <svg className="w-5 h-5 mb-1" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" /></svg>
+                                        Copied
+                                    </>
+                                ) : (
+                                    <>
+                                        <svg className="w-5 h-5 mb-1" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3" /></svg>
+                                        Copy
+                                    </>
+                                )}
+                            </button>
+                        </div>
+                    </div>
+
+                    <div className="bg-slate-50 dark:bg-slate-900/50 p-5 rounded-xl border border-slate-200 dark:border-slate-700">
+                         <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-3 gap-2">
+                            <div className="flex items-center gap-2">
+                                <h3 className="font-bold text-slate-700 dark:text-slate-200">Hiddify Key 2 (VMESS)</h3>
+                                <span className="text-xs font-mono bg-indigo-100 text-indigo-700 dark:bg-indigo-900 dark:text-indigo-300 px-2 py-1 rounded">Alt Server</span>
+                            </div>
+                        </div>
+                        <div className="flex gap-2">
+                            <code className="flex-1 bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-lg p-3 text-xs sm:text-sm font-mono text-slate-500 break-all h-24 overflow-y-auto select-all leading-relaxed">
+                                {hiddifyKeyVmess}
+                            </code>
+                            <button 
+                                onClick={() => handleCopy(hiddifyKeyVmess, 'vmess')}
+                                className={`flex flex-col items-center justify-center px-4 rounded-lg font-bold text-sm transition-all duration-200 border min-w-[100px] ${copiedId === 'vmess' ? 'bg-green-50 border-green-200 text-green-600' : 'bg-white hover:bg-slate-50 border-slate-200 text-slate-600'}`}
+                            >
+                                {copiedId === 'vmess' ? (
                                     <>
                                         <svg className="w-5 h-5 mb-1" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" /></svg>
                                         Copied
@@ -403,20 +407,6 @@ export default function App() {
     const [fileName, setFileName] = useState<string>('cleaned.srt');
     const [summary, setSummary] = useState<ChangeSummary | null>(null);
     const [foreignReport, setForeignReport] = useState<ForeignLanguageReport | null>(null);
-    const [isUpdateModalOpen, setIsUpdateModalOpen] = useState(false);
-
-    useEffect(() => {
-        // One-time modal logic
-        const hasSeenUpdate = localStorage.getItem('hasSeenUpdate_v1');
-        if (!hasSeenUpdate) {
-            setIsUpdateModalOpen(true);
-        }
-    }, []);
-
-    const closeUpdateModal = () => {
-        setIsUpdateModalOpen(false);
-        localStorage.setItem('hasSeenUpdate_v1', 'true');
-    };
 
     const handleFileSelect = useCallback((content: string, name: string) => {
         setOriginalContent(content);
@@ -437,7 +427,6 @@ export default function App() {
 
     return (
         <div className="min-h-screen text-slate-800 dark:text-slate-200 p-4 sm:p-6 lg:p-8">
-            <UpdateModal isOpen={isUpdateModalOpen} onClose={closeUpdateModal} />
             <div className="max-w-7xl mx-auto">
                 <header className="text-center mb-10">
                     <h1 className="text-4xl sm:text-5xl font-extrabold text-slate-900 dark:text-white">Translator's Toolkit</h1>
