@@ -194,18 +194,18 @@ const IncomeTracker: React.FC = () => {
 
 const Guide: React.FC = () => {
     const [copied, setCopied] = useState(false);
-    const outlineKey = "ss://Y2hhY2hhMjAtaWV0Zi1wb2x5MTMwNTpYQXJBZ0RWTEY4MkhWMzBaMDdReDNs@194.56.225.72:36763/?outline=1#Feb 19 𝙆𝙚𝙮";
+    const hiddifyKey = "vless://897b11cf-aa86-4fa0-9a6b-87d6c2a3cc5a@my.edumailme.com:443?alpn=h2%2Chttp%2F1.1&encryption=none&fp=chrome&host=my.edumailme.com&path=%2Fxray&security=tls&sni=my.edumailme.com&type=ws#SINGAPORE-50.00GB%F0%9F%93%8A-30D%E2%8F%B3";
 
     const handleCopy = () => {
-        navigator.clipboard.writeText(outlineKey);
+        navigator.clipboard.writeText(hiddifyKey);
         setCopied(true);
         setTimeout(() => setCopied(false), 2000);
     };
 
     return (
         <div className="max-w-4xl mx-auto space-y-8 animate-fade-in">
-             {/* Useful Resources - Now at the Top */}
-            <div className="bg-white dark:bg-slate-800 p-8 rounded-xl shadow-lg border border-slate-200 dark:border-slate-700">
+             {/* Useful Resources - TOP Priority */}
+             <div className="bg-white dark:bg-slate-800 p-6 sm:p-8 rounded-xl shadow-lg border border-slate-200 dark:border-slate-700">
                 <h2 className="text-2xl font-bold mb-6 text-slate-800 dark:text-white flex items-center">
                     <span className="bg-indigo-100 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 p-2 rounded-lg mr-3">
                         <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -215,14 +215,14 @@ const Guide: React.FC = () => {
                     Useful Resources
                 </h2>
 
-                <div className="grid gap-6">
-                    <a href="https://drive.google.com/drive/u/1/folders/16j0H2tw4-xbK2Vb9VAzqzmZa9Edxprju" target="_blank" rel="noopener noreferrer" className="flex items-center p-4 bg-pink-50 dark:bg-pink-900/20 rounded-lg hover:bg-pink-100 dark:hover:bg-pink-900/40 transition-colors group">
-                        <div className="bg-pink-500 text-white p-2 rounded-full mr-4">
+                <div className="grid grid-cols-1 gap-4">
+                    <a href="https://drive.google.com/drive/u/1/folders/16j0H2tw4-xbK2Vb9VAzqzmZa9Edxprju" target="_blank" rel="noopener noreferrer" className="flex items-center p-4 bg-pink-50 dark:bg-pink-900/20 rounded-lg hover:bg-pink-100 dark:hover:bg-pink-900/40 transition-all group border border-pink-100/50 dark:border-pink-800/30">
+                        <div className="bg-pink-500 text-white p-2 rounded-full mr-4 shadow-sm">
                             <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z" /><path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z" /></svg>
                         </div>
                         <div>
                             <h3 className="font-bold text-slate-800 dark:text-white group-hover:text-pink-600 dark:group-hover:text-pink-400">Click to access</h3>
-                            <p className="text-xs text-slate-500 dark:text-slate-400">View on Google Drive</p>
+                            <p className="text-xs text-slate-500 dark:text-slate-400">View essential files on Google Drive</p>
                         </div>
                     </a>
                 </div>
@@ -235,57 +235,57 @@ const Guide: React.FC = () => {
                 </p>
              </div>
 
-             {/* VPN Section */}
+             {/* VPN Section - Replaced with Hiddify */}
              <div className="bg-white dark:bg-slate-800 p-6 sm:p-8 rounded-xl shadow-lg border border-slate-200 dark:border-slate-700 relative overflow-hidden">
-                <div className="absolute top-0 right-0 p-4 opacity-10">
+                <div className="absolute top-0 right-0 p-4 opacity-5">
                     <svg className="w-32 h-32" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/></svg>
                 </div>
                 
                 <h2 className="text-2xl font-bold mb-6 text-slate-800 dark:text-white flex items-center relative z-10">
-                    <span className="bg-orange-100 dark:bg-orange-900/30 text-orange-600 dark:text-orange-400 p-2 rounded-lg mr-3">
-                         <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11.536 9.464 9.536 11.464 7.464 9.464M6.343 11.657A8 8 0 1018.657 5.657L6.343 11.657z" /></svg>
+                    <span className="bg-violet-100 dark:bg-violet-900/30 text-violet-600 dark:text-violet-400 p-2 rounded-lg mr-3">
+                         <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" /></svg>
                     </span>
-                    VPN Access
+                    Hiddify VPN Access
                 </h2>
 
-                <div className="mb-6 bg-amber-50 dark:bg-amber-900/20 border-l-4 border-amber-500 p-4 rounded-r-lg relative z-10">
+                <div className="mb-6 bg-violet-50 dark:bg-violet-900/20 border-l-4 border-violet-500 p-4 rounded-r-lg relative z-10">
                     <div className="flex items-start">
                         <div className="flex-shrink-0">
-                            <svg className="h-5 w-5 text-amber-500" viewBox="0 0 20 20" fill="currentColor">
-                                <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                            <svg className="h-5 w-5 text-violet-500" viewBox="0 0 20 20" fill="currentColor">
+                                <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
                             </svg>
                         </div>
                         <div className="ml-3">
-                            <h3 className="text-sm font-bold text-amber-800 dark:text-amber-200">Important Update</h3>
-                            <div className="mt-2 text-sm text-amber-700 dark:text-amber-300">
-                                <p>Hey, as u have noticed on the internet. The military gov start banning outline vpn and my key which is premium version might or might not work. Even if it connected, it would only connect with slow speed. It may depend on the wifi too. My suggestion is connect it first. then go to <a href="https://www.fast.com" target="_blank" rel="noopener noreferrer" className="underline font-bold hover:text-amber-900">www.fast.com</a> if it shows you more than 10mbps. you might be good but if it's not then best bet is x-vpn.</p>
+                            <h3 className="text-sm font-bold text-violet-800 dark:text-violet-200">How to use</h3>
+                            <div className="mt-2 text-sm text-violet-700 dark:text-violet-300 leading-relaxed">
+                                <p>Hey use this key and download <span className="font-bold">Hiddify VPN</span> from <a href="https://hiddify.com/" target="_blank" rel="noopener noreferrer" className="underline font-bold hover:text-violet-900">this link</a> and install. Use the key below — the procedure is almost the same as Outline VPN. Import the key and connect!</p>
                             </div>
                         </div>
                     </div>
                 </div>
 
                 <div className="relative z-10 space-y-6">
-                    {/* Outline Key Section */}
+                    {/* Hiddify Key Section */}
                     <div className="bg-slate-50 dark:bg-slate-900/50 p-5 rounded-xl border border-slate-200 dark:border-slate-700">
                          <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-3 gap-2">
                             <div className="flex items-center gap-2">
-                                <h3 className="font-bold text-slate-700 dark:text-slate-200">Outline VPN Key</h3>
-                                <span className="text-xs font-mono bg-sky-100 text-sky-700 dark:bg-sky-900 dark:text-sky-300 px-2 py-1 rounded">Feb 19 Update</span>
+                                <h3 className="font-bold text-slate-700 dark:text-slate-200">Hiddify Key (VLESS)</h3>
+                                <span className="text-xs font-mono bg-violet-100 text-violet-700 dark:bg-violet-900 dark:text-violet-300 px-2 py-1 rounded">Latest Update</span>
                             </div>
                              <div className="text-xs text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-900/20 px-2 py-1 rounded border border-amber-100 dark:border-amber-800/30 flex items-center">
                                 <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" viewBox="0 0 20 20" fill="currentColor">
-                                    <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
+                                    <path fillRule="evenodd" d="M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25zM12.75 6a.75.75 0 00-1.5 0v6c0 .414.336.75.75.75h4.5a.75.75 0 000-1.5h-3.75V6z" clipRule="evenodd" />
                                 </svg>
-                                <span>Note: Remove non-working keys first. Valid for 1 month only.</span>
+                                <span>Note: Remove previous keys. Valid for 1 month.</span>
                             </div>
                         </div>
                         <div className="flex gap-2">
-                            <code className="flex-1 bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-lg p-3 text-xs sm:text-sm font-mono text-slate-500 break-all h-24 overflow-y-auto select-all">
-                                {outlineKey}
+                            <code className="flex-1 bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-lg p-3 text-xs sm:text-sm font-mono text-slate-500 break-all h-24 overflow-y-auto select-all leading-relaxed">
+                                {hiddifyKey}
                             </code>
                             <button 
                                 onClick={handleCopy}
-                                className={`flex flex-col items-center justify-center px-4 rounded-lg font-bold text-sm transition-all duration-200 border ${copied ? 'bg-green-50 border-green-200 text-green-600' : 'bg-white hover:bg-slate-50 border-slate-200 text-slate-600'}`}
+                                className={`flex flex-col items-center justify-center px-4 rounded-lg font-bold text-sm transition-all duration-200 border min-w-[100px] ${copied ? 'bg-green-50 border-green-200 text-green-600' : 'bg-white hover:bg-slate-50 border-slate-200 text-slate-600'}`}
                             >
                                 {copied ? (
                                     <>
@@ -302,10 +302,9 @@ const Guide: React.FC = () => {
                         </div>
                     </div>
 
-                    {/* X-VPN Section */}
                     <div className="text-sm text-slate-600 dark:text-slate-400 bg-orange-50 dark:bg-orange-900/10 p-4 rounded-lg border border-orange-100 dark:border-orange-800/30">
                         <p>
-                            <span className="font-bold text-orange-700 dark:text-orange-400">Alternative:</span> If you don't get access to Outline VPN, you can try X-VPN which you likely already have installed. If not, <a href="https://drive.google.com/drive/folders/16j0H2tw4-xbK2Vb9VAzqzmZa9Edxprju" target="_blank" rel="noopener noreferrer" className="text-sky-600 dark:text-sky-400 font-bold hover:underline decoration-2 underline-offset-2">click here to download</a>.
+                            <span className="font-bold text-orange-700 dark:text-orange-400">Alternative:</span> If Hiddify is slow, you can still try X-VPN. If not installed, <a href="https://drive.google.com/drive/folders/16j0H2tw4-xbK2Vb9VAzqzmZa9Edxprju" target="_blank" rel="noopener noreferrer" className="text-sky-600 dark:text-sky-400 font-bold hover:underline decoration-2 underline-offset-2">click here to download from Drive</a>.
                         </p>
                     </div>
                 </div>
@@ -319,6 +318,7 @@ const Guide: React.FC = () => {
                 <p className="opacity-90 text-sm">Use the Compare feature in Subtitle Edit to visualize differences and fix issues efficiently.</p>
             </div>
 
+             {/* Common Errors & Solutions */}
              <div className="bg-white dark:bg-slate-800 p-8 rounded-xl shadow-lg border border-slate-200 dark:border-slate-700">
                 <h2 className="text-2xl font-bold mb-6 text-slate-800 dark:text-white flex items-center">
                     <span className="bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400 p-2 rounded-lg mr-3">
