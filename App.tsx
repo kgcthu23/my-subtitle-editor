@@ -1,4 +1,5 @@
-import React, { useState, useCallback, useMemo, useEffect, useRef } from 'react';
+
+import React, { useState, useCallback, useMemo, useEffect } from 'react';
 import { cleanSrtContent, detectForeignLanguages, getChangeSummary } from './services/srtCleaner';
 import type { ChangeSummary, ForeignLanguageReport, IncomeData, IncomeEntry, DetectedLanguageInfo } from './types';
 
@@ -22,6 +23,33 @@ const WarningIcon = () => (
 );
 
 // --- Child Components ---
+
+const UpdateModal: React.FC<{ isOpen: boolean; onClose: () => void }> = ({ isOpen, onClose }) => {
+    if (!isOpen) return null;
+    return (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-in fade-in duration-300">
+            <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-2xl max-w-sm w-full p-8 border border-slate-200 dark:border-slate-700 transform animate-in zoom-in-95 duration-300">
+                <div className="flex flex-col items-center text-center">
+                    <div className="bg-sky-100 dark:bg-sky-900/30 p-4 rounded-full mb-6">
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-10 w-10 text-sky-600 dark:text-sky-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+                        </svg>
+                    </div>
+                    <h2 className="text-2xl font-black text-slate-900 dark:text-white mb-3">Notice</h2>
+                    <p className="text-slate-600 dark:text-slate-400 font-medium mb-8 leading-relaxed">
+                        New update has been made.
+                    </p>
+                    <button 
+                        onClick={onClose}
+                        className="w-full py-3 bg-sky-600 hover:bg-sky-700 text-white font-bold rounded-xl shadow-lg shadow-sky-500/30 transition-all duration-200 active:scale-95"
+                    >
+                        Got it!
+                    </button>
+                </div>
+            </div>
+        </div>
+    );
+};
 
 const FileUpload: React.FC<{ onFileSelect: (content: string, fileName: string) => void; disabled: boolean }> = ({ onFileSelect, disabled }) => {
     const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -144,6 +172,7 @@ const IncomeTracker: React.FC = () => {
         e.preventDefault();
         const numLines = parseInt(lines, 10);
         const numRate = parseFloat(rate);
+        // FIX: Changed 'iNaN' to 'isNaN' to resolve reference error.
         if (isNaN(numLines) || isNaN(numRate)) return;
 
         const updatedData = JSON.parse(JSON.stringify(incomeData));
@@ -195,6 +224,7 @@ const IncomeTracker: React.FC = () => {
 const Guide: React.FC = () => {
     const [copied, setCopied] = useState(false);
     const hiddifyKey = "vless://897b11cf-aa86-4fa0-9a6b-87d6c2a3cc5a@my.edumailme.com:443?alpn=h2%2Chttp%2F1.1&encryption=none&fp=chrome&host=my.edumailme.com&path=%2Fxray&security=tls&sni=my.edumailme.com&type=ws#SINGAPORE-50.00GB%F0%9F%93%8A-30D%E2%8F%B3";
+    const driveLink = "https://drive.google.com/drive/u/0/folders/16j0H2tw4-xbK2Vb9VAzqzmZa9Edxprju";
 
     const handleCopy = () => {
         navigator.clipboard.writeText(hiddifyKey);
@@ -204,7 +234,6 @@ const Guide: React.FC = () => {
 
     return (
         <div className="max-w-4xl mx-auto space-y-8 animate-fade-in">
-             {/* Useful Resources - TOP Priority */}
              <div className="bg-white dark:bg-slate-800 p-6 sm:p-8 rounded-xl shadow-lg border border-slate-200 dark:border-slate-700">
                 <h2 className="text-2xl font-bold mb-6 text-slate-800 dark:text-white flex items-center">
                     <span className="bg-indigo-100 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 p-2 rounded-lg mr-3">
@@ -214,28 +243,25 @@ const Guide: React.FC = () => {
                     </span>
                     Useful Resources
                 </h2>
-
                 <div className="grid grid-cols-1 gap-4">
-                    <a href="https://drive.google.com/drive/u/1/folders/16j0H2tw4-xbK2Vb9VAzqzmZa9Edxprju" target="_blank" rel="noopener noreferrer" className="flex items-center p-4 bg-pink-50 dark:bg-pink-900/20 rounded-lg hover:bg-pink-100 dark:hover:bg-pink-900/40 transition-all group border border-pink-100/50 dark:border-pink-800/30">
+                    <a href={driveLink} target="_blank" rel="noopener noreferrer" className="flex items-center p-4 bg-pink-50 dark:bg-pink-900/20 rounded-lg hover:bg-pink-100 dark:hover:bg-pink-900/40 transition-all group border border-pink-100/50 dark:border-pink-800/30">
                         <div className="bg-pink-500 text-white p-2 rounded-full mr-4 shadow-sm">
                             <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z" /><path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z" /></svg>
                         </div>
                         <div>
                             <h3 className="font-bold text-slate-800 dark:text-white group-hover:text-pink-600 dark:group-hover:text-pink-400">Click to access</h3>
-                            <p className="text-xs text-slate-500 dark:text-slate-400">View essential files on Google Drive</p>
+                            <p className="text-xs text-slate-500 dark:text-slate-400">View essential files on Google Drive (Regularly Updated)</p>
                         </div>
                     </a>
                 </div>
             </div>
 
-             {/* Intro Text */}
              <div className="bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-lg p-4 text-center">
                 <p className="text-slate-600 dark:text-slate-400 text-sm font-medium italic">
                     "This guide includes vpn recommendation, error fixing and apps recommendation"
                 </p>
              </div>
 
-             {/* VPN Section - Replaced with Hiddify */}
              <div className="bg-white dark:bg-slate-800 p-6 sm:p-8 rounded-xl shadow-lg border border-slate-200 dark:border-slate-700 relative overflow-hidden">
                 <div className="absolute top-0 right-0 p-4 opacity-5">
                     <svg className="w-32 h-32" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"/></svg>
@@ -256,16 +282,16 @@ const Guide: React.FC = () => {
                             </svg>
                         </div>
                         <div className="ml-3">
-                            <h3 className="text-sm font-bold text-violet-800 dark:text-violet-200">How to use</h3>
-                            <div className="mt-2 text-sm text-violet-700 dark:text-violet-300 leading-relaxed">
-                                <p>Hey use this key and download <span className="font-bold">Hiddify VPN</span> from <a href="https://hiddify.com/" target="_blank" rel="noopener noreferrer" className="underline font-bold hover:text-violet-900">this link</a> and install. Use the key below — the procedure is almost the same as Outline VPN. Import the key and connect!</p>
+                            <h3 className="text-sm font-bold text-violet-800 dark:text-violet-200">Installation & Setup</h3>
+                            <div className="mt-2 text-sm text-violet-700 dark:text-violet-300 leading-relaxed space-y-3">
+                                <p>Hey use this key and download <span className="font-bold">Hiddify VPN</span> from <a href="https://hiddify.com/" target="_blank" rel="noopener noreferrer" className="underline font-bold hover:text-violet-900">this link (Official)</a> or <a href={driveLink} target="_blank" rel="noopener noreferrer" className="underline font-bold hover:text-violet-900">you can still check out the drive</a> and install.</p>
+                                <p>Use the key below — the procedure is almost the same as Outline VPN. Import the key and connect! <span className="italic">From now on i will add things that u might need to this drive.</span></p>
                             </div>
                         </div>
                     </div>
                 </div>
 
                 <div className="relative z-10 space-y-6">
-                    {/* Hiddify Key Section */}
                     <div className="bg-slate-50 dark:bg-slate-900/50 p-5 rounded-xl border border-slate-200 dark:border-slate-700">
                          <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-3 gap-2">
                             <div className="flex items-center gap-2">
@@ -301,10 +327,9 @@ const Guide: React.FC = () => {
                             </button>
                         </div>
                     </div>
-
                     <div className="text-sm text-slate-600 dark:text-slate-400 bg-orange-50 dark:bg-orange-900/10 p-4 rounded-lg border border-orange-100 dark:border-orange-800/30">
                         <p>
-                            <span className="font-bold text-orange-700 dark:text-orange-400">Alternative:</span> If Hiddify is slow, you can still try X-VPN. If not installed, <a href="https://drive.google.com/drive/folders/16j0H2tw4-xbK2Vb9VAzqzmZa9Edxprju" target="_blank" rel="noopener noreferrer" className="text-sky-600 dark:text-sky-400 font-bold hover:underline decoration-2 underline-offset-2">click here to download from Drive</a>.
+                            <span className="font-bold text-orange-700 dark:text-orange-400">Alternative:</span> If Hiddify is slow, you can still try X-VPN. If not installed, <a href={driveLink} target="_blank" rel="noopener noreferrer" className="text-sky-600 dark:text-sky-400 font-bold hover:underline decoration-2 underline-offset-2">click here to download from Drive</a>.
                         </p>
                     </div>
                 </div>
@@ -318,7 +343,6 @@ const Guide: React.FC = () => {
                 <p className="opacity-90 text-sm">Use the Compare feature in Subtitle Edit to visualize differences and fix issues efficiently.</p>
             </div>
 
-             {/* Common Errors & Solutions */}
              <div className="bg-white dark:bg-slate-800 p-8 rounded-xl shadow-lg border border-slate-200 dark:border-slate-700">
                 <h2 className="text-2xl font-bold mb-6 text-slate-800 dark:text-white flex items-center">
                     <span className="bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400 p-2 rounded-lg mr-3">
@@ -328,14 +352,11 @@ const Guide: React.FC = () => {
                     </span>
                     Common Errors & Solutions
                 </h2>
-
                 <div className="space-y-12">
-                    {/* Error Item 1 */}
                     <div className="border-l-4 border-sky-500 pl-6 py-2">
                         <h3 className="text-xl font-bold text-slate-700 dark:text-slate-200 mb-3">
                             "Empty line expected, but found number..."
                         </h3>
-                        
                         <div className="grid md:grid-cols-2 gap-6">
                             <div className="bg-slate-900 rounded-lg p-4 font-mono text-xs text-slate-300 shadow-inner overflow-hidden border border-slate-700">
                                 <div className="flex items-center gap-2 mb-2 text-yellow-500 border-b border-slate-700 pb-2">
@@ -350,7 +371,6 @@ const Guide: React.FC = () => {
                                     <p><span className="text-slate-500">Line 1090:</span> Empty line expected, but found number (272) followed by time code.</p>
                                 </div>
                             </div>
-                            
                             <div className="flex flex-col justify-center">
                                 <h4 className="font-semibold text-sky-600 dark:text-sky-400 mb-2 uppercase tracking-wide text-xs">Best Solution</h4>
                                 <div className="text-slate-600 dark:text-slate-300 leading-relaxed bg-sky-50 dark:bg-sky-900/20 p-4 rounded-lg border border-sky-100 dark:border-sky-800">
@@ -362,15 +382,11 @@ const Guide: React.FC = () => {
                             </div>
                         </div>
                     </div>
-
-                    {/* Error Item 2 */}
                     <div className="border-l-4 border-sky-500 pl-6 py-2">
                          <h3 className="text-xl font-bold text-slate-700 dark:text-slate-200 mb-4">
                             "Subtitle with time codes has a different number of lines..."
                         </h3>
-                        
                         <div className="grid md:grid-cols-2 gap-6">
-                            {/* Visual Mockup of Dialog */}
                             <div className="bg-[#2b2b2b] rounded-lg p-1 shadow-xl border border-gray-600 font-sans text-sm select-none">
                                 <div className="flex justify-between items-center px-2 py-1 bg-[#2b2b2b] text-white text-xs border-b border-gray-600">
                                     <span>Subtitle Edit 4.0.14</span>
@@ -388,7 +404,6 @@ const Guide: React.FC = () => {
                                     <div className="px-6 py-1 bg-[#3c3c3c] text-white border border-gray-500 shadow-sm text-xs min-w-[70px] text-center">Cancel</div>
                                 </div>
                             </div>
-                            
                             <div className="flex flex-col justify-center">
                                 <h4 className="font-semibold text-sky-600 dark:text-sky-400 mb-2 uppercase tracking-wide text-xs">Best Solution</h4>
                                 <div className="text-slate-600 dark:text-slate-300 leading-relaxed bg-sky-50 dark:bg-sky-900/20 p-4 rounded-lg border border-sky-100 dark:border-sky-800 space-y-3">
@@ -422,6 +437,20 @@ export default function App() {
     const [fileName, setFileName] = useState<string>('cleaned.srt');
     const [summary, setSummary] = useState<ChangeSummary | null>(null);
     const [foreignReport, setForeignReport] = useState<ForeignLanguageReport | null>(null);
+    const [isUpdateModalOpen, setIsUpdateModalOpen] = useState(false);
+
+    useEffect(() => {
+        // One-time modal logic
+        const hasSeenUpdate = localStorage.getItem('hasSeenUpdate_v1');
+        if (!hasSeenUpdate) {
+            setIsUpdateModalOpen(true);
+        }
+    }, []);
+
+    const closeUpdateModal = () => {
+        setIsUpdateModalOpen(false);
+        localStorage.setItem('hasSeenUpdate_v1', 'true');
+    };
 
     const handleFileSelect = useCallback((content: string, name: string) => {
         setOriginalContent(content);
@@ -442,6 +471,7 @@ export default function App() {
 
     return (
         <div className="min-h-screen text-slate-800 dark:text-slate-200 p-4 sm:p-6 lg:p-8">
+            <UpdateModal isOpen={isUpdateModalOpen} onClose={closeUpdateModal} />
             <div className="max-w-7xl mx-auto">
                 <header className="text-center mb-10">
                     <h1 className="text-4xl sm:text-5xl font-extrabold text-slate-900 dark:text-white">Translator's Toolkit</h1>
@@ -478,7 +508,7 @@ export default function App() {
                     {activeView === 'tracker' && <IncomeTracker />}
                     {activeView === 'guide' && <Guide />}
                 </main>
-                <footer className="text-center mt-12 text-xs text-slate-500"><p>Translator's Toolkit update 23.01.2026</p></footer>
+                <footer className="text-center mt-12 text-xs text-slate-500"><p>Translator's Toolkit update 28.01.2026</p></footer>
             </div>
             <style>{`
                 @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
