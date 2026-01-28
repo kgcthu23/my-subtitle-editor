@@ -1,4 +1,3 @@
-
 import React, { useState, useCallback, useMemo, useEffect } from 'react';
 import { cleanSrtContent, detectForeignLanguages, getChangeSummary } from './services/srtCleaner';
 import type { ChangeSummary, ForeignLanguageReport, IncomeData, IncomeEntry, DetectedLanguageInfo } from './types';
@@ -37,7 +36,7 @@ const UpdateModal: React.FC<{ isOpen: boolean; onClose: () => void }> = ({ isOpe
                     </div>
                     <h2 className="text-2xl font-black text-slate-900 dark:text-white mb-3">Notice</h2>
                     <p className="text-slate-600 dark:text-slate-400 font-medium mb-8 leading-relaxed">
-                        New update has been made.
+                        This website was updated.
                     </p>
                     <button 
                         onClick={onClose}
@@ -172,7 +171,6 @@ const IncomeTracker: React.FC = () => {
         e.preventDefault();
         const numLines = parseInt(lines, 10);
         const numRate = parseFloat(rate);
-        // FIX: Changed 'iNaN' to 'isNaN' to resolve reference error.
         if (isNaN(numLines) || isNaN(numRate)) return;
 
         const updatedData = JSON.parse(JSON.stringify(incomeData));
@@ -241,16 +239,16 @@ const Guide: React.FC = () => {
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
                         </svg>
                     </span>
-                    Useful Resources
+                    My Google Drive
                 </h2>
                 <div className="grid grid-cols-1 gap-4">
-                    <a href={driveLink} target="_blank" rel="noopener noreferrer" className="flex items-center p-4 bg-pink-50 dark:bg-pink-900/20 rounded-lg hover:bg-pink-100 dark:hover:bg-pink-900/40 transition-all group border border-pink-100/50 dark:border-pink-800/30">
-                        <div className="bg-pink-500 text-white p-2 rounded-full mr-4 shadow-sm">
-                            <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z" /><path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z" /></svg>
+                    <a href={driveLink} target="_blank" rel="noopener noreferrer" className="flex items-center p-5 bg-gradient-to-br from-pink-50 to-rose-50 dark:from-pink-900/20 dark:to-rose-900/20 rounded-xl hover:shadow-md transition-all group border border-pink-100 dark:border-pink-800/30">
+                        <div className="bg-pink-500 text-white p-3 rounded-xl mr-5 shadow-lg shadow-pink-500/30 group-hover:scale-110 transition-transform">
+                            <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 20 20"><path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z" /><path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z" /></svg>
                         </div>
                         <div>
-                            <h3 className="font-bold text-slate-800 dark:text-white group-hover:text-pink-600 dark:group-hover:text-pink-400">Click to access</h3>
-                            <p className="text-xs text-slate-500 dark:text-slate-400">View essential files on Google Drive (Regularly Updated)</p>
+                            <h3 className="font-black text-lg text-slate-800 dark:text-white group-hover:text-pink-600 dark:group-hover:text-pink-400">Open Toolkit Drive</h3>
+                            <p className="text-sm text-slate-500 dark:text-slate-400">Essential apps, VPN installers, and tutorial documentation (Updated 2026)</p>
                         </div>
                     </a>
                 </div>
@@ -258,7 +256,7 @@ const Guide: React.FC = () => {
 
              <div className="bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-lg p-4 text-center">
                 <p className="text-slate-600 dark:text-slate-400 text-sm font-medium italic">
-                    "This guide includes vpn recommendation, error fixing and apps recommendation"
+                    "This guide provides setup instructions for Hiddify VPN and fixes for common Subtitle Edit errors."
                 </p>
              </div>
 
@@ -282,10 +280,10 @@ const Guide: React.FC = () => {
                             </svg>
                         </div>
                         <div className="ml-3">
-                            <h3 className="text-sm font-bold text-violet-800 dark:text-violet-200">Installation & Setup</h3>
+                            <h3 className="text-sm font-bold text-violet-800 dark:text-violet-200">Setup Instructions</h3>
                             <div className="mt-2 text-sm text-violet-700 dark:text-violet-300 leading-relaxed space-y-3">
-                                <p>Hey use this key and download <span className="font-bold">Hiddify VPN</span> from <a href="https://hiddify.com/" target="_blank" rel="noopener noreferrer" className="underline font-bold hover:text-violet-900">this link (Official)</a> or <a href={driveLink} target="_blank" rel="noopener noreferrer" className="underline font-bold hover:text-violet-900">you can still check out the drive</a> and install.</p>
-                                <p>Use the key below — the procedure is almost the same as Outline VPN. Import the key and connect! <span className="italic">From now on i will add things that u might need to this drive.</span></p>
+                                <p>Download <span className="font-bold">Hiddify VPN</span> from the <a href={driveLink} target="_blank" rel="noopener noreferrer" className="underline font-bold hover:text-violet-900">Google Drive folder</a> or official site. Use the key below to import your configuration.</p>
+                                <p>This VPN is recommended for high-speed access during peak hours. <span className="italic">Note: Ensure you remove previous outdated keys before importing the new one.</span></p>
                             </div>
                         </div>
                     </div>
@@ -302,7 +300,7 @@ const Guide: React.FC = () => {
                                 <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" viewBox="0 0 20 20" fill="currentColor">
                                     <path fillRule="evenodd" d="M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25zM12.75 6a.75.75 0 00-1.5 0v6c0 .414.336.75.75.75h4.5a.75.75 0 000-1.5h-3.75V6z" clipRule="evenodd" />
                                 </svg>
-                                <span>Note: Remove previous keys. Valid for 1 month.</span>
+                                <span>Valid for 1 month. Regularly refreshed.</span>
                             </div>
                         </div>
                         <div className="flex gap-2">
@@ -327,20 +325,15 @@ const Guide: React.FC = () => {
                             </button>
                         </div>
                     </div>
-                    <div className="text-sm text-slate-600 dark:text-slate-400 bg-orange-50 dark:bg-orange-900/10 p-4 rounded-lg border border-orange-100 dark:border-orange-800/30">
-                        <p>
-                            <span className="font-bold text-orange-700 dark:text-orange-400">Alternative:</span> If Hiddify is slow, you can still try X-VPN. If not installed, <a href={driveLink} target="_blank" rel="noopener noreferrer" className="text-sky-600 dark:text-sky-400 font-bold hover:underline decoration-2 underline-offset-2">click here to download from Drive</a>.
-                        </p>
-                    </div>
                 </div>
              </div>
 
              <div className="bg-gradient-to-r from-sky-500 to-indigo-600 rounded-xl p-6 text-white shadow-lg">
                 <h3 className="text-xl font-bold mb-2 flex items-center">
                     <svg className="w-6 h-6 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
-                    Pro Tip: The best way to check errors is "Compare"
+                    Pro Tip: Use "Compare"
                 </h3>
-                <p className="opacity-90 text-sm">Use the Compare feature in Subtitle Edit to visualize differences and fix issues efficiently.</p>
+                <p className="opacity-90 text-sm">The best way to fix errors is using the Compare feature in Subtitle Edit to visualize differences and missing lines.</p>
             </div>
 
              <div className="bg-white dark:bg-slate-800 p-8 rounded-xl shadow-lg border border-slate-200 dark:border-slate-700">
@@ -361,61 +354,19 @@ const Guide: React.FC = () => {
                             <div className="bg-slate-900 rounded-lg p-4 font-mono text-xs text-slate-300 shadow-inner overflow-hidden border border-slate-700">
                                 <div className="flex items-center gap-2 mb-2 text-yellow-500 border-b border-slate-700 pb-2">
                                     <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
-                                    <span className="font-semibold">Subtitle Edit 4.0.14 Error Log</span>
+                                    <span className="font-semibold">Subtitle Edit Error Log</span>
                                 </div>
                                 <div className="space-y-1 opacity-90">
-                                    <p><span className="text-slate-500">Line 3:</span> Empty line expected, but found number (2) followed by time code.</p>
-                                    <p><span className="text-slate-500">Line 5:</span> Empty line expected, but found number (3) followed by time code.</p>
-                                    <p><span className="text-slate-500">Line 7:</span> Empty line expected, but found number (4) followed by time code.</p>
-                                    <p className="text-slate-500 pl-2">...</p>
-                                    <p><span className="text-slate-500">Line 1090:</span> Empty line expected, but found number (272) followed by time code.</p>
+                                    <p><span className="text-slate-500">Line 3:</span> Empty line expected, but found number (2)...</p>
+                                    <p><span className="text-slate-500">Line 1090:</span> Empty line expected, but found number (272)...</p>
                                 </div>
                             </div>
                             <div className="flex flex-col justify-center">
-                                <h4 className="font-semibold text-sky-600 dark:text-sky-400 mb-2 uppercase tracking-wide text-xs">Best Solution</h4>
+                                <h4 className="font-semibold text-sky-600 dark:text-sky-400 mb-2 uppercase tracking-wide text-xs">Solution</h4>
                                 <div className="text-slate-600 dark:text-slate-300 leading-relaxed bg-sky-50 dark:bg-sky-900/20 p-4 rounded-lg border border-sky-100 dark:border-sky-800">
-                                    <p className="mb-2">This is a normal error often caused by merged lines in the source file.</p>
                                     <p className="font-medium text-slate-800 dark:text-slate-100">
-                                        👉 just check via <span className="text-sky-600 dark:text-sky-400">"Import Timestamp"</span> in Subtitle Edit
+                                        👉 Check via <span className="text-sky-600 dark:text-sky-400 font-bold">"Import Timestamp"</span> in Subtitle Edit to re-sync indices.
                                     </p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div className="border-l-4 border-sky-500 pl-6 py-2">
-                         <h3 className="text-xl font-bold text-slate-700 dark:text-slate-200 mb-4">
-                            "Subtitle with time codes has a different number of lines..."
-                        </h3>
-                        <div className="grid md:grid-cols-2 gap-6">
-                            <div className="bg-[#2b2b2b] rounded-lg p-1 shadow-xl border border-gray-600 font-sans text-sm select-none">
-                                <div className="flex justify-between items-center px-2 py-1 bg-[#2b2b2b] text-white text-xs border-b border-gray-600">
-                                    <span>Subtitle Edit 4.0.14</span>
-                                    <span className="text-gray-400">✕</span>
-                                </div>
-                                <div className="p-6 flex gap-4 items-start">
-                                    <div className="text-white text-4xl leading-none font-serif opacity-90 border-2 border-white rounded-full w-10 h-10 flex items-center justify-center shrink-0">?</div>
-                                    <div className="text-white text-sm mt-1">
-                                        Subtitle with time codes has a different number of lines (1073) than current subtitle (1072) - continue anyway?
-                                    </div>
-                                </div>
-                                <div className="bg-[#2b2b2b] p-3 flex justify-center gap-2">
-                                    <div className="px-6 py-1 bg-[#3c3c3c] text-white border border-gray-500 shadow-sm text-xs min-w-[70px] text-center">Yes</div>
-                                    <div className="px-6 py-1 bg-[#3c3c3c] text-white border border-gray-500 shadow-sm text-xs min-w-[70px] text-center">No</div>
-                                    <div className="px-6 py-1 bg-[#3c3c3c] text-white border border-gray-500 shadow-sm text-xs min-w-[70px] text-center">Cancel</div>
-                                </div>
-                            </div>
-                            <div className="flex flex-col justify-center">
-                                <h4 className="font-semibold text-sky-600 dark:text-sky-400 mb-2 uppercase tracking-wide text-xs">Best Solution</h4>
-                                <div className="text-slate-600 dark:text-slate-300 leading-relaxed bg-sky-50 dark:bg-sky-900/20 p-4 rounded-lg border border-sky-100 dark:border-sky-800 space-y-3">
-                                    <p className="text-sm">This usually happens during <span className="font-semibold">"Import Timestamp"</span>.</p>
-                                    <div className="space-y-1">
-                                        <p className="font-medium text-slate-800 dark:text-slate-100">👉 Use the <span className="text-sky-600 dark:text-sky-400 font-bold">"Compare"</span> feature.</p>
-                                    </div>
-                                    <ul className="text-sm space-y-1 mt-2 bg-white dark:bg-slate-800 p-3 rounded border border-slate-200 dark:border-slate-700">
-                                        <li className="flex items-center gap-2"><span className="w-2.5 h-2.5 rounded-full bg-green-500"></span> <span>Green is okay</span></li>
-                                        <li className="flex items-center gap-2"><span className="w-2.5 h-2.5 rounded-full bg-yellow-400"></span> <span>Yellow is timing error (ignore)</span></li>
-                                        <li className="flex items-center gap-2 font-bold text-red-500 dark:text-red-400"><span className="w-2.5 h-2.5 rounded-full bg-red-500"></span> <span>Red is missing line (Fix this!)</span></li>
-                                    </ul>
                                 </div>
                             </div>
                         </div>
