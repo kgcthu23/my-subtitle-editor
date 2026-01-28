@@ -248,7 +248,7 @@ const Guide: React.FC = () => {
                         </div>
                         <div>
                             <h3 className="font-black text-lg text-slate-800 dark:text-white group-hover:text-pink-600 dark:group-hover:text-pink-400">Open Toolkit Drive</h3>
-                            <p className="text-sm text-slate-500 dark:text-slate-400">Essential apps, VPN installers, and tutorial documentation (Updated 2026)</p>
+                            <p className="text-sm text-slate-500 dark:text-slate-400">Essential apps, installers, and tutorial documentation (Updated 2026)</p>
                         </div>
                     </a>
                 </div>
@@ -280,10 +280,25 @@ const Guide: React.FC = () => {
                             </svg>
                         </div>
                         <div className="ml-3">
-                            <h3 className="text-sm font-bold text-violet-800 dark:text-violet-200">Setup Instructions</h3>
+                            <h3 className="text-sm font-bold text-violet-800 dark:text-violet-200">Download & Setup</h3>
                             <div className="mt-2 text-sm text-violet-700 dark:text-violet-300 leading-relaxed space-y-3">
-                                <p>Download <span className="font-bold">Hiddify VPN</span> from the <a href={driveLink} target="_blank" rel="noopener noreferrer" className="underline font-bold hover:text-violet-900">Google Drive folder</a> or official site. Use the key below to import your configuration.</p>
-                                <p>This VPN is recommended for high-speed access during peak hours. <span className="italic">Note: Ensure you remove previous outdated keys before importing the new one.</span></p>
+                                <p>Choose one of the links below to download <span className="font-bold">Hiddify VPN</span>. Installation is easy: just double-click the installer and accept everything.</p>
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 mt-2">
+                                    <a href="https://limewire.com/d/6ZcJw#cMZPd7rz3B" target="_blank" rel="noopener noreferrer" className="flex items-center px-4 py-2 bg-white dark:bg-slate-700 border border-violet-200 dark:border-violet-800 rounded-lg hover:bg-violet-100 transition-colors text-xs font-bold text-violet-700 dark:text-violet-300">
+                                        🚀 LimeWire Mirror
+                                    </a>
+                                    <a href="https://t.me/+BfyZ73a7lbcyM2Rl" target="_blank" rel="noopener noreferrer" className="flex items-center px-4 py-2 bg-white dark:bg-slate-700 border border-violet-200 dark:border-violet-800 rounded-lg hover:bg-violet-100 transition-colors text-xs font-bold text-violet-700 dark:text-violet-300">
+                                        ✈️ Telegram Channel
+                                    </a>
+                                    <a href="https://hiddify.com/" target="_blank" rel="noopener noreferrer" className="flex items-center px-4 py-2 bg-white dark:bg-slate-700 border border-violet-200 dark:border-violet-800 rounded-lg hover:bg-violet-100 transition-colors text-xs font-bold text-violet-700 dark:text-violet-300 col-span-full">
+                                        🌐 hiddify.com (Choose Windows)
+                                    </a>
+                                </div>
+                                <div className="mt-4 p-3 bg-violet-100/50 dark:bg-violet-900/30 rounded-lg border border-violet-200 dark:border-violet-800/50">
+                                    <p className="text-[12px] font-bold text-violet-900 dark:text-violet-200 mb-1">⚠️ Data Preservation Note</p>
+                                    <p className="text-[11px] leading-snug">Please <span className="font-bold underline">disconnect</span> Hiddify VPN when downloading movies or large files, as there is a monthly data limit per user. Save the high-speed data for your translation work!</p>
+                                </div>
+                                <p className="text-[11px] opacity-80 mt-2 italic">This VPN is recommended for high-speed access during peak hours. Note: Ensure you remove previous outdated keys before importing the new one below.</p>
                             </div>
                         </div>
                     </div>
