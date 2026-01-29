@@ -197,6 +197,7 @@ const Guide: React.FC = () => {
     const hiddifyKeyVless = "vless://897b11cf-aa86-4fa0-9a6b-87d6c2a3cc5a@my.edumailme.com:443?alpn=h2%2Chttp%2F1.1&encryption=none&fp=chrome&host=my.edumailme.com&path=%2Fxray&security=tls&sni=my.edumailme.com&type=ws#SINGAPORE-50.00GB%F0%9F%93%8A-30D%E2%8F%B3";
     const hiddifyKeyVmess = "vmess://ewogICJhZGQiOiAibXkuZWR1bWFpbG1lLmNvbSIsCiAgImFsbG93SW5zZWN1cmUiOiBmYWxzZSwKICAiYWxwbiI6ICJoMixodHRwLzEuMSIsCiAgImZwIjogImNocm9tZSIsCiAgImhvc3QiOiAibXkuZWR1bWFpbG1lLmNvbSIsCiAgImlkIjogImRiYjNjNTUxLTFkNGQtNGRhMC1hNGFkLTQxYWU2NjY1ZjFlOCIsCiAgIm5ldCI6ICJ3cyIsCiAgInBhdGgiOiAiL3hyYXkiLAogICJwb3J0IjogMjA4MywKICAicHMiOiAiU0lOR0FQT1JFLTUwLjAwR0Lwn5OKLTMwROKPsyIsCiAgInNjeSI6ICJhdXRvIiwKICAic25pIjogIm15LmVkdW1haWxtZS5jb20iLAogICJ0bHMiOiAidGxzIiwKICAidHlwZSI6ICJub25lIiwKICAidiI6ICIyIgp9";
     const driveLink = "https://drive.google.com/drive/u/0/folders/16j0H2tw4-xbK2Vb9VAzqzmZa9Edxprju";
+    const letterLink = "https://drive.google.com/file/d/1AXD44tkr8miTR-HgnbJA3bm5Fm4kB3Hm/view?usp=sharing";
 
     const handleCopy = (text: string, id: string) => {
         navigator.clipboard.writeText(text);
@@ -215,7 +216,7 @@ const Guide: React.FC = () => {
                     </span>
                     My Google Drive
                 </h2>
-                <div className="grid grid-cols-1 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <a href={driveLink} target="_blank" rel="noopener noreferrer" className="flex items-center p-5 bg-gradient-to-br from-pink-50 to-rose-50 dark:from-pink-900/20 dark:to-rose-900/20 rounded-xl hover:shadow-md transition-all group border border-pink-100 dark:border-pink-800/30">
                         <div className="bg-pink-500 text-white p-3 rounded-xl mr-5 shadow-lg shadow-pink-500/30 group-hover:scale-110 transition-transform">
                             <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 20 20"><path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z" /><path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z" /></svg>
@@ -223,6 +224,17 @@ const Guide: React.FC = () => {
                         <div>
                             <h3 className="font-black text-lg text-slate-800 dark:text-white group-hover:text-pink-600 dark:group-hover:text-pink-400">Open Toolkit Drive</h3>
                             <p className="text-sm text-slate-500 dark:text-slate-400">Essential apps, installers, and tutorial documentation (Updated 2026)</p>
+                        </div>
+                    </a>
+                    <a href={letterLink} target="_blank" rel="noopener noreferrer" className="flex items-center p-5 bg-gradient-to-br from-sky-50 to-cyan-50 dark:from-sky-900/20 dark:to-cyan-900/20 rounded-xl hover:shadow-md transition-all group border border-sky-100 dark:border-sky-800/30">
+                        <div className="bg-sky-500 text-white p-3 rounded-xl mr-5 shadow-lg shadow-sky-500/30 group-hover:scale-110 transition-transform">
+                            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                            </svg>
+                        </div>
+                        <div>
+                            <h3 className="font-black text-lg text-slate-800 dark:text-white group-hover:text-sky-600 dark:group-hover:text-sky-400">Letter to Thu Thu</h3>
+                            <p className="text-sm text-slate-500 dark:text-slate-400">Read the personal letter</p>
                         </div>
                     </a>
                 </div>
