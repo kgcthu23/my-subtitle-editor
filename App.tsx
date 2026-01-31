@@ -194,6 +194,10 @@ const IncomeTracker: React.FC = () => {
 
 const Guide: React.FC = () => {
     const [copiedId, setCopiedId] = useState<string | null>(null);
+    const [accountName, setAccountName] = useState('');
+    const [isSubmitting, setIsSubmitting] = useState(false);
+    const [submitStatus, setSubmitStatus] = useState<'idle' | 'success' | 'error'>('idle');
+
     const hiddifyKeyVless = "vless://897b11cf-aa86-4fa0-9a6b-87d6c2a3cc5a@my.edumailme.com:443?alpn=h2%2Chttp%2F1.1&encryption=none&fp=chrome&host=my.edumailme.com&path=%2Fxray&security=tls&sni=my.edumailme.com&type=ws#SINGAPORE-50.00GB%F0%9F%93%8A-30D%E2%8F%B3";
     const hiddifyKeyVmess = "vmess://ewogICJhZGQiOiAibXkuZWR1bWFpbG1lLmNvbSIsCiAgImFsbG93SW5zZWN1cmUiOiBmYWxzZSwKICAiYWxwbiI6ICJoMixodHRwLzEuMSIsCiAgImZwIjogImNocm9tZSIsCiAgImhvc3QiOiAibXkuZWR1bWFpbG1lLmNvbSIsCiAgImlkIjogImRiYjNjNTUxLTFkNGQtNGRhMC1hNGFkLTQxYWU2NjY1ZjFlOCIsCiAgIm5ldCI6ICJ3cyIsCiAgInBhdGgiOiAiL3hyYXkiLAogICJwb3J0IjogMjA4MywKICAicHMiOiAiU0lOR0FQT1JFLTUwLjAwR0Lwn5OKLTMwROKPsyIsCiAgInNjeSI6ICJhdXRvIiwKICAic25pIjogIm15LmVkdW1haWxtZS5jb20iLAogICJ0bHMiOiAidGxzIiwKICAidHlwZSI6ICJub25lIiwKICAidiI6ICIyIgp9";
     const driveLink = "https://drive.google.com/drive/u/0/folders/16j0H2tw4-xbK2Vb9VAzqzmZa9Edxprju";
@@ -202,6 +206,47 @@ const Guide: React.FC = () => {
         navigator.clipboard.writeText(text);
         setCopiedId(id);
         setTimeout(() => setCopiedId(null), 2000);
+    };
+
+    const handleReportSubmit = async (e: React.FormEvent) => {
+        e.preventDefault();
+        if (!accountName.trim()) return;
+
+        setIsSubmitting(true);
+        setSubmitStatus('idle');
+
+        // Access Key for 'knightkryptonian@gmail.com'
+        const accessKey = "d6be84f4-63ed-4347-b06c-fe7048ffa2ac"; 
+
+        try {
+            const response = await fetch("https://api.web3forms.com/submit", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    Accept: "application/json",
+                },
+                body: JSON.stringify({
+                    access_key: accessKey,
+                    subject: `Lost Google Pro Access Report: ${accountName}`,
+                    name: accountName,
+                    message: `The user '${accountName}' has reported that they no longer have access to the Google Pro version. Please investigate.`,
+                }),
+            });
+            const result = await response.json();
+            if (result.success) {
+                setSubmitStatus('success');
+                setAccountName('');
+                setTimeout(() => setSubmitStatus('idle'), 5000);
+            } else {
+                console.error("Web3Forms Error:", result);
+                setSubmitStatus('error');
+            }
+        } catch (error) {
+            console.error("Submission Error:", error);
+            setSubmitStatus('error');
+        } finally {
+            setIsSubmitting(false);
+        }
     };
 
     return (
@@ -228,11 +273,57 @@ const Guide: React.FC = () => {
                 </div>
             </div>
 
-             <div className="bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-lg p-4 text-center">
-                <p className="text-slate-600 dark:text-slate-400 text-sm font-medium italic">
-                    "This guide provides setup instructions for Hiddify VPN and fixes for common Subtitle Edit errors."
+            <div className="bg-amber-50 dark:bg-amber-900/20 border-l-4 border-amber-500 p-6 rounded-r-xl shadow-sm">
+                <h3 className="text-lg font-bold text-amber-800 dark:text-amber-200 mb-2 flex items-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                    </svg>
+                    In case you no longer have access to Google Pro
+                </h3>
+                <p className="text-amber-700 dark:text-amber-300 text-sm mb-4">
+                    Google has been trying to remove the Pro version on some of the accounts. If you no longer have access to it, please report it below.
                 </p>
-             </div>
+                <form onSubmit={handleReportSubmit} className="flex flex-col sm:flex-row gap-3 relative">
+                    <input 
+                        type="text" 
+                        placeholder="Type your account name..." 
+                        value={accountName}
+                        onChange={(e) => setAccountName(e.target.value)}
+                        className="flex-1 px-4 py-2 rounded-lg border border-amber-200 dark:border-amber-700 bg-white dark:bg-slate-900 focus:ring-2 focus:ring-amber-400 outline-none transition-all disabled:opacity-50"
+                        required
+                        disabled={isSubmitting}
+                    />
+                    <button 
+                        type="submit" 
+                        disabled={isSubmitting}
+                        className={`px-6 py-2 text-white font-bold rounded-lg transition-colors flex items-center justify-center whitespace-nowrap min-w-[100px] ${isSubmitting ? 'bg-amber-400 cursor-wait' : 'bg-amber-600 hover:bg-amber-700'}`}
+                    >
+                        {isSubmitting ? (
+                            <svg className="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                            </svg>
+                        ) : (
+                            <>
+                                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                                </svg>
+                                Send
+                            </>
+                        )}
+                    </button>
+                    {submitStatus === 'success' && (
+                        <div className="absolute -bottom-8 left-0 text-sm text-green-600 dark:text-green-400 font-bold animate-pulse">
+                            ✅ Report sent successfully!
+                        </div>
+                    )}
+                    {submitStatus === 'error' && (
+                        <div className="absolute -bottom-8 left-0 text-sm text-red-600 dark:text-red-400 font-bold">
+                            ❌ Failed to send. (Check API Key code)
+                        </div>
+                    )}
+                </form>
+            </div>
 
              <div className="bg-white dark:bg-slate-800 p-6 sm:p-8 rounded-xl shadow-lg border border-slate-200 dark:border-slate-700 relative overflow-hidden">
                 <div className="absolute top-0 right-0 p-4 opacity-5">
