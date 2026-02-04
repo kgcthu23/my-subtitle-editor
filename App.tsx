@@ -280,8 +280,11 @@ const Guide: React.FC = () => {
                     </svg>
                     In case you no longer have access to Google Pro
                 </h3>
-                <p className="text-amber-700 dark:text-amber-300 text-sm mb-4">
+                <p className="text-amber-700 dark:text-amber-300 text-sm mb-2">
                     Google has been trying to remove the Pro version on some of the accounts. If you no longer have access to it, please report it below.
+                </p>
+                <p className="text-amber-600 dark:text-amber-400 text-xs mb-4 italic bg-amber-100 dark:bg-amber-800/30 p-2 rounded inline-block">
+                    Note: If you don't know what it means, check the rainbow-ish color beside your Gmail account profile. If it's glowing, you should be fine. :)
                 </p>
                 <form onSubmit={handleReportSubmit} className="flex flex-col sm:flex-row gap-3 relative">
                     <input 
@@ -358,10 +361,6 @@ const Guide: React.FC = () => {
                                     <a href="https://hiddify.com/" target="_blank" rel="noopener noreferrer" className="flex items-center px-4 py-2 bg-white dark:bg-slate-700 border border-violet-200 dark:border-violet-800 rounded-lg hover:bg-violet-100 transition-colors text-xs font-bold text-violet-700 dark:text-violet-300 col-span-full">
                                         🌐 hiddify.com (Choose Windows)
                                     </a>
-                                </div>
-                                <div className="mt-4 p-3 bg-violet-100/50 dark:bg-violet-900/30 rounded-lg border border-violet-200 dark:border-violet-800/50">
-                                    <p className="text-[12px] font-bold text-violet-900 dark:text-violet-200 mb-1">⚠️ Data Preservation Note</p>
-                                    <p className="text-[11px] leading-snug">Please <span className="font-bold underline">disconnect</span> Hiddify VPN when downloading movies or large files, as there is a monthly data limit per user. Save the high-speed data for your translation work!</p>
                                 </div>
                                 <p className="text-[11px] opacity-80 mt-2 italic">This VPN is recommended for high-speed access during peak hours. Note: Ensure you remove previous outdated keys before importing the new one below.</p>
                             </div>
