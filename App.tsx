@@ -221,6 +221,22 @@ const IncomeTracker: React.FC = () => {
         setLines(''); setRate('');
     };
 
+    const handleDeleteEntry = (id: string) => {
+        const updatedData = JSON.parse(JSON.stringify(incomeData));
+        const monthData = updatedData[currentMonthKey];
+        if (!monthData) return;
+
+        const entryIndex = monthData.entries.findIndex((e: IncomeEntry) => e.id === id);
+        if (entryIndex === -1) return;
+
+        const entry = monthData.entries[entryIndex];
+        monthData.total -= entry.amount;
+        monthData.entries.splice(entryIndex, 1);
+        
+        setIncomeData(updatedData);
+        localStorage.setItem('incomeTrackerData', JSON.stringify(updatedData));
+    };
+
     const currentMonthData = incomeData[currentMonthKey] ?? { total: 0, entries: [] };
 
     return (
@@ -243,9 +259,20 @@ const IncomeTracker: React.FC = () => {
                 </div>
                 <div className="space-y-3">
                     {currentMonthData.entries.map(entry => (
-                        <div key={entry.id} className="flex justify-between items-center p-3 bg-slate-50 dark:bg-slate-900/50 rounded-md">
+                        <div key={entry.id} className="flex justify-between items-center p-3 bg-slate-50 dark:bg-slate-900/50 rounded-md group hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">
                             <div><p className="font-bold">{entry.lines.toLocaleString()} lines</p><p className="text-xs text-slate-500">{entry.date}</p></div>
-                            <p className="font-bold text-green-600">{entry.amount.toLocaleString()} MMK</p>
+                            <div className="flex items-center gap-4">
+                                <p className="font-bold text-green-600">{entry.amount.toLocaleString()} MMK</p>
+                                <button 
+                                    onClick={() => handleDeleteEntry(entry.id)}
+                                    className="text-slate-400 hover:text-red-500 transition-colors opacity-100 sm:opacity-0 sm:group-hover:opacity-100 p-2"
+                                    title="Delete entry"
+                                >
+                                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                    </svg>
+                                </button>
+                            </div>
                         </div>
                     ))}
                     {currentMonthData.entries.length === 0 && <p className="text-center text-slate-500 py-10">No entries this month.</p>}
