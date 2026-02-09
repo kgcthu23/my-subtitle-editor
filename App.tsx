@@ -21,7 +21,71 @@ const WarningIcon = () => (
     </svg>
 );
 
+const MOTIVATIONAL_QUOTES = [
+    "Good Luck, Thu Thu! You're the best.",
+    "Fighting, Thu Thu! 💪",
+    "Go show them how it's done, Thu Thu.",
+    "Don't worry, it's going to be a breeze for you.",
+    "Thu Thu can do it! No doubt about it.",
+    "Sending you a giant hug and lots of luck.",
+    "Thu Thu... you’re going to pass with flying colors.",
+    "Hope you get those full marks you've been working for!",
+    "Recite your prayers, stay calm, and dominate, Thu Thu.",
+    "I’m praying for you and thinking of you every second. You've got this!",
+    "I believe in you more than I believe in anything else. You've got this, Thu Thu.",
+    "Take a deep breath for me. You’re going to be brilliant today.",
+    "I’m already proud of you, no matter what. But I know you’re going to kill it anyway!",
+    "Think of me as your secret weapon today. I’m sending you all my strength, Thu Thu.",
+    "I know how much this means to you, and that’s why I know you’re going to succeed.",
+    "If you get stuck on a question, Relax and calm first. I know you can solve it.",
+    "I’ll be waiting to hear how great you did. Go shine, Thu Thu.",
+    "Thu Thu... your hard work will pay off, believe it.",
+    "Don't stress too much Thu Thu, I know you can do your best.",
+    "May lots of luck come to Thu Thu.",
+    "This exam is easy for Thu Thu. Fighting!",
+    "Don't lose sleep studying, Thu Thu. Take care of your health.",
+    "Don't forget that I'm always on Thu Thu's side.",
+    "Just try your best Thu Thu, good results will come naturally.",
+    "May everything go smoothly for Thu Thu.",
+    "Stay calm and answer Thu Thu... you can do this.",
+    "Everything will happen just as Thu Thu imagined.",
+    "Thu Thu is the smartest person I know, answer with confidence.",
+    "Thu Thu, you’re the smartest person I know. Go into that room and show them what I already know.",
+    "Don't let the nerves win, Thu Thu. You know this material better than anyone.",
+    "Fighting, Thu Thu! This exam is just a small hurdle for someone as talented as you.",
+    "Difficulties are just challenges for people like you. You make the hard things look easy.",
+    "Your brain is absolute gold, Thu Thu. This test doesn't stand a chance.",
+    "Ignore the noise and the stress around you. Just do your thing, Thu Thu. You’re in a league of your own.",
+    "Don't stress too much, Thu Thu. I know you can do your best, and I’m right here behind you.",
+    "I’m sending all the luck in the world to Thu Thu today. You deserve every bit of it.",
+    "Never forget that I’m always on your side, Thu Thu.",
+    "I hope everything goes as smoothly as possible for you today.",
+    "Stay calm and keep that beautiful focus, Thu Thu... you’ve got this handled.",
+    "Everything will happen just as you’ve imagined. Your dreams are closer than you think.",
+    "Thu Thu, your mind is honestly my favorite thing about you. You’re going to brilliant today.",
+    "I love how your brain works. That exam paper has no idea what’s coming for it.",
+    "You’re not just hardworking; you’re genuinely brilliant. Watching you solve things is impressive, Thu Thu.",
+    "I’m always in awe of how quickly you pick things up. You’re definitely the smartest person in the room.",
+    "You have this way of making the most complex topics seem simple. That’s how I know you’ve got this handled.",
+    "I’m so lucky to be close to someone as bright and capable as you."
+];
+
 // --- Child Components ---
+
+const DailyQuote: React.FC = () => {
+    const quote = useMemo(() => {
+        const index = Math.floor(Math.random() * MOTIVATIONAL_QUOTES.length);
+        return MOTIVATIONAL_QUOTES[index];
+    }, []);
+
+    return (
+        <div className="mt-3 px-4 animate-fade-in">
+            <p className="text-sm sm:text-base font-medium text-pink-500 dark:text-pink-400 italic">
+                ✨ "{quote}" ✨
+            </p>
+        </div>
+    );
+};
 
 const FileUpload: React.FC<{ onFileSelect: (content: string, fileName: string) => void; disabled: boolean }> = ({ onFileSelect, disabled }) => {
     const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -194,7 +258,7 @@ const IncomeTracker: React.FC = () => {
 
 const Guide: React.FC = () => {
     const [copiedId, setCopiedId] = useState<string | null>(null);
-    const [accountName, setAccountName] = useState('');
+    const [issue, setIssue] = useState('');
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [submitStatus, setSubmitStatus] = useState<'idle' | 'success' | 'error'>('idle');
 
@@ -210,7 +274,7 @@ const Guide: React.FC = () => {
 
     const handleReportSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        if (!accountName.trim()) return;
+        if (!issue.trim()) return;
 
         setIsSubmitting(true);
         setSubmitStatus('idle');
@@ -227,15 +291,15 @@ const Guide: React.FC = () => {
                 },
                 body: JSON.stringify({
                     access_key: accessKey,
-                    subject: `Lost Google Pro Access Report: ${accountName}`,
-                    name: accountName,
-                    message: `The user '${accountName}' has reported that they no longer have access to the Google Pro version. Please investigate.`,
+                    subject: `Toolkit Issue Report: Anonymous`,
+                    name: 'Anonymous',
+                    message: issue,
                 }),
             });
             const result = await response.json();
             if (result.success) {
                 setSubmitStatus('success');
-                setAccountName('');
+                setIssue('');
                 setTimeout(() => setSubmitStatus('idle'), 5000);
             } else {
                 console.error("Web3Forms Error:", result);
@@ -278,51 +342,43 @@ const Guide: React.FC = () => {
                     <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
                     </svg>
-                    In case you no longer have access to Google Pro
+                    Report an Issue
                 </h3>
-                <p className="text-amber-700 dark:text-amber-300 text-sm mb-2">
-                    Google has been trying to remove the Pro version on some of the accounts. If you no longer have access to it, please report it below.
+                <p className="text-amber-700 dark:text-amber-300 text-sm mb-4">
+                    Encountering problems with the toolkit, VPN, or access? Describe the issue below so I can help.
                 </p>
-                <p className="text-amber-600 dark:text-amber-400 text-xs mb-4 italic bg-amber-100 dark:bg-amber-800/30 p-2 rounded inline-block">
-                    Note: If you don't know what it means, check the rainbow-ish color beside your Gmail account profile. If it's glowing, you should be fine. :)
-                </p>
-                <form onSubmit={handleReportSubmit} className="flex flex-col sm:flex-row gap-3 relative">
-                    <input 
-                        type="text" 
-                        placeholder="Type your account name..." 
-                        value={accountName}
-                        onChange={(e) => setAccountName(e.target.value)}
-                        className="flex-1 px-4 py-2 rounded-lg border border-amber-200 dark:border-amber-700 bg-white dark:bg-slate-900 focus:ring-2 focus:ring-amber-400 outline-none transition-all disabled:opacity-50"
-                        required
-                        disabled={isSubmitting}
-                    />
-                    <button 
-                        type="submit" 
-                        disabled={isSubmitting}
-                        className={`px-6 py-2 text-white font-bold rounded-lg transition-colors flex items-center justify-center whitespace-nowrap min-w-[100px] ${isSubmitting ? 'bg-amber-400 cursor-wait' : 'bg-amber-600 hover:bg-amber-700'}`}
-                    >
-                        {isSubmitting ? (
-                            <svg className="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                            </svg>
-                        ) : (
-                            <>
-                                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-                                </svg>
-                                Send
-                            </>
-                        )}
-                    </button>
+                <form onSubmit={handleReportSubmit} className="space-y-3 relative">
+                     <div className="relative">
+                             <input
+                                type="text"
+                                placeholder="What's the issue?"
+                                value={issue}
+                                onChange={(e) => setIssue(e.target.value)}
+                                className="w-full px-4 py-2 rounded-lg border border-amber-200 dark:border-amber-700 bg-white dark:bg-slate-900 focus:ring-2 focus:ring-amber-400 outline-none transition-all disabled:opacity-50 text-sm pr-20"
+                                required
+                                disabled={isSubmitting}
+                            />
+                             <button 
+                                type="submit" 
+                                disabled={isSubmitting}
+                                className={`absolute right-1 top-1 bottom-1 px-4 text-white font-bold rounded-md transition-colors flex items-center justify-center text-xs ${isSubmitting ? 'bg-amber-400 cursor-wait' : 'bg-amber-600 hover:bg-amber-700'}`}
+                            >
+                                {isSubmitting ? (
+                                    <svg className="animate-spin h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                    </svg>
+                                ) : 'Send'}
+                            </button>
+                    </div>
                     {submitStatus === 'success' && (
-                        <div className="absolute -bottom-8 left-0 text-sm text-green-600 dark:text-green-400 font-bold animate-pulse">
-                            ✅ Report sent successfully!
+                        <div className="text-xs text-green-600 dark:text-green-400 font-bold animate-pulse mt-2">
+                            ✅ Issue reported successfully!
                         </div>
                     )}
                     {submitStatus === 'error' && (
-                        <div className="absolute -bottom-8 left-0 text-sm text-red-600 dark:text-red-400 font-bold">
-                            ❌ Failed to send. (Check API Key code)
+                        <div className="text-xs text-red-600 dark:text-red-400 font-bold mt-2">
+                            ❌ Failed to send report.
                         </div>
                     )}
                 </form>
@@ -436,52 +492,6 @@ const Guide: React.FC = () => {
                     </div>
                 </div>
              </div>
-
-             <div className="bg-gradient-to-r from-sky-500 to-indigo-600 rounded-xl p-6 text-white shadow-lg">
-                <h3 className="text-xl font-bold mb-2 flex items-center">
-                    <svg className="w-6 h-6 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
-                    Pro Tip: Use "Compare"
-                </h3>
-                <p className="opacity-90 text-sm">The best way to fix errors is using the Compare feature in Subtitle Edit to visualize differences and missing lines.</p>
-            </div>
-
-             <div className="bg-white dark:bg-slate-800 p-8 rounded-xl shadow-lg border border-slate-200 dark:border-slate-700">
-                <h2 className="text-2xl font-bold mb-6 text-slate-800 dark:text-white flex items-center">
-                    <span className="bg-red-100 dark:bg-red-900/30 text-red-600 dark:text-red-400 p-2 rounded-lg mr-3">
-                        <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                        </svg>
-                    </span>
-                    Common Errors & Solutions
-                </h2>
-                <div className="space-y-12">
-                    <div className="border-l-4 border-sky-500 pl-6 py-2">
-                        <h3 className="text-xl font-bold text-slate-700 dark:text-slate-200 mb-3">
-                            "Empty line expected, but found number..."
-                        </h3>
-                        <div className="grid md:grid-cols-2 gap-6">
-                            <div className="bg-slate-900 rounded-lg p-4 font-mono text-xs text-slate-300 shadow-inner overflow-hidden border border-slate-700">
-                                <div className="flex items-center gap-2 mb-2 text-yellow-500 border-b border-slate-700 pb-2">
-                                    <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
-                                    <span className="font-semibold">Subtitle Edit Error Log</span>
-                                </div>
-                                <div className="space-y-1 opacity-90">
-                                    <p><span className="text-slate-500">Line 3:</span> Empty line expected, but found number (2)...</p>
-                                    <p><span className="text-slate-500">Line 1090:</span> Empty line expected, but found number (272)...</p>
-                                </div>
-                            </div>
-                            <div className="flex flex-col justify-center">
-                                <h4 className="font-semibold text-sky-600 dark:text-sky-400 mb-2 uppercase tracking-wide text-xs">Solution</h4>
-                                <div className="text-slate-600 dark:text-slate-300 leading-relaxed bg-sky-50 dark:bg-sky-900/20 p-4 rounded-lg border border-sky-100 dark:border-sky-800">
-                                    <p className="font-medium text-slate-800 dark:text-slate-100">
-                                        👉 Check via <span className="text-sky-600 dark:text-sky-400 font-bold">"Import Timestamp"</span> in Subtitle Edit to re-sync indices.
-                                    </p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
         </div>
     );
 };
@@ -520,6 +530,7 @@ export default function App() {
             <div className="max-w-7xl mx-auto">
                 <header className="text-center mb-10">
                     <h1 className="text-4xl sm:text-5xl font-extrabold text-slate-900 dark:text-white">Translator's Toolkit</h1>
+                    <DailyQuote />
                     <div className="mt-6 flex justify-center gap-2 p-1 bg-slate-200/50 dark:bg-slate-800/50 rounded-lg max-w-sm mx-auto shadow-inner">
                         {(['cleaner', 'tracker', 'guide'] as AppView[]).map((view) => (
                             <button 
