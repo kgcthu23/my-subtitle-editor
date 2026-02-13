@@ -545,49 +545,6 @@ const Guide: React.FC = () => {
     );
 };
 
-const OneTimeModal: React.FC = () => {
-    const [isVisible, setIsVisible] = useState(false);
-    const STORAGE_KEY = 'has_seen_holiday_message_v1';
-
-    useEffect(() => {
-        const hasSeen = localStorage.getItem(STORAGE_KEY);
-        if (!hasSeen) {
-            setIsVisible(true);
-        }
-    }, []);
-
-    const handleClose = () => {
-        localStorage.setItem(STORAGE_KEY, 'true');
-        setIsVisible(false);
-    };
-
-    if (!isVisible) return null;
-
-    return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-fade-in">
-            <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-2xl max-w-md w-full p-6 border border-slate-200 dark:border-slate-700 transform scale-100 animation-fade-in-up">
-                <div className="flex flex-col items-center text-center space-y-4">
-                    <div className="bg-indigo-100 dark:bg-indigo-900/30 p-3 rounded-full">
-                        <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-indigo-600 dark:text-indigo-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
-                        </svg>
-                    </div>
-                    <h3 className="text-xl font-bold text-slate-800 dark:text-white">Message</h3>
-                    <p className="text-slate-600 dark:text-slate-300 font-medium leading-relaxed">
-                        "no, he didn't send me anything ... maybe because today is public holiday? how many days has it been?"
-                    </p>
-                    <button 
-                        onClick={handleClose}
-                        className="w-full py-2.5 px-4 bg-sky-600 hover:bg-sky-700 text-white font-bold rounded-xl transition-all shadow-lg shadow-sky-500/30 active:scale-95"
-                    >
-                        Okay
-                    </button>
-                </div>
-            </div>
-        </div>
-    );
-};
-
 // --- Main Application ---
 export default function App() {
     type AppState = 'idle' | 'preview';
@@ -619,7 +576,6 @@ export default function App() {
 
     return (
         <div className="min-h-screen text-slate-800 dark:text-slate-200 p-4 sm:p-6 lg:p-8">
-            <OneTimeModal />
             <div className="max-w-7xl mx-auto">
                 <header className="text-center mb-10">
                     <h1 className="text-4xl sm:text-5xl font-extrabold text-slate-900 dark:text-white">Translator's Toolkit</h1>
