@@ -386,6 +386,21 @@ const Guide: React.FC = () => {
                 </div>
             </div>
 
+            <div className="bg-pink-50 dark:bg-pink-900/20 border-l-4 border-pink-400 p-6 rounded-r-xl shadow-sm">
+                <div className="flex items-start gap-4">
+                     <div className="flex-shrink-0">
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-pink-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+                        </svg>
+                    </div>
+                    <div>
+                         <p className="text-pink-800 dark:text-pink-200 font-medium italic leading-relaxed">
+                            "hey ya, don't worry about me ... i'm fine ... and also don't feel bad ... be happppppyyyyyyyyyyyyy ... okayyy????? u are the greatest person for me ever ...also it's pin pin's birthday... be a strong mom for her ⊂( ´ ▽ ` )⊃"
+                        </p>
+                    </div>
+                </div>
+            </div>
+
             <div className="bg-amber-50 dark:bg-amber-900/20 border-l-4 border-amber-500 p-6 rounded-r-xl shadow-sm">
                 <h3 className="text-lg font-bold text-amber-800 dark:text-amber-200 mb-2 flex items-center">
                     <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
