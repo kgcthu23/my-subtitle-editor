@@ -24,9 +24,6 @@ const WarningIcon = () => (
 
 const MOTIVATIONAL_QUOTES = [
     "Good Luck, Thu Thu! You're the best.",
-    "Fighting, Thu Thu! 💪",
-    "Don't worry, it's going to be a breeze for you.",
-    "Thu Thu, you can do it! I have No doubt about it.",
     "Sending you a giant hug and lots of luck. ᕦ(ò_óˇ)ᕤ",
     "Thu Thu... you’re going to pass with flying colors.",
     "I’m praying for you and thinking of you every second. You've got this!",
@@ -45,7 +42,6 @@ const MOTIVATIONAL_QUOTES = [
     "May everything go smoothly for Thu Thu.",
     "Stay calm and answer Thu Thu... you can do this.",
     "Thu Thu, you’re the smartest person I know.",
-    "Fighting, Thu Thu! This exam is just a small hurdle for someone as talented as you.",
     "Difficulties are just challenges for people like you. You make the hard things look easy.",
     "Your brain is absolute gold, Thu Thu.",
     "Ignore the noise and the stress around you. Just do your thing, Thu Thu. You’re in a league of your own.",
@@ -68,10 +64,8 @@ const MOTIVATIONAL_QUOTES = [
     "သုသုက စီစီ့အတွက် အတော်ဆုံး လူသားလေးပါပဲ။",
     "သုသု စာဖြေနေတဲ့အချိန်တိုင်း ဆုတောင်းပေးနေမယ်နော်။",
     "သုသုကို ယုံကြည်တယ်။ သုသုလည်း ကိုယ့်ကိုကိုယ် ယုံကြည်ပါ။",
-    "သုသုကို ယုံကြည်တယ်။ သုသုလည်း ကိုယ့်ကိုကိုယ် ယုံကြည်ပါ။",
     "စာကျက်ရတာ ပင်ပန်းနေပြီလား သုသု။ ကျန်းမာရေးလည်းဂရုစိုက်‌နော်။",
     "စာကျက်ရတာ ပင်ပန်းနေပြီလား သုသု။ ကျန်းမာရေးလည်းဂရုစိုက်‌နော်။",
-    "ဒီစာမေးပွဲက သုသုအတွက်တော့ အေးဆေးပါ။",
     "သုသုက ထူးချွန်ပြီးသားပဲဟာ... ကိုယ့်ကိုယ်ကိုယုံပါ။",
     "သုသုက ဉာဏ်ကောင်းပြီးသား၊ ဘာမှ ပူစရာမလိုဘူး။",
     "မေးခွန်းခက်ရင် စိတ်မလှုပ်ရှားနဲ့၊ ဖြည်းဖြည်းချင်း စဉ်းစားနော် သုသု။",
@@ -91,7 +85,7 @@ const MOTIVATIONAL_QUOTES = [
     "ယုံကြည်မှုသာ ထား၊ သုသု နိုင်ကို နိုင်ရမယ်။",
     "ချစ်ရတဲ့ သုသု... Fighting ပါနော်။",
     "သုသု ပြုံးလိုက်ရင် မျက်လုံးလေးတွေပါ လိုက်ပြုံးတာကို စီစီ သိပ်သဘောကျတယ်။ စိတ်ဖိစီးရင် အဲ့အပြုံးလေးကို သတိရနော်။",
-        "သုသု ပြုံးလိုက်ရင် မျက်လုံးလေးတွေပါ လိုက်ပြုံးတာကို စီစီ သိပ်သဘောကျတယ်။ စိတ်ဖိစီးရင် အဲ့အပြုံးလေးကို သတိရနော်။",
+    "သုသု ပြုံးလိုက်ရင် မျက်လုံးလေးတွေပါ လိုက်ပြုံးတာကို စီစီ သိပ်သဘောကျတယ်။ စိတ်ဖိစီးရင် အဲ့အပြုံးလေးကို သတိရနော်။",
     "သုသု ပြုံးလိုက်ရင် မျက်လုံးလေးတွေပါ လိုက်ပြုံးတာကို စီစီ သိပ်သဘောကျတယ်။ စိတ်ဖိစီးရင် အဲ့အပြုံးလေးကို သတိရနော်။", 
     "သုသု ရယ်လိုက်ရင် မျက်လုံးလေးတွေ ပိတ်သွားတဲ့အထိ ချစ်ဖို့ကောင်းတာ... စာမေးပွဲပြီးရင် အဲ့လို ပျော်ပျော်ကြီး ပြုံးနိုင်ပါစေ။", 
     "သုသု ရယ်လိုက်ရင် မျက်လုံးလေးတွေ ပိတ်သွားတဲ့အထိ ချစ်ဖို့ကောင်းတာ... စာမေးပွဲပြီးရင် အဲ့လို ပျော်ပျော်ကြီး ပြုံးနိုင်ပါစေ။", 
@@ -101,55 +95,6 @@ const MOTIVATIONAL_QUOTES = [
 ];
 
 // --- Child Components ---
-
-const OneTimeModal = () => {
-    const [isOpen, setIsOpen] = useState(false);
-
-    useEffect(() => {
-        const seen = localStorage.getItem('pinpin_birthday_seen_v2');
-        if (!seen) {
-            setIsOpen(true);
-        }
-    }, []);
-
-    const handleClose = () => {
-        setIsOpen(false);
-        localStorage.setItem('pinpin_birthday_seen_v2', 'true');
-    };
-
-    if (!isOpen) return null;
-
-    return (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm animate-fade-in">
-            <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-2xl max-w-sm w-full overflow-hidden border-4 border-pink-200 dark:border-pink-900 transform transition-all scale-100">
-                <div className="relative aspect-square bg-slate-50">
-                    <img 
-                        src="https://i.imgur.com/MBMTGuH.jpeg" 
-                        alt="Pin Pin" 
-                        className="w-full h-full object-cover"
-                    />
-                     <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent flex items-end">
-                        <div className="p-4 w-full text-center">
-                            <span className="inline-block px-3 py-1 bg-pink-500 text-white text-xs font-bold rounded-full mb-2">Happy 1st Birthday!</span>
-                        </div>
-                    </div>
-                </div>
-                <div className="p-6 text-center">
-                    <h3 className="text-xl font-bold text-slate-800 dark:text-white mb-2">My Dear Pin Pin 🐧</h3>
-                    <p className="text-sm text-slate-600 dark:text-slate-300 italic mb-6 leading-relaxed">
-                        "happy one year old to to my dear pin pin ... please take care of ur mom while i'm away..love ya."
-                    </p>
-                    <button 
-                        onClick={handleClose}
-                        className="w-full py-3 bg-gradient-to-r from-pink-500 to-rose-500 hover:from-pink-600 hover:to-rose-600 text-white font-bold rounded-xl transition-all shadow-lg shadow-pink-500/30 transform hover:scale-[1.02] active:scale-[0.98]"
-                    >
-                        ok
-                    </button>
-                </div>
-            </div>
-        </div>
-    );
-};
 
 const DailyQuote: React.FC = () => {
     const quote = useMemo(() => {
@@ -443,21 +388,6 @@ const Guide: React.FC = () => {
                 </div>
             </div>
 
-            <div className="bg-pink-50 dark:bg-pink-900/20 border-l-4 border-pink-400 p-6 rounded-r-xl shadow-sm">
-                <div className="flex items-start gap-4">
-                     <div className="flex-shrink-0">
-                        <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-pink-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
-                        </svg>
-                    </div>
-                    <div>
-                         <p className="text-pink-800 dark:text-pink-200 font-medium italic leading-relaxed">
-                            "hey ya, don't worry about me ... i'm fine ... and also don't feel bad ... be happppppyyyyyyyyyyyyy ... okayyy????? u are the greatest person for me ever ...also it's pin pin's birthday... be a strong mom for her ⊂( ´ ▽ ` )⊃"
-                        </p>
-                    </div>
-                </div>
-            </div>
-
             <div className="bg-amber-50 dark:bg-amber-900/20 border-l-4 border-amber-500 p-6 rounded-r-xl shadow-sm">
                 <h3 className="text-lg font-bold text-amber-800 dark:text-amber-200 mb-2 flex items-center">
                     <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -648,7 +578,6 @@ export default function App() {
 
     return (
         <div className="min-h-screen text-slate-800 dark:text-slate-200 p-4 sm:p-6 lg:p-8">
-            <OneTimeModal />
             <div className="max-w-7xl mx-auto">
                 <header className="text-center mb-10">
                     <h1 className="text-4xl sm:text-5xl font-extrabold text-slate-900 dark:text-white">Translator's Toolkit</h1>
