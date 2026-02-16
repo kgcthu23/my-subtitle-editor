@@ -22,6 +22,19 @@ const WarningIcon = () => (
     </svg>
 );
 
+const EyeIcon = () => (
+    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+    </svg>
+);
+
+const EyeOffIcon = () => (
+    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21" />
+    </svg>
+);
+
 const MOTIVATIONAL_QUOTES = [
     "Good Luck, Thu Thu! You're the best.",
     "Sending you a giant hug and lots of luck. ᕦ(ò_óˇ)ᕤ",
@@ -558,6 +571,16 @@ export default function App() {
     const [fileName, setFileName] = useState<string>('cleaned.srt');
     const [summary, setSummary] = useState<ChangeSummary | null>(null);
     const [foreignReport, setForeignReport] = useState<ForeignLanguageReport | null>(null);
+    const [showQuotes, setShowQuotes] = useState<boolean>(() => {
+        const saved = localStorage.getItem('showQuotes');
+        return saved !== 'false';
+    });
+
+    const toggleQuotes = () => {
+        const newState = !showQuotes;
+        setShowQuotes(newState);
+        localStorage.setItem('showQuotes', String(newState));
+    };
 
     const handleFileSelect = useCallback((content: string, name: string) => {
         setOriginalContent(content);
@@ -579,9 +602,29 @@ export default function App() {
     return (
         <div className="min-h-screen text-slate-800 dark:text-slate-200 p-4 sm:p-6 lg:p-8">
             <div className="max-w-7xl mx-auto">
-                <header className="text-center mb-10">
+                <header className="text-center mb-10 pt-2">
                     <h1 className="text-4xl sm:text-5xl font-extrabold text-slate-900 dark:text-white">Translator's Toolkit</h1>
-                    <DailyQuote />
+                    
+                    {showQuotes && <DailyQuote />}
+                    
+                    <button 
+                        onClick={toggleQuotes} 
+                        className="mt-2 mx-auto flex items-center justify-center gap-2 text-xs font-medium text-slate-400 hover:text-sky-600 dark:text-slate-500 dark:hover:text-sky-400 transition-colors"
+                        title={showQuotes ? "Hide Quotes" : "Show Quotes"}
+                    >
+                        {showQuotes ? (
+                            <>
+                                <EyeOffIcon />
+                                <span>Hide Quotes</span>
+                            </>
+                        ) : (
+                            <>
+                                <EyeIcon />
+                                <span>Show Quotes</span>
+                            </>
+                        )}
+                    </button>
+
                     <div className="mt-6 flex justify-center gap-2 p-1 bg-slate-200/50 dark:bg-slate-800/50 rounded-lg max-w-sm mx-auto shadow-inner">
                         {(['cleaner', 'tracker', 'guide'] as AppView[]).map((view) => (
                             <button 
