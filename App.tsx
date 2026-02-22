@@ -116,7 +116,7 @@ const FileUpload: React.FC<{ onFileSelect: (content: string, fileName: string) =
     return (
         <div className="w-full max-w-2xl mx-auto">
             <label htmlFor="file-upload" className="relative cursor-pointer bg-white dark:bg-slate-800 rounded-lg border-2 border-dashed border-sky-400/50 dark:border-sky-500/60 flex flex-col items-center justify-center p-12 hover:bg-sky-50 dark:hover:bg-slate-700 transition-colors duration-300">
-                <UploadIcon />
+                <UploadCloud className="w-8 h-8 text-sky-500 mb-2" />
                 <span className="mt-2 text-base font-medium text-slate-600 dark:text-slate-300">Click to upload or drag and drop</span>
                 <span className="text-sm text-slate-500 dark:text-slate-400">SRT files only</span>
                 <input id="file-upload" type="file" className="sr-only" accept=".srt" onChange={handleFileChange} disabled={disabled} />
@@ -190,7 +190,7 @@ const ForeignLanguageReportDisplay: React.FC<{ report: ForeignLanguageReport }> 
 
     return (
         <div className="bg-yellow-50 dark:bg-yellow-900/30 border-l-4 border-yellow-400 text-yellow-800 dark:text-yellow-200 p-4 rounded-r-lg" role="alert">
-            <div className="flex items-center"><WarningIcon /><div><p className="font-bold">Foreign Language Detection</p></div></div>
+            <div className="flex items-center"><AlertTriangle className="w-6 h-6 text-yellow-500 mr-3 flex-shrink-0" /><div><p className="font-bold">Foreign Language Detection</p></div></div>
             <div className="mt-4 max-h-60 overflow-y-auto pr-2">
                 <table className="w-full text-left text-sm">
                     <thead className="sticky top-0 bg-yellow-100 dark:bg-yellow-800/50"><tr><th className="p-2">Line</th><th className="p-2">Detected</th><th className="p-2">Preview</th></tr></thead>
@@ -550,6 +550,11 @@ export default function App() {
     const [fileName, setFileName] = useState<string>('cleaned.srt');
     const [summary, setSummary] = useState<ChangeSummary | null>(null);
     const [foreignReport, setForeignReport] = useState<ForeignLanguageReport | null>(null);
+    const [showQuotes, setShowQuotes] = useState<boolean>(true);
+
+    const toggleQuotes = useCallback(() => {
+        setShowQuotes(prev => !prev);
+    }, []);
 
     const handleFileSelect = useCallback((content: string, name: string) => {
         setOriginalContent(content);
@@ -635,7 +640,7 @@ export default function App() {
                                         <h2 className="text-xl font-bold">Review Changes</h2>
                                         <div className="flex gap-3">
                                             <button onClick={() => setAppState('idle')} className="px-4 py-2 text-sm font-semibold bg-slate-200 dark:bg-slate-700 rounded-md">Clean Another</button>
-                                            <button onClick={handleDownload} className="px-5 py-2 text-sm font-semibold text-white bg-sky-600 rounded-md hover:bg-sky-700 shadow-md flex items-center"><DownloadIcon /> Download</button>
+                                            <button onClick={handleDownload} className="px-5 py-2 text-sm font-semibold text-white bg-sky-600 rounded-md hover:bg-sky-700 shadow-md flex items-center"><Download className="w-4 h-4 mr-2" /> Download</button>
                                         </div>
                                     </div>
                                     <Preview originalContent={originalContent} cleanedContent={cleanedContent} summary={summary} foreignReport={foreignReport} />
