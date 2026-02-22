@@ -1,38 +1,18 @@
+
 import React, { useState, useCallback, useMemo, useEffect } from 'react';
 import { cleanSrtContent, detectForeignLanguages, getChangeSummary } from './services/srtCleaner';
 import type { ChangeSummary, ForeignLanguageReport, IncomeData, IncomeEntry, DetectedLanguageInfo } from './types';
+import {
+    UploadCloud, Download, AlertTriangle, Eye, EyeOff,
+    LayoutDashboard, Calculator, BookOpen, Sparkles,
+    ArrowRight, CheckCircle2, Trash2, Link as LinkIcon, Info, MessageSquare
+} from 'lucide-react';
+import { clsx, type ClassValue } from 'clsx';
+import { twMerge } from 'tailwind-merge';
 
-// SVG Icons
-const UploadIcon = () => (
-    <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
-    </svg>
-);
-
-const DownloadIcon = () => (
-    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
-    </svg>
-);
-
-const WarningIcon = () => (
-    <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-yellow-400 mr-3 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-    </svg>
-);
-
-const EyeIcon = () => (
-    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-    </svg>
-);
-
-const EyeOffIcon = () => (
-    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21" />
-    </svg>
-);
+function cn(...inputs: ClassValue[]) {
+    return twMerge(clsx(inputs));
+}
 
 const MOTIVATIONAL_QUOTES = [
     "Good Luck, Thu Thu! You're the best.",
@@ -63,20 +43,27 @@ const MOTIVATIONAL_QUOTES = [
     "Everything will happen just as you’ve imagined. Your dreams are closer than you think.",
     "Thu Thu, your mind is honestly my favorite thing about you. You’re going to brilliant today.",
     "I love how your brain works. U definitely knows about lots of things including weird facts. :P",
+    "I love how your brain works. U definitely knows about lots of things including weird facts. :P",
     "You’re not just hardworking; you’re genuinely brilliant. Watching you solve things is impressive, Thu Thu.",
+    "You’re not just hardworking; you’re genuinely brilliant. Watching you solve things is impressive, Thu Thu.",
+    "I’m always in awe of how quickly you pick things up. You’re definitely the smartest person i know.",
     "I’m always in awe of how quickly you pick things up. You’re definitely the smartest person i know.",
     "You have this way of making the most complex topics seem simple. That’s how I know you’ve got this handled.",
     "I’m so lucky to be close to someone as bright and capable as you.",
     "သုသုရေ... Fighting နော်! အကောင်းဆုံး လုပ်နိုင်မှာပါ။",
     "ကံကောင်းခြင်းတွေအားလုံး သုသုဆီကို ရောက်လာပါစေ။",
     "သုသုက စီစီ့အတွက် အတော်ဆုံး လူသားလေးပါပဲ။",
+    "သုသုက စီစီ့အတွက် အတော်ဆုံး လူသားလေးပါပဲ။",
     "သုသု စာဖြေနေတဲ့အချိန်တိုင်း ဆုတောင်းပေးနေမယ်နော်။",
     "သုသုကို ယုံကြည်တယ်။ သုသုလည်း ကိုယ့်ကိုကိုယ် ယုံကြည်ပါ။",
+    "စာကျက်ရတာ ပင်ပန်းနေပြီလား သုသု။ ကျန်းမာရေးလည်းဂရုစိုက်‌နော်။",
     "စာကျက်ရတာ ပင်ပန်းနေပြီလား သုသု။ ကျန်းမာရေးလည်းဂရုစိုက်‌နော်။",
     "သုသုက ထူးချွန်ပြီးသားပဲဟာ... ကိုယ့်ကိုယ်ကိုယုံပါ။",
     "သုသုက ဉာဏ်ကောင်းပြီးသား၊ ဘာမှ ပူစရာမလိုဘူး။",
     "မေးခွန်းခက်ရင် စိတ်မလှုပ်ရှားနဲ့၊ ဖြည်းဖြည်းချင်း စဉ်းစားနော် သုသု။",
     "ကျန်းမာရေးလည်း ဂရုစိုက်ဦးနော် သုသု။ အိပ်ရေးဝမှ ဉာဏ်ပွင့်မှာ။",
+    "ကျန်းမာရေးလည်း ဂရုစိုက်ဦးနော် သုသု။ အိပ်ရေးဝမှ ဉာဏ်ပွင့်မှာ။",
+    "အရာအားလုံးက သုသု စိတ်ကူးထားတဲ့အတိုင်း ဖြစ်လာမှာပါ။",
     "အရာအားလုံးက သုသု စိတ်ကူးထားတဲ့အတိုင်း ဖြစ်လာမှာပါ။",
     "အချိန်ရရင် ဘုရားရှိခိုးနော် သုသု။ စိတ်တည်ငြိမ်သွားလိမ့်မယ်။",
     "ရလဒ်ကို မတွေးနဲ့ဦး၊ လက်ရှိအချိန်မှာ အကောင်းဆုံးဖြေဖို့ပဲ အာရုံစိုက်နော် သုသု။",
@@ -85,40 +72,32 @@ const MOTIVATIONAL_QUOTES = [
     "ဂုဏ်ထူးတွေ အများကြီး ပိုင်ဆိုင်နိုင်ပါစေ သုသု။",
     "သုသုက No.1 ပဲ။",
     "သုသု အတွက် စီစီ့ရဲ့ အားအင်တွေ ပို့ပေးလိုက်ပါတယ်။ (づ ◕‿◕ )づ",
+    "သုသု အတွက် စီစီ့ရဲ့ အားအင်တွေ ပို့ပေးလိုက်ပါတယ်။ (づ ◕‿◕ )づ",
     "သုသု ဖြေသမျှ အမှန်တွေချည်း ဖြစ်ပါစေ။",
     "ယုံကြည်မှုသာ ထား၊ သုသု နိုင်ကို နိုင်ရမယ်။",
     "ချစ်ရတဲ့ သုသု... Fighting ပါနော်။",
     "သုသု ပြုံးလိုက်ရင် မျက်လုံးလေးတွေပါ လိုက်ပြုံးတာကို စီစီ သိပ်သဘောကျတယ်။ စိတ်ဖိစီးရင် အဲ့အပြုံးလေးကို သတိရနော်။",
+    "သုသု ပြုံးလိုက်ရင် မျက်လုံးလေးတွေပါ လိုက်ပြုံးတာကို စီစီ သိပ်သဘောကျတယ်။ စိတ်ဖိစီးရင် အဲ့အပြုံးလေးကို သတိရနော်။",
+    "သုသု ပြုံးလိုက်ရင် မျက်လုံးလေးတွေပါ လိုက်ပြုံးတာကို စီစီ သိပ်သဘောကျတယ်။ စိတ်ဖိစီးရင် အဲ့အပြုံးလေးကို သတိရနော်။",
+    "သုသု ရယ်လိုက်ရင် မျက်လုံးလေးတွေ ပိတ်သွားတဲ့အထိ ချစ်ဖို့ကောင်းတာ... စာမေးပွဲပြီးရင် အဲ့လို ပျော်ပျော်ကြီး ပြုံးနိုင်ပါစေ။",
+    "သုသု ရယ်လိုက်ရင် မျက်လုံးလေးတွေ ပိတ်သွားတဲ့အထိ ချစ်ဖို့ကောင်းတာ... စာမေးပွဲပြီးရင် အဲ့လို ပျော်ပျော်ကြီး ပြုံးနိုင်ပါစေ။",
     "သုသု ရယ်လိုက်ရင် မျက်လုံးလေးတွေ ပိတ်သွားတဲ့အထိ ချစ်ဖို့ကောင်းတာ... စာမေးပွဲပြီးရင် အဲ့လို ပျော်ပျော်ကြီး ပြုံးနိုင်ပါစေ။",
     "စီစီက သုသုဘက်ကနေ အမြဲရှိနေပါတယ်။",
-    "ကျန်းမာရေး ဂရုစိုက်ပြီး ဖြေနော်... သုသု နေမကောင်းရင် စီစီ စိတ်မကောင်းဘူး。"
+    "ကျန်းမာရေး ဂရုစိုက်ပြီး ဖြေနော်... သုသု နေမကောင်းရင် စီစီ စိတ်မကောင်းဘူး။"
 ];
 
 // --- Child Components ---
 
 const DailyQuote: React.FC = () => {
-    const [quoteIndex, setQuoteIndex] = useState(() => Math.floor(Math.random() * MOTIVATIONAL_QUOTES.length));
-
-    useEffect(() => {
-        const interval = setInterval(() => {
-            setQuoteIndex(prev => {
-                let next;
-                do {
-                    next = Math.floor(Math.random() * MOTIVATIONAL_QUOTES.length);
-                } while (next === prev);
-                return next;
-            });
-        }, 4000);
-        return () => clearInterval(interval);
+    const quote = useMemo(() => {
+        const index = Math.floor(Math.random() * MOTIVATIONAL_QUOTES.length);
+        return MOTIVATIONAL_QUOTES[index];
     }, []);
 
-    const quote = MOTIVATIONAL_QUOTES[quoteIndex];
-
     return (
-        <div key={quoteIndex} className="mt-4 px-6 py-4 bg-gradient-to-r from-pink-500/10 via-brand-500/10 to-violet-500/10 rounded-2xl border border-white/20 dark:border-white/5 backdrop-blur-sm animate-fade-in inline-block shadow-sm">
-            <p className="text-sm sm:text-base font-medium text-brand-600 dark:text-brand-400 italic flex items-center gap-2">
-                <Sparkles className="w-5 h-5 min-w-[1.25rem] text-pink-500" />
-                <span>{quote}</span>
+        <div className="mt-3 px-4 animate-fade-in">
+            <p className="text-sm sm:text-base font-medium text-pink-500 dark:text-pink-400 italic">
+                ✨ "{quote}" ✨
             </p>
         </div>
     );
@@ -136,13 +115,10 @@ const FileUpload: React.FC<{ onFileSelect: (content: string, fileName: string) =
 
     return (
         <div className="w-full max-w-2xl mx-auto">
-            <label htmlFor="file-upload" className="group relative cursor-pointer bg-white/70 dark:bg-dark-surface/70 backdrop-blur-md rounded-3xl border-2 border-dashed border-brand-300 dark:border-brand-500/30 flex flex-col items-center justify-center p-16 hover:bg-brand-50 dark:hover:bg-brand-900/10 transition-all duration-500 hover:border-brand-500 dark:hover:border-brand-400 shadow-[0_0_40px_-15px_rgba(99,102,241,0.2)] hover:shadow-[0_0_50px_-10px_rgba(99,102,241,0.4)] overflow-hidden">
-                <div className="absolute inset-0 bg-gradient-to-br from-brand-500/5 to-purple-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-                <div className="bg-brand-100 dark:bg-brand-900/50 p-4 rounded-full mb-6 group-hover:scale-110 transition-transform duration-500 ease-out">
-                    <UploadCloud className="w-10 h-10 text-brand-600 dark:text-brand-400" />
-                </div>
-                <span className="mt-2 text-xl font-bold text-gray-800 dark:text-gray-200">Upload SRT File</span>
-                <span className="text-sm text-gray-500 dark:text-gray-400 mt-2">Drag and drop or click to browse</span>
+            <label htmlFor="file-upload" className="relative cursor-pointer bg-white dark:bg-slate-800 rounded-lg border-2 border-dashed border-sky-400/50 dark:border-sky-500/60 flex flex-col items-center justify-center p-12 hover:bg-sky-50 dark:hover:bg-slate-700 transition-colors duration-300">
+                <UploadIcon />
+                <span className="mt-2 text-base font-medium text-slate-600 dark:text-slate-300">Click to upload or drag and drop</span>
+                <span className="text-sm text-slate-500 dark:text-slate-400">SRT files only</span>
                 <input id="file-upload" type="file" className="sr-only" accept=".srt" onChange={handleFileChange} disabled={disabled} />
             </label>
         </div>
@@ -155,26 +131,17 @@ const Preview: React.FC<{ originalContent: string; cleanedContent: string; summa
 
     return (
         <div className="space-y-8">
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                <div className="bg-white/80 dark:bg-dark-surface/80 backdrop-blur-md p-6 rounded-3xl shadow-xl shadow-gray-200/50 dark:shadow-none border border-white/20 dark:border-white/5 relative overflow-hidden group">
-                    <div className="absolute top-0 right-0 p-4 opacity-5 group-hover:opacity-10 transition-opacity"><Info className="w-32 h-32" /></div>
-                    <div className="flex items-center gap-2 mb-4">
-                        <div className="w-3 h-3 rounded-full bg-red-500/80 shadow-[0_0_10px_rgba(239,68,68,0.5)]"></div>
-                        <h3 className="text-lg font-bold text-gray-800 dark:text-gray-100">Original Content</h3>
-                    </div>
-                    <pre className="text-sm font-mono text-gray-600 dark:text-gray-300 overflow-x-auto p-4 bg-gray-50/50 dark:bg-black/20 rounded-2xl border border-gray-100 dark:border-gray-800 h-64 overflow-y-auto custom-scrollbar">
-                        {originalLines.map((line, i) => <div key={i} className="py-0.5">{line || <span className="text-gray-400 italic">¶</span>}</div>)}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="bg-white dark:bg-slate-800 p-4 rounded-lg shadow-md">
+                    <h3 className="text-lg font-bold text-slate-800 dark:text-slate-100 mb-2 border-b border-slate-200 dark:border-slate-700 pb-2">Original</h3>
+                    <pre className="text-xs text-slate-600 dark:text-slate-300 overflow-x-auto p-2 bg-slate-50 dark:bg-slate-900/50 rounded-md">
+                        {originalLines.map((line, i) => <div key={i}>{line || '[EMPTY LINE]'}</div>)}
                     </pre>
                 </div>
-                <div className="bg-white/80 dark:bg-dark-surface/80 backdrop-blur-md p-6 rounded-3xl shadow-xl shadow-brand-500/10 dark:shadow-none border border-white/20 dark:border-white/5 relative overflow-hidden group">
-                    <div className="absolute top-0 left-0 w-1 bg-gradient-to-b from-brand-400 to-purple-500 h-full"></div>
-                    <div className="absolute top-0 right-0 p-4 opacity-5 group-hover:opacity-10 transition-opacity"><CheckCircle2 className="w-32 h-32 text-brand-500" /></div>
-                    <div className="flex items-center gap-2 mb-4">
-                        <div className="w-3 h-3 rounded-full bg-emerald-500/80 shadow-[0_0_10px_rgba(16,185,129,0.5)]"></div>
-                        <h3 className="text-lg font-bold text-gray-800 dark:text-gray-100">Cleaned Content</h3>
-                    </div>
-                    <pre className="text-sm font-mono text-emerald-700 dark:text-emerald-400 overflow-x-auto p-4 bg-emerald-50/30 dark:bg-emerald-900/10 rounded-2xl border border-emerald-100 dark:border-emerald-800/30 h-64 overflow-y-auto custom-scrollbar">
-                        {cleanedLines.map((line, i) => <div key={i} className="py-0.5">{line || <span className="text-emerald-500/40 italic">¶</span>}</div>)}
+                <div className="bg-white dark:bg-slate-800 p-4 rounded-lg shadow-md">
+                    <h3 className="text-lg font-bold text-green-600 dark:text-green-400 mb-2 border-b border-slate-200 dark:border-slate-700 pb-2">Cleaned</h3>
+                    <pre className="text-xs text-green-700 text-green-600 dark:text-green-300 overflow-x-auto p-2 bg-green-50 dark:bg-green-900/20 rounded-md">
+                        {cleanedLines.map((line, i) => <div key={i}>{line || '[EMPTY LINE]'}</div>)}
                     </pre>
                 </div>
             </div>
@@ -199,19 +166,16 @@ const ChangeSummaryDisplay: React.FC<{ summary: ChangeSummary }> = ({ summary })
     ].filter(item => item.value > 0);
 
     return (
-        <div className="bg-white/90 dark:bg-dark-surface/90 backdrop-blur-md p-8 rounded-3xl shadow-lg border border-white/20 dark:border-white/5">
-            <h3 className="text-xl font-bold text-gray-800 dark:text-gray-100 mb-6 flex items-center gap-2">
-                <Sparkles className="w-5 h-5 text-brand-500" />
-                Optimization Summary
-            </h3>
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
-                {items.length > 0 ? items.map((item, idx) => (
-                    <div key={item.label} className="bg-gradient-to-br from-gray-50 to-gray-100 dark:from-dark-bg dark:to-black/20 p-4 rounded-2xl border border-gray-200 dark:border-gray-800 hover:scale-105 transition-transform duration-300 hover:shadow-lg hover:shadow-brand-500/10">
-                        <span className="block text-3xl font-black bg-clip-text text-transparent bg-gradient-to-r from-brand-500 to-purple-600 dark:from-brand-400 dark:to-purple-400 mb-1">{item.value}</span>
-                        <span className="text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wide leading-tight block">{item.label}</span>
-                    </div>
-                )) : <p className="text-gray-500 col-span-full">No major changes detected.</p>}
-            </div>
+        <div className="bg-white dark:bg-slate-800 p-6 rounded-lg shadow-md">
+            <h3 className="text-lg font-bold text-slate-800 dark:text-slate-100 mb-4">Summary of Changes</h3>
+            <ul className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                {items.length > 0 ? items.map(item => (
+                    <li key={item.label} className="bg-slate-100 dark:bg-slate-700 p-3 rounded-md">
+                        <span className="block text-xl font-bold text-sky-600 dark:text-sky-400">{item.value}</span>
+                        <span className="text-sm text-slate-600 dark:text-slate-300">{item.label}</span>
+                    </li>
+                )) : <p className="text-slate-500">No major changes detected.</p>}
+            </ul>
         </div>
     );
 };
@@ -219,35 +183,20 @@ const ChangeSummaryDisplay: React.FC<{ summary: ChangeSummary }> = ({ summary })
 const ForeignLanguageReportDisplay: React.FC<{ report: ForeignLanguageReport }> = ({ report }) => {
     const reportEntries = Object.keys(report).map((key) => [key, report[key]]) as [string, DetectedLanguageInfo][];
     if (reportEntries.length === 0) return (
-        <div className="bg-emerald-500/10 border border-emerald-500/20 text-emerald-800 dark:text-emerald-300 p-6 rounded-2xl flex items-center gap-4" role="alert">
-            <div className="p-3 bg-emerald-500/20 rounded-full"><CheckCircle2 className="w-6 h-6 text-emerald-600 dark:text-emerald-400" /></div>
-            <div>
-                <p className="font-bold text-lg">Clean Content</p>
-                <p className="text-sm opacity-80">No foreign languages detected.</p>
-            </div>
+        <div className="bg-green-100 dark:bg-green-900/30 border-l-4 border-green-500 text-green-800 dark:text-green-200 p-4 rounded-r-lg" role="alert">
+            <p className="font-bold">No foreign languages detected.</p>
         </div>
     );
 
     return (
-        <div className="bg-amber-500/10 border border-amber-500/30 text-amber-900 dark:text-amber-200 p-6 rounded-3xl" role="alert">
-            <div className="flex items-center gap-3 mb-4">
-                <div className="p-2 bg-amber-500/20 rounded-xl"><AlertTriangle className="w-6 h-6 text-amber-600 dark:text-amber-400" /></div>
-                <p className="font-bold text-lg">Foreign Language Detection</p>
-            </div>
-            <div className="mt-4 max-h-80 overflow-y-auto pr-2 custom-scrollbar">
-                <table className="w-full text-left text-sm border-collapse">
-                    <thead className="sticky top-0 bg-amber-100/90 dark:bg-amber-900/90 backdrop-blur-md z-10">
-                        <tr><th className="p-3 rounded-tl-xl">Line</th><th className="p-3">Detected</th><th className="p-3 rounded-tr-xl">Preview</th></tr>
-                    </thead>
-                    <tbody className="divide-y divide-amber-200/50 dark:divide-amber-800/50">
+        <div className="bg-yellow-50 dark:bg-yellow-900/30 border-l-4 border-yellow-400 text-yellow-800 dark:text-yellow-200 p-4 rounded-r-lg" role="alert">
+            <div className="flex items-center"><WarningIcon /><div><p className="font-bold">Foreign Language Detection</p></div></div>
+            <div className="mt-4 max-h-60 overflow-y-auto pr-2">
+                <table className="w-full text-left text-sm">
+                    <thead className="sticky top-0 bg-yellow-100 dark:bg-yellow-800/50"><tr><th className="p-2">Line</th><th className="p-2">Detected</th><th className="p-2">Preview</th></tr></thead>
+                    <tbody className="divide-y divide-yellow-200 dark:divide-yellow-700/50">
                         {reportEntries.map(([lineNum, info]) => (
-                            <tr key={lineNum} className="hover:bg-amber-500/5 transition-colors">
-                                <td className="p-3 font-mono text-amber-700 dark:text-amber-400">{lineNum}</td>
-                                <td className="p-3 py-4">
-                                    <span className="px-2 py-1 bg-amber-500/20 text-amber-800 dark:text-amber-300 rounded-md text-xs font-bold uppercase tracking-wider">{info.languages.join(', ')}</span>
-                                </td>
-                                <td className="p-3 font-mono truncate max-w-sm opacity-80">{info.line}</td>
-                            </tr>
+                            <tr key={lineNum}><td className="p-2 font-mono">{lineNum}</td><td className="p-2">{info.languages.join(', ')}</td><td className="p-2 font-mono truncate max-w-xs">{info.line}</td></tr>
                         ))}
                     </tbody>
                 </table>
@@ -308,73 +257,42 @@ const IncomeTracker: React.FC = () => {
     const currentMonthData = incomeData[currentMonthKey] ?? { total: 0, entries: [] };
 
     return (
-        <div className="grid grid-cols-1 xl:grid-cols-3 gap-8 items-start animate-fade-in">
-            <div className="bg-white/80 dark:bg-dark-surface/80 backdrop-blur-md p-8 rounded-3xl shadow-xl border border-white/20 dark:border-white/5 order-2 xl:order-1">
-                <div className="w-12 h-12 bg-brand-100 dark:bg-brand-900/50 rounded-2xl flex items-center justify-center mb-6">
-                    <Calculator className="w-6 h-6 text-brand-600 dark:text-brand-400" />
-                </div>
-                <h3 className="text-xl font-bold mb-6">Add New Entry</h3>
-                <form onSubmit={handleAddEntry} className="space-y-5">
-                    <div>
-                        <label className="block text-sm font-semibold mb-2 text-gray-700 dark:text-gray-300">Lines Translated</label>
-                        <input type="number" value={lines} onChange={e => setLines(e.target.value)} className="w-full px-4 py-3 bg-gray-50/50 dark:bg-black/20 border border-gray-200 dark:border-gray-700 rounded-xl focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none transition-all placeholder:text-gray-400" placeholder="e.g. 500" required />
-                    </div>
-                    <div>
-                        <label className="block text-sm font-semibold mb-2 text-gray-700 dark:text-gray-300">Rate (MMK per line)</label>
-                        <input type="number" value={rate} onChange={e => setRate(e.target.value)} className="w-full px-4 py-3 bg-gray-50/50 dark:bg-black/20 border border-gray-200 dark:border-gray-700 rounded-xl focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none transition-all placeholder:text-gray-400" placeholder="e.g. 100" required />
-                    </div>
-                    <button type="submit" className="w-full py-3.5 bg-gradient-to-r from-brand-600 to-brand-500 hover:from-brand-500 hover:to-brand-400 text-white font-bold rounded-xl shadow-[0_0_20px_rgba(99,102,241,0.4)] hover:shadow-[0_0_30px_rgba(99,102,241,0.6)] transition-all flex justify-center items-center gap-2">
-                        <span>Save Entry</span>
-                        <ArrowRight className="w-4 h-4" />
-                    </button>
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start animate-fade-in">
+            <div className="bg-white dark:bg-slate-800 p-6 rounded-xl shadow-lg border border-slate-200 dark:border-slate-700">
+                <h3 className="text-lg font-bold mb-4">Add Entry</h3>
+                <form onSubmit={handleAddEntry} className="space-y-4">
+                    <div><label className="block text-sm font-medium mb-1">Lines</label><input type="number" value={lines} onChange={e => setLines(e.target.value)} className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-md" required /></div>
+                    <div><label className="block text-sm font-medium mb-1">Rate (MMK)</label><input type="number" value={rate} onChange={e => setRate(e.target.value)} className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-md" required /></div>
+                    <button type="submit" className="w-full py-2 bg-sky-600 text-white font-bold rounded-md hover:bg-sky-700 transition-colors">Add</button>
                 </form>
             </div>
-
-            <div className="xl:col-span-2 bg-white/80 dark:bg-dark-surface/80 backdrop-blur-md p-8 rounded-3xl shadow-xl border border-white/20 dark:border-white/5 order-1 xl:order-2">
-                <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-8 gap-6 border-b border-gray-100 dark:border-gray-800/60 pb-8">
-                    <div>
-                        <h3 className="text-2xl font-black text-gray-800 dark:text-white">Recent Earnings</h3>
-                        <p className="text-gray-500 dark:text-gray-400 mt-1">Track your progress for {new Date().toLocaleString('default', { month: 'long', year: 'numeric' })}</p>
-                    </div>
-                    <div className="bg-gradient-to-br from-emerald-400 to-emerald-600 p-1 rounded-2xl shadow-lg shadow-emerald-500/30">
-                        <div className="bg-white dark:bg-dark-surface rounded-xl px-6 py-4 flex flex-col items-end sm:items-center h-full">
-                            <span className="text-xs font-bold text-emerald-500 dark:text-emerald-400 uppercase tracking-widest mb-1">Monthly Total</span>
-                            <span className="text-3xl font-black bg-clip-text text-transparent bg-gradient-to-r from-emerald-500 to-emerald-700 dark:from-emerald-400 dark:to-emerald-200">
-                                {currentMonthData.total.toLocaleString()} <span className="text-lg opacity-70">MMK</span>
-                            </span>
-                        </div>
+            <div className="lg:col-span-2 bg-white dark:bg-slate-800 p-6 rounded-xl shadow-lg border border-slate-200 dark:border-slate-700">
+                <div className="flex flex-col sm:flex-row justify-between items-center mb-6 pb-4 border-b border-slate-100 dark:border-slate-700 gap-4">
+                    <h3 className="text-xl font-bold text-slate-800 dark:text-white">Recent Entries</h3>
+                    <div className="bg-emerald-50 dark:bg-emerald-900/20 px-4 py-2 rounded-lg border border-emerald-100 dark:border-emerald-800 flex flex-col items-end sm:items-center">
+                        <span className="text-[10px] font-bold text-emerald-600 dark:text-emerald-400 uppercase tracking-wider">This Month's Total</span>
+                        <span className="text-xl font-black text-emerald-700 dark:text-emerald-300">{currentMonthData.total.toLocaleString()} MMK</span>
                     </div>
                 </div>
-
-                <div className="space-y-4 max-h-[500px] overflow-y-auto custom-scrollbar pr-2">
+                <div className="space-y-3">
                     {currentMonthData.entries.map(entry => (
-                        <div key={entry.id} className="flex flex-col sm:flex-row justify-between items-start sm:items-center p-5 bg-gray-50/50 dark:bg-black/20 rounded-2xl border border-gray-100 dark:border-gray-800/60 group hover:border-brand-500/50 transition-all duration-300">
-                            <div className="mb-3 sm:mb-0">
-                                <p className="font-bold text-lg text-gray-800 dark:text-gray-200 flex items-center gap-2">
-                                    {entry.lines.toLocaleString()} lines
-                                    <span className="text-xs font-normal px-2 py-0.5 bg-gray-200 dark:bg-gray-800 rounded-md text-gray-600 dark:text-gray-400">@ {entry.rate}</span>
-                                </p>
-                                <p className="text-xs text-gray-500 mt-1 font-medium">{new Date(entry.timestamp).toLocaleString()}</p>
-                            </div>
-                            <div className="flex items-center gap-6 w-full sm:w-auto justify-between sm:justify-end">
-                                <p className="font-black text-xl text-emerald-600 dark:text-emerald-400">{entry.amount.toLocaleString()} MMK</p>
+                        <div key={entry.id} className="flex justify-between items-center p-3 bg-slate-50 dark:bg-slate-900/50 rounded-md group hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">
+                            <div><p className="font-bold">{entry.lines.toLocaleString()} lines</p><p className="text-xs text-slate-500">{entry.date}</p></div>
+                            <div className="flex items-center gap-4">
+                                <p className="font-bold text-green-600">{entry.amount.toLocaleString()} MMK</p>
                                 <button
                                     onClick={() => handleDeleteEntry(entry.id)}
-                                    className="p-2.5 bg-red-50 dark:bg-red-500/10 text-red-500 dark:text-red-400 rounded-xl hover:bg-red-500 hover:text-white transition-colors border border-red-100 dark:border-red-500/20 shadow-sm"
+                                    className="text-slate-400 hover:text-red-500 transition-colors opacity-100 sm:opacity-0 sm:group-hover:opacity-100 p-2"
                                     title="Delete entry"
                                 >
-                                    <Trash2 className="w-4 h-4" />
+                                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                    </svg>
                                 </button>
                             </div>
                         </div>
                     ))}
-                    {currentMonthData.entries.length === 0 && (
-                        <div className="flex flex-col items-center justify-center py-16 text-center opacity-60">
-                            <Calculator className="w-16 h-16 mb-4 text-gray-400" />
-                            <p className="text-lg font-bold">No entries yet</p>
-                            <p className="text-sm">Add your first translation entry to start tracking.</p>
-                        </div>
-                    )}
+                    {currentMonthData.entries.length === 0 && <p className="text-center text-slate-500 py-10">No entries this month.</p>}
                 </div>
             </div>
         </div>
@@ -404,124 +322,217 @@ const Guide: React.FC = () => {
         setIsSubmitting(true);
         setSubmitStatus('idle');
 
+        // Access Key for 'knightkryptonian@gmail.com'
         const accessKey = "d6be84f4-63ed-4347-b06c-fe7048ffa2ac";
 
         try {
             const response = await fetch("https://api.web3forms.com/submit", {
                 method: "POST",
-                headers: { "Content-Type": "application/json", Accept: "application/json" },
-                body: JSON.stringify({ access_key: accessKey, subject: `Toolkit Issue Report: Anonymous`, name: 'Anonymous', message: issue }),
+                headers: {
+                    "Content-Type": "application/json",
+                    Accept: "application/json",
+                },
+                body: JSON.stringify({
+                    access_key: accessKey,
+                    subject: `Toolkit Issue Report: Anonymous`,
+                    name: 'Anonymous',
+                    message: issue,
+                }),
             });
             const result = await response.json();
             if (result.success) {
-                setSubmitStatus('success'); setIssue(''); setTimeout(() => setSubmitStatus('idle'), 5000);
-            } else { setSubmitStatus('error'); }
-        } catch (error) { setSubmitStatus('error'); }
-        finally { setIsSubmitting(false); }
+                setSubmitStatus('success');
+                setIssue('');
+                setTimeout(() => setSubmitStatus('idle'), 5000);
+            } else {
+                console.error("Web3Forms Error:", result);
+                setSubmitStatus('error');
+            }
+        } catch (error) {
+            console.error("Submission Error:", error);
+            setSubmitStatus('error');
+        } finally {
+            setIsSubmitting(false);
+        }
     };
 
     return (
         <div className="max-w-4xl mx-auto space-y-8 animate-fade-in">
-            <div className="bg-white/80 dark:bg-dark-surface/80 backdrop-blur-md p-8 rounded-3xl shadow-xl border border-white/20 dark:border-white/5 relative overflow-hidden group">
-                <div className="absolute -right-10 -top-10 bg-brand-500/10 w-40 h-40 rounded-full blur-3xl"></div>
-
-                <h2 className="text-2xl font-black mb-6 flex items-center gap-4">
-                    <div className="p-3 bg-brand-500/10 rounded-xl"><LinkIcon className="w-6 h-6 text-brand-600 dark:text-brand-400" /></div>
-                    Resources Drive
+            <div className="bg-white dark:bg-slate-800 p-6 sm:p-8 rounded-xl shadow-lg border border-slate-200 dark:border-slate-700">
+                <h2 className="text-2xl font-bold mb-6 text-slate-800 dark:text-white flex items-center">
+                    <span className="bg-indigo-100 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 p-2 rounded-lg mr-3">
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
+                        </svg>
+                    </span>
+                    My Google Drive
                 </h2>
-
-                <a href={driveLink} target="_blank" rel="noopener noreferrer" className="block p-6 bg-gradient-to-r from-brand-600 to-purple-600 rounded-2xl hover:scale-[1.02] transition-transform duration-300 shadow-lg shadow-brand-500/25 group relative overflow-hidden">
-                    <div className="absolute right-0 top-0 w-64 h-full bg-white/10 skew-x-12 -mr-16 group-hover:mr-0 transition-all duration-700"></div>
-                    <div className="relative z-10 flex items-center justify-between">
+                <div className="grid grid-cols-1 gap-4">
+                    <a href={driveLink} target="_blank" rel="noopener noreferrer" className="flex items-center p-5 bg-gradient-to-br from-pink-50 to-rose-50 dark:from-pink-900/20 dark:to-rose-900/20 rounded-xl hover:shadow-md transition-all group border border-pink-100 dark:border-pink-800/30">
+                        <div className="bg-pink-500 text-white p-3 rounded-xl mr-5 shadow-lg shadow-pink-500/30 group-hover:scale-110 transition-transform">
+                            <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 20 20"><path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z" /><path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z" /></svg>
+                        </div>
                         <div>
-                            <h3 className="font-extrabold text-white text-xl">Open Toolkit Drive</h3>
-                            <p className="text-white/80 mt-1">Essential apps, installers, and tutorials</p>
+                            <h3 className="font-black text-lg text-slate-800 dark:text-white group-hover:text-pink-600 dark:group-hover:text-pink-400">Open Toolkit Drive</h3>
+                            <p className="text-sm text-slate-500 dark:text-slate-400">Essential apps, installers, and tutorial documentation (Updated 2026)</p>
                         </div>
-                        <div className="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center backdrop-blur-sm">
-                            <ArrowRight className="w-6 h-6 text-white" />
-                        </div>
-                    </div>
-                </a>
+                    </a>
+                </div>
             </div>
 
-            <div className="grid grid-cols-1 gap-8">
-                <div className="bg-white/80 dark:bg-dark-surface/80 backdrop-blur-md p-8 rounded-3xl shadow-xl border border-white/20 dark:border-white/5">
-                    <h2 className="text-2xl font-black mb-6 flex items-center gap-4">
-                        <div className="p-3 bg-violet-500/10 rounded-xl"><Sparkles className="w-6 h-6 text-violet-600 dark:text-violet-400" /></div>
-                        Hiddify VPN Keys
-                    </h2>
-                    <div className="mb-8 p-5 bg-violet-50 dark:bg-violet-500/5 rounded-2xl border border-violet-100 dark:border-violet-500/20">
-                        <h4 className="font-bold text-violet-800 dark:text-violet-300 mb-2">Setup Instructions</h4>
-                        <p className="text-sm text-violet-700/80 dark:text-violet-300/80 mb-4">Download using one of the mirrors, install, and copy a key below. Remove old keys before importing new ones for best speed.</p>
-                        <div className="flex flex-wrap gap-3">
-                            <a href="https://limewire.com/d/6ZcJw#cMZPd7rz3B" target="_blank" rel="noopener noreferrer" className="px-4 py-2 bg-white dark:bg-dark-bg rounded-xl font-bold text-sm text-violet-600 shadow-sm border border-violet-100 dark:border-violet-500/20 hover:border-violet-300 transition-colors">LimeWire</a>
-                            <a href="https://t.me/+BfyZ73a7lbcyM2Rl" target="_blank" rel="noopener noreferrer" className="px-4 py-2 bg-white dark:bg-dark-bg rounded-xl font-bold text-sm text-violet-600 shadow-sm border border-violet-100 dark:border-violet-500/20 hover:border-violet-300 transition-colors">Telegram</a>
-                            <a href="https://hiddify.com/" target="_blank" rel="noopener noreferrer" className="px-4 py-2 bg-white dark:bg-dark-bg rounded-xl font-bold text-sm text-violet-600 shadow-sm border border-violet-100 dark:border-violet-500/20 hover:border-violet-300 transition-colors">Official Site</a>
-                        </div>
-                    </div>
-
-                    <div className="space-y-6">
-                        {[
-                            { name: 'VLESS (Recommended)', key: hiddifyKeyVless },
-                            { name: 'VMESS (Fallback)', key: hiddifyKeyVmess }
-                        ].map((item, idx) => (
-                            <div key={idx} className="bg-gray-50/50 dark:bg-black/20 p-5 rounded-2xl border border-gray-100 dark:border-gray-800 relative">
-                                <h4 className="font-bold text-gray-800 dark:text-gray-200 mb-3">{item.name}</h4>
-                                <div className="flex gap-3">
-                                    <code className="flex-1 overflow-x-auto p-4 bg-white dark:bg-black rounded-xl border border-gray-200 dark:border-gray-800 text-xs font-mono text-gray-500 break-all h-24 custom-scrollbar">
-                                        {item.key}
-                                    </code>
-                                    <button
-                                        onClick={() => handleCopy(item.key, item.name)}
-                                        className={cn("px-6 font-bold rounded-xl transition-all shadow-sm flex flex-col items-center justify-center gap-2",
-                                            copiedId === item.name ? "bg-emerald-50 text-emerald-600 border border-emerald-200" : "bg-white dark:bg-dark-bg text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-700 hover:border-brand-300 hover:text-brand-600"
-                                        )}
-                                    >
-                                        {copiedId === item.name ? <CheckCircle2 className="w-5 h-5" /> : <BookOpen className="w-5 h-5" />}
-                                        {copiedId === item.name ? "Copied!" : "Copy"}
-                                    </button>
-                                </div>
-                            </div>
-                        ))}
-                    </div>
-                </div>
-
-                <div className="bg-white/80 dark:bg-dark-surface/80 backdrop-blur-md p-8 rounded-3xl shadow-xl border border-white/20 dark:border-white/5">
-                    <h2 className="text-2xl font-black mb-6 flex items-center gap-4">
-                        <div className="p-3 bg-brand-500/10 rounded-xl"><MessageSquare className="w-6 h-6 text-brand-600 dark:text-brand-400" /></div>
-                        Report for an Issue
-                    </h2>
-                    <form onSubmit={handleReportSubmit} className="space-y-4">
-                        <div>
-                            <label className="block text-sm font-semibold mb-2 text-gray-700 dark:text-gray-300">Message / Issue Report</label>
-                            <textarea
-                                value={issue}
-                                onChange={e => setIssue(e.target.value)}
-                                className="w-full px-4 py-3 bg-gray-50/50 dark:bg-black/20 border border-gray-200 dark:border-gray-700 rounded-xl focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none transition-all placeholder:text-gray-400 min-h-[120px] resize-y custom-scrollbar"
-                                placeholder="Describe your issue or send a message..."
-                                required
-                                disabled={isSubmitting}
-                            />
-                        </div>
+            <div className="bg-amber-50 dark:bg-amber-900/20 border-l-4 border-amber-500 p-6 rounded-r-xl shadow-sm">
+                <h3 className="text-lg font-bold text-amber-800 dark:text-amber-200 mb-2 flex items-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                    </svg>
+                    Report an Issue
+                </h3>
+                <p className="text-amber-700 dark:text-amber-300 text-sm mb-4">
+                    Encountering problems with the toolkit, VPN, or access? Describe the issue below so I can help.
+                </p>
+                <form onSubmit={handleReportSubmit} className="space-y-3 relative">
+                    <div className="relative">
+                        <input
+                            type="text"
+                            placeholder="What's the issue?"
+                            value={issue}
+                            onChange={(e) => setIssue(e.target.value)}
+                            className="w-full px-4 py-2 rounded-lg border border-amber-200 dark:border-amber-700 bg-white dark:bg-slate-900 focus:ring-2 focus:ring-amber-400 outline-none transition-all disabled:opacity-50 text-sm pr-20"
+                            required
+                            disabled={isSubmitting}
+                        />
                         <button
                             type="submit"
                             disabled={isSubmitting}
-                            className="w-full py-3.5 bg-gradient-to-r from-brand-600 to-brand-500 hover:from-brand-500 hover:to-brand-400 disabled:from-gray-400 disabled:to-gray-300 text-white font-bold rounded-xl shadow-[0_0_20px_rgba(99,102,241,0.4)] hover:shadow-[0_0_30px_rgba(99,102,241,0.6)] disabled:shadow-none transition-all flex justify-center items-center gap-2"
+                            className={`absolute right-1 top-1 bottom-1 px-4 text-white font-bold rounded-md transition-colors flex items-center justify-center text-xs ${isSubmitting ? 'bg-amber-400 cursor-wait' : 'bg-amber-600 hover:bg-amber-700'}`}
                         >
-                            <span>{isSubmitting ? 'Sending...' : 'Send Report'}</span>
-                            {!isSubmitting && <ArrowRight className="w-4 h-4" />}
+                            {isSubmitting ? (
+                                <svg className="animate-spin h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                </svg>
+                            ) : 'Send'}
                         </button>
-                        {submitStatus === 'success' && (
-                            <div className="p-4 bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-200 dark:border-emerald-800/50 rounded-xl animate-fade-in">
-                                <p className="text-emerald-600 dark:text-emerald-400 text-sm font-bold text-center flex items-center justify-center gap-2"><CheckCircle2 className="w-5 h-5" /> Message sent successfully!</p>
+                    </div>
+                    {submitStatus === 'success' && (
+                        <div className="text-xs text-green-600 dark:text-green-400 font-bold animate-pulse mt-2">
+                            ✅ Issue reported successfully!
+                        </div>
+                    )}
+                    {submitStatus === 'error' && (
+                        <div className="text-xs text-red-600 dark:text-red-400 font-bold mt-2">
+                            ❌ Failed to send report.
+                        </div>
+                    )}
+                </form>
+            </div>
+
+            <div className="bg-white dark:bg-slate-800 p-6 sm:p-8 rounded-xl shadow-lg border border-slate-200 dark:border-slate-700 relative overflow-hidden">
+                <div className="absolute top-0 right-0 p-4 opacity-5">
+                    <svg className="w-32 h-32" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z" /></svg>
+                </div>
+
+                <h2 className="text-2xl font-bold mb-6 text-slate-800 dark:text-white flex items-center relative z-10">
+                    <span className="bg-violet-100 dark:bg-violet-900/30 text-violet-600 dark:text-violet-400 p-2 rounded-lg mr-3">
+                        <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" /></svg>
+                    </span>
+                    Hiddify VPN Access
+                </h2>
+
+                <div className="mb-6 bg-violet-50 dark:bg-violet-900/20 border-l-4 border-violet-500 p-4 rounded-r-lg relative z-10">
+                    <div className="flex items-start">
+                        <div className="flex-shrink-0">
+                            <svg className="h-5 w-5 text-violet-500" viewBox="0 0 20 20" fill="currentColor">
+                                <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
+                            </svg>
+                        </div>
+                        <div className="ml-3">
+                            <h3 className="text-sm font-bold text-violet-800 dark:text-violet-200">Download & Setup</h3>
+                            <div className="mt-2 text-sm text-violet-700 dark:text-violet-300 leading-relaxed space-y-3">
+                                <p>Choose one of the links below to download <span className="font-bold">Hiddify VPN</span>. Installation is easy: just double-click the installer and accept everything.</p>
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 mt-2">
+                                    <a href="https://limewire.com/d/6ZcJw#cMZPd7rz3B" target="_blank" rel="noopener noreferrer" className="flex items-center px-4 py-2 bg-white dark:bg-slate-700 border border-violet-200 dark:border-violet-800 rounded-lg hover:bg-violet-100 transition-colors text-xs font-bold text-violet-700 dark:text-violet-300">
+                                        🚀 LimeWire Mirror
+                                    </a>
+                                    <a href="https://t.me/+BfyZ73a7lbcyM2Rl" target="_blank" rel="noopener noreferrer" className="flex items-center px-4 py-2 bg-white dark:bg-slate-700 border border-violet-200 dark:border-violet-800 rounded-lg hover:bg-violet-100 transition-colors text-xs font-bold text-violet-700 dark:text-violet-300">
+                                        ✈️ Telegram Channel
+                                    </a>
+                                    <a href="https://hiddify.com/" target="_blank" rel="noopener noreferrer" className="flex items-center px-4 py-2 bg-white dark:bg-slate-700 border border-violet-200 dark:border-violet-800 rounded-lg hover:bg-violet-100 transition-colors text-xs font-bold text-violet-700 dark:text-violet-300 col-span-full">
+                                        🌐 hiddify.com (Choose Windows)
+                                    </a>
+                                </div>
+                                <p className="text-[11px] opacity-80 mt-2 italic">This VPN is recommended for high-speed access during peak hours. Note: Ensure you remove previous outdated keys before importing the new one below.</p>
                             </div>
-                        )}
-                        {submitStatus === 'error' && (
-                            <div className="p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800/50 rounded-xl animate-fade-in">
-                                <p className="text-red-600 dark:text-red-400 text-sm font-bold text-center flex items-center justify-center gap-2"><AlertTriangle className="w-5 h-5" /> Failed to send message. Please try again.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div className="relative z-10 space-y-6">
+                    <div className="bg-slate-50 dark:bg-slate-900/50 p-5 rounded-xl border border-slate-200 dark:border-slate-700">
+                        <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-3 gap-2">
+                            <div className="flex items-center gap-2">
+                                <h3 className="font-bold text-slate-700 dark:text-slate-200">Hiddify Key 1 (VLESS)</h3>
+                                <span className="text-xs font-mono bg-violet-100 text-violet-700 dark:bg-violet-900 dark:text-violet-300 px-2 py-1 rounded">Latest Update</span>
                             </div>
-                        )}
-                    </form>
+                            <div className="text-xs text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-900/20 px-2 py-1 rounded border border-amber-100 dark:border-amber-800/30 flex items-center">
+                                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" viewBox="0 0 20 20" fill="currentColor">
+                                    <path fillRule="evenodd" d="M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25zM12.75 6a.75.75 0 00-1.5 0v6c0 .414.336.75.75.75h4.5a.75.75 0 000-1.5h-3.75V6z" clipRule="evenodd" />
+                                </svg>
+                                <span>Refreshed: 2026-01-28</span>
+                            </div>
+                        </div>
+                        <div className="flex gap-2">
+                            <code className="flex-1 bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-lg p-3 text-xs sm:text-sm font-mono text-slate-500 break-all h-24 overflow-y-auto select-all leading-relaxed">
+                                {hiddifyKeyVless}
+                            </code>
+                            <button
+                                onClick={() => handleCopy(hiddifyKeyVless, 'vless')}
+                                className={`flex flex-col items-center justify-center px-4 rounded-lg font-bold text-sm transition-all duration-200 border min-w-[100px] ${copiedId === 'vless' ? 'bg-green-50 border-green-200 text-green-600' : 'bg-white hover:bg-slate-50 border-slate-200 text-slate-600'}`}
+                            >
+                                {copiedId === 'vless' ? (
+                                    <>
+                                        <svg className="w-5 h-5 mb-1" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" /></svg>
+                                        Copied
+                                    </>
+                                ) : (
+                                    <>
+                                        <svg className="w-5 h-5 mb-1" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3" /></svg>
+                                        Copy
+                                    </>
+                                )}
+                            </button>
+                        </div>
+                    </div>
+
+                    <div className="bg-slate-50 dark:bg-slate-900/50 p-5 rounded-xl border border-slate-200 dark:border-slate-700">
+                        <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-3 gap-2">
+                            <div className="flex items-center gap-2">
+                                <h3 className="font-bold text-slate-700 dark:text-slate-200">Hiddify Key 2 (VMESS)</h3>
+                                <span className="text-xs font-mono bg-indigo-100 text-indigo-700 dark:bg-indigo-900 dark:text-indigo-300 px-2 py-1 rounded">Alt Server</span>
+                            </div>
+                        </div>
+                        <div className="flex gap-2">
+                            <code className="flex-1 bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-lg p-3 text-xs sm:text-sm font-mono text-slate-500 break-all h-24 overflow-y-auto select-all leading-relaxed">
+                                {hiddifyKeyVmess}
+                            </code>
+                            <button
+                                onClick={() => handleCopy(hiddifyKeyVmess, 'vmess')}
+                                className={`flex flex-col items-center justify-center px-4 rounded-lg font-bold text-sm transition-all duration-200 border min-w-[100px] ${copiedId === 'vmess' ? 'bg-green-50 border-green-200 text-green-600' : 'bg-white hover:bg-slate-50 border-slate-200 text-slate-600'}`}
+                            >
+                                {copiedId === 'vmess' ? (
+                                    <>
+                                        <svg className="w-5 h-5 mb-1" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" /></svg>
+                                        Copied
+                                    </>
+                                ) : (
+                                    <>
+                                        <svg className="w-5 h-5 mb-1" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3" /></svg>
+                                        Copy
+                                    </>
+                                )}
+                            </button>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -558,58 +569,73 @@ export default function App() {
     };
 
     return (
-        <div className="min-h-screen text-slate-800 dark:text-slate-200 p-4 sm:p-6 lg:p-8">
-            <div className="max-w-7xl mx-auto">
-                <header className="text-center mb-10 pt-2">
-                    <h1 className="text-4xl sm:text-5xl font-extrabold text-slate-900 dark:text-white">Translator's Toolkit</h1>
+        <div className="min-h-screen bg-[#f8fafc] dark:bg-[#0f1115] text-gray-900 dark:text-gray-100 font-sans selection:bg-brand-500 selection:text-white transition-colors duration-300 relative overflow-hidden">
+            {/* Background Orbs */}
+            <div className="fixed top-[-10%] left-[-10%] w-[40%] h-[40%] rounded-full bg-brand-500/20 blur-[120px] pointer-events-none mix-blend-multiply dark:mix-blend-lighten animate-blob"></div>
+            <div className="fixed bottom-[-10%] right-[-10%] w-[40%] h-[40%] rounded-full bg-purple-500/20 blur-[120px] pointer-events-none mix-blend-multiply dark:mix-blend-lighten animate-blob animation-delay-2000"></div>
 
-                    {showQuotes && <DailyQuote />}
+            <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 min-h-screen flex flex-col">
+                <header className="mb-12">
+                    <div className="flex flex-col items-center text-center">
+                        <h1 className="text-4xl sm:text-5xl font-black tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-brand-600 via-purple-600 to-brand-500 dark:from-brand-400 dark:via-purple-400 dark:to-brand-300 pb-2">
+                            Translator's Toolkit
+                        </h1>
+                        <p className="mt-2 text-gray-500 dark:text-gray-400 font-medium">Streamline your subtitle workflow instantly.</p>
 
-                    <button
-                        onClick={toggleQuotes}
-                        className="mt-2 mx-auto flex items-center justify-center gap-2 text-xs font-medium text-slate-400 hover:text-sky-600 dark:text-slate-500 dark:hover:text-sky-400 transition-colors"
-                        title={showQuotes ? "Hide Quotes" : "Show Quotes"}
-                    >
-                        {showQuotes ? (
-                            <>
-                                <EyeOffIcon />
-                                <span>Hide Quotes</span>
-                            </>
-                        ) : (
-                            <>
-                                <EyeIcon />
-                                <span>Show Quotes</span>
-                            </>
-                        )}
-                    </button>
-
-                    <div className="mt-6 flex justify-center gap-2 p-1 bg-slate-200/50 dark:bg-slate-800/50 rounded-lg max-w-sm mx-auto shadow-inner">
-                        {(['cleaner', 'tracker', 'guide'] as AppView[]).map((view) => (
+                        <div className="relative mt-2 flex flex-col items-center">
+                            {showQuotes && <DailyQuote />}
                             <button
-                                key={view}
-                                onClick={() => setActiveView(view)}
-                                className={`flex-1 px-3 py-2 text-sm font-semibold rounded-md transition-all flex items-center justify-center ${activeView === view ? "bg-white dark:bg-slate-900 text-sky-600 shadow-sm" : "text-slate-600 dark:text-slate-300 hover:bg-white/50"}`}
+                                onClick={toggleQuotes}
+                                className={cn(
+                                    "flex items-center gap-2 px-3 py-1.5 rounded-full text-gray-400 transition-colors text-sm font-medium mt-2",
+                                    showQuotes
+                                        ? "hover:bg-gray-200/50 dark:hover:bg-gray-800/50 opacity-50 hover:opacity-100"
+                                        : "hover:bg-gray-200 dark:hover:bg-gray-800 opacity-100 bg-white/50 dark:bg-dark-surface/50 border border-gray-200 dark:border-gray-800 shadow-sm"
+                                )}
                             >
-                                {view === 'cleaner' && '🎬 Cleaner'}
-                                {view === 'tracker' && '💰 Tracker'}
-                                {view === 'guide' && '📘 Guide'}
+                                {showQuotes ? (
+                                    <><EyeOff className="w-4 h-4" /> <span>Hide</span></>
+                                ) : (
+                                    <><Eye className="w-4 h-4" /> Show</>
+                                )}
                             </button>
-                        ))}
+                        </div>
+                    </div>
+
+                    <div className="mt-3 flex justify-center">
+                        <div className="bg-white/60 dark:bg-black/30 backdrop-blur-md p-1.5 rounded-2xl shadow-sm border border-white/20 dark:border-white/5 inline-flex gap-2">
+                            {([
+                                { id: 'cleaner', label: 'Cleaner', icon: <LayoutDashboard className="w-4 h-4" /> },
+                                { id: 'tracker', label: 'Tracker', icon: <Calculator className="w-4 h-4" /> },
+                                { id: 'guide', label: 'Guide', icon: <BookOpen className="w-4 h-4" /> }
+                            ] as const).map(({ id, label, icon }) => (
+                                <button
+                                    key={id}
+                                    onClick={() => setActiveView(id)}
+                                    className={cn(
+                                        "px-6 py-2.5 text-sm font-bold rounded-xl transition-all flex items-center gap-2",
+                                        activeView === id
+                                            ? "bg-white dark:bg-dark-surface text-brand-600 dark:text-brand-400 shadow-[0_2px_10px_rgba(0,0,0,0.05)] dark:shadow-[0_2px_10px_rgba(0,0,0,0.2)]"
+                                            : "text-gray-500 hover:text-gray-700 dark:text-gray-400 hover:hover:bg-white/50 dark:hover:bg-white/5"
+                                    )}
+                                >
+                                    {icon}
+                                    {label}
+                                </button>
+                            ))}
+                        </div>
                     </div>
                 </header>
-
-                <main className="flex-1 pb-16">
+                <main>
                     {activeView === 'cleaner' && (
                         appState === 'idle' ? <FileUpload onFileSelect={handleFileSelect} disabled={false} /> :
                             originalContent && cleanedContent && summary && foreignReport && (
                                 <div className="space-y-8 animate-fade-in">
-                                    <div className="bg-white/80 dark:bg-dark-surface/80 backdrop-blur-md p-6 rounded-3xl shadow-xl shadow-gray-200/50 dark:shadow-none border border-white/20 dark:border-white/5 sticky top-6 z-20 flex flex-col sm:flex-row justify-between items-center gap-4">
-                                        <h2 className="text-xl font-bold flex items-center gap-2"><CheckCircle2 className="text-emerald-500 w-6 h-6" /> Review Changes</h2>
-                                        <div className="flex gap-3 w-full sm:w-auto">
-                                            <button onClick={() => setAppState('idle')} className="flex-1 sm:flex-none px-6 py-3 font-bold bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700 rounded-xl transition-colors">Start Over</button>
-                                            <button onClick={handleDownload} className="flex-1 sm:flex-none px-8 py-3 font-bold text-white bg-gradient-to-r from-brand-600 to-brand-500 hover:from-brand-500 hover:to-brand-400 rounded-xl shadow-lg shadow-brand-500/30 flex items-center justify-center gap-2 transition-all">
-                                                <Download className="w-5 h-5" /> Download Corrected
-                                            </button>
+                                    <div className="bg-white/80 dark:bg-slate-800/50 backdrop-blur-sm p-6 rounded-xl shadow-lg border border-slate-200 dark:border-slate-700 sticky top-4 z-10 flex flex-col sm:flex-row justify-between items-center gap-4">
+                                        <h2 className="text-xl font-bold">Review Changes</h2>
+                                        <div className="flex gap-3">
+                                            <button onClick={() => setAppState('idle')} className="px-4 py-2 text-sm font-semibold bg-slate-200 dark:bg-slate-700 rounded-md">Clean Another</button>
+                                            <button onClick={handleDownload} className="px-5 py-2 text-sm font-semibold text-white bg-sky-600 rounded-md hover:bg-sky-700 shadow-md flex items-center"><DownloadIcon /> Download</button>
                                         </div>
                                     </div>
                                     <Preview originalContent={originalContent} cleanedContent={cleanedContent} summary={summary} foreignReport={foreignReport} />
@@ -619,20 +645,11 @@ export default function App() {
                     {activeView === 'tracker' && <IncomeTracker />}
                     {activeView === 'guide' && <Guide />}
                 </main>
-                <footer className="mt-auto text-center py-6">
-                    <p className="text-xs font-semibold text-gray-400 uppercase tracking-widest">Translator's Toolkit • v2.0 Premium Design</p>
-                </footer>
+                <footer className="text-center mt-12 text-xs text-slate-500"><p>Translator's Toolkit update 28.01.2026</p></footer>
             </div>
             <style>{`
                 @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-                .animate-fade-in { animation: fadeIn 0.5s ease-out forwards; }
-                .custom-scrollbar::-webkit-scrollbar { width: 8px; height: 8px; }
-                .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
-                .custom-scrollbar::-webkit-scrollbar-thumb { background: rgba(156, 163, 175, 0.3); border-radius: 10px; }
-                .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: rgba(156, 163, 175, 0.5); }
-                @keyframes blob { 0% { transform: translate(0px, 0px) scale(1); } 33% { transform: translate(30px, -50px) scale(1.1); } 66% { transform: translate(-20px, 20px) scale(0.9); } 100% { transform: translate(0px, 0px) scale(1); } }
-                .animate-blob { animation: blob 10s infinite; }
-                .animation-delay-2000 { animation-delay: 2s; }
+                .animate-fade-in { animation: fadeIn 0.4s ease-out forwards; }
             `}</style>
         </div>
     );
