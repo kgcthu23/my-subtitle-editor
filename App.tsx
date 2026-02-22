@@ -585,7 +585,7 @@ export default function App() {
                         <h1 className="text-4xl sm:text-5xl font-black tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-brand-600 via-purple-600 to-brand-500 dark:from-brand-400 dark:via-purple-400 dark:to-brand-300 pb-2">
                             Translator's Toolkit
                         </h1>
-                        <p className="mt-2 text-gray-500 dark:text-gray-400 font-medium">Streamline your subtitle workflow instantly.</p>
+
 
                         <div className="relative mt-2 flex flex-col items-center">
                             {showQuotes && <DailyQuote />}

@@ -1,23 +1,51 @@
 <!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3e%3crect width='32' height='32' rx='8' fill='%230ea5e9'/%3e%3ctext x='16' y='22' font-family='Inter, sans-serif' font-size='16' font-weight='bold' fill='white' text-anchor='middle'%3eTT%3c/text%3e%3c/svg%3e" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Translator's Toolkit</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap" rel="stylesheet">
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-      tailwind.config = {
-        theme: {
+<html lang="en" class="dark">
+
+<head>
+  <meta charset="UTF-8" />
+  <link rel="icon" type="image/svg+xml"
+    href="data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3e%3crect width='32' height='32' rx='8' fill='%230ea5e9'/%3e%3ctext x='16' y='22' font-family='Inter, sans-serif' font-size='16' font-weight='bold' fill='white' text-anchor='middle'%3eTT%3c/text%3e%3c/svg%3e" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Translator's Toolkit</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@100..900&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
           fontFamily: {
-            sans: ['Inter', 'sans-serif'],
+            sans: ['Outfit', 'sans-serif'],
           },
-        }
+          colors: {
+            brand: {
+              DEFAULT: '#6366f1',
+              light: '#818cf8',
+              dark: '#4f46e5',
+              50: '#eef2ff',
+              100: '#e0e7ff',
+              200: '#c7d2fe',
+              300: '#a5b4fc',
+              400: '#818cf8',
+              500: '#6366f1',
+              600: '#4f46e5',
+              700: '#4338ca',
+              800: '#3730a3',
+              900: '#312e81',
+              950: '#1e1b4b',
+            },
+            dark: {
+              bg: '#0f1115',
+              surface: '#181b21',
+              border: '#2a2e37',
+            }
+          }
+        },
       }
-    </script>
+    }
+  </script>
   <script type="importmap">
 {
   "imports": {
@@ -28,8 +56,11 @@
 }
 </script>
 </head>
-  <body class="bg-slate-100 dark:bg-slate-900">
-    <div id="root"></div>
-    <script type="module" src="/index.tsx"></script>
-  </body>
+
+<body
+  class="bg-gray-50 dark:bg-dark-bg text-gray-900 dark:text-gray-100 font-sans antialiased selection:bg-brand-500 selection:text-white transition-colors duration-300">
+  <div id="root"></div>
+  <script type="module" src="/index.tsx"></script>
+</body>
+
 </html>

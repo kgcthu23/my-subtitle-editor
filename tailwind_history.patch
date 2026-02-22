@@ -1,0 +1,313 @@
+commit e86397f99086401b25862120e8f1edf4cf444e03
+Author: kaung ce <kgcthu.kev.com>
+Date:   Sun Feb 22 07:43:37 2026 +0630
+
+    Revert "feat: Implement dark mode, migrate to Lucide icons, and integrate `clsx`/`tailwind-merge` for improved styling."
+    
+    This reverts commit 4119754d13741f9e6d805eef132078a27e42d516.
+
+diff --git a/index.html b/index.html
+index def31bc..49811b9 100644
+--- a/index.html
++++ b/index.html
+@@ -1,51 +1,23 @@
+ <!DOCTYPE html>
+-<html lang="en" class="dark">
+-
+-<head>
+-  <meta charset="UTF-8" />
+-  <link rel="icon" type="image/svg+xml"
+-    href="data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3e%3crect width='32' height='32' rx='8' fill='%230ea5e9'/%3e%3ctext x='16' y='22' font-family='Inter, sans-serif' font-size='16' font-weight='bold' fill='white' text-anchor='middle'%3eTT%3c/text%3e%3c/svg%3e" />
+-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+-  <title>Translator's Toolkit</title>
+-  <link rel="preconnect" href="https://fonts.googleapis.com">
+-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+-  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@100..900&display=swap" rel="stylesheet">
+-  <script src="https://cdn.tailwindcss.com"></script>
+-  <script>
+-    tailwind.config = {
+-      darkMode: 'class',
+-      theme: {
+-        extend: {
++<html lang="en">
++  <head>
++    <meta charset="UTF-8" />
++    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3e%3crect width='32' height='32' rx='8' fill='%230ea5e9'/%3e%3ctext x='16' y='22' font-family='Inter, sans-serif' font-size='16' font-weight='bold' fill='white' text-anchor='middle'%3eTT%3c/text%3e%3c/svg%3e" />
++    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
++    <title>Translator's Toolkit</title>
++    <link rel="preconnect" href="https://fonts.googleapis.com">
++    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
++    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap" rel="stylesheet">
++    <script src="https://cdn.tailwindcss.com"></script>
++    <script>
++      tailwind.config = {
++        theme: {
+           fontFamily: {
+-            sans: ['Outfit', 'sans-serif'],
++            sans: ['Inter', 'sans-serif'],
+           },
+-          colors: {
+-            brand: {
+-              DEFAULT: '#6366f1',
+-              light: '#818cf8',
+-              dark: '#4f46e5',
+-              50: '#eef2ff',
+-              100: '#e0e7ff',
+-              200: '#c7d2fe',
+-              300: '#a5b4fc',
+-              400: '#818cf8',
+-              500: '#6366f1',
+-              600: '#4f46e5',
+-              700: '#4338ca',
+-              800: '#3730a3',
+-              900: '#312e81',
+-              950: '#1e1b4b',
+-            },
+-            dark: {
+-              bg: '#0f1115',
+-              surface: '#181b21',
+-              border: '#2a2e37',
+-            }
+-          }
+-        },
++        }
+       }
+-    }
+-  </script>
++    </script>
+   <script type="importmap">
+ {
+   "imports": {
+@@ -56,11 +28,8 @@
+ }
+ </script>
+ </head>
+-
+-<body
+-  class="bg-gray-50 dark:bg-dark-bg text-gray-900 dark:text-gray-100 font-sans antialiased selection:bg-brand-500 selection:text-white transition-colors duration-300">
+-  <div id="root"></div>
+-  <script type="module" src="/index.tsx"></script>
+-</body>
+-
++  <body class="bg-slate-100 dark:bg-slate-900">
++    <div id="root"></div>
++    <script type="module" src="/index.tsx"></script>
++  </body>
+ </html>
+\ No newline at end of file
+
+commit 4119754d13741f9e6d805eef132078a27e42d516
+Author: kaung ce <kgcthu.kev.com>
+Date:   Sun Feb 22 07:34:14 2026 +0630
+
+    feat: Implement dark mode, migrate to Lucide icons, and integrate `clsx`/`tailwind-merge` for improved styling.
+
+diff --git a/index.html b/index.html
+index 49811b9..def31bc 100644
+--- a/index.html
++++ b/index.html
+@@ -1,23 +1,51 @@
+ <!DOCTYPE html>
+-<html lang="en">
+-  <head>
+-    <meta charset="UTF-8" />
+-    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3e%3crect width='32' height='32' rx='8' fill='%230ea5e9'/%3e%3ctext x='16' y='22' font-family='Inter, sans-serif' font-size='16' font-weight='bold' fill='white' text-anchor='middle'%3eTT%3c/text%3e%3c/svg%3e" />
+-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+-    <title>Translator's Toolkit</title>
+-    <link rel="preconnect" href="https://fonts.googleapis.com">
+-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap" rel="stylesheet">
+-    <script src="https://cdn.tailwindcss.com"></script>
+-    <script>
+-      tailwind.config = {
+-        theme: {
++<html lang="en" class="dark">
++
++<head>
++  <meta charset="UTF-8" />
++  <link rel="icon" type="image/svg+xml"
++    href="data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3e%3crect width='32' height='32' rx='8' fill='%230ea5e9'/%3e%3ctext x='16' y='22' font-family='Inter, sans-serif' font-size='16' font-weight='bold' fill='white' text-anchor='middle'%3eTT%3c/text%3e%3c/svg%3e" />
++  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
++  <title>Translator's Toolkit</title>
++  <link rel="preconnect" href="https://fonts.googleapis.com">
++  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
++  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@100..900&display=swap" rel="stylesheet">
++  <script src="https://cdn.tailwindcss.com"></script>
++  <script>
++    tailwind.config = {
++      darkMode: 'class',
++      theme: {
++        extend: {
+           fontFamily: {
+-            sans: ['Inter', 'sans-serif'],
++            sans: ['Outfit', 'sans-serif'],
+           },
+-        }
++          colors: {
++            brand: {
++              DEFAULT: '#6366f1',
++              light: '#818cf8',
++              dark: '#4f46e5',
++              50: '#eef2ff',
++              100: '#e0e7ff',
++              200: '#c7d2fe',
++              300: '#a5b4fc',
++              400: '#818cf8',
++              500: '#6366f1',
++              600: '#4f46e5',
++              700: '#4338ca',
++              800: '#3730a3',
++              900: '#312e81',
++              950: '#1e1b4b',
++            },
++            dark: {
++              bg: '#0f1115',
++              surface: '#181b21',
++              border: '#2a2e37',
++            }
++          }
++        },
+       }
+-    </script>
++    }
++  </script>
+   <script type="importmap">
+ {
+   "imports": {
+@@ -28,8 +56,11 @@
+ }
+ </script>
+ </head>
+-  <body class="bg-slate-100 dark:bg-slate-900">
+-    <div id="root"></div>
+-    <script type="module" src="/index.tsx"></script>
+-  </body>
++
++<body
++  class="bg-gray-50 dark:bg-dark-bg text-gray-900 dark:text-gray-100 font-sans antialiased selection:bg-brand-500 selection:text-white transition-colors duration-300">
++  <div id="root"></div>
++  <script type="module" src="/index.tsx"></script>
++</body>
++
+ </html>
+\ No newline at end of file
+
+commit 2e56f1705443c7edc3f6374bd903ace2ae6c6459
+Author: Kaung Si Thu <kgcthu.kev@gmail.com>
+Date:   Fri Oct 31 11:41:08 2025 +0630
+
+    refactor: Update app title and favicon
+    
+    Changes the application title from "SRT Subtitle Cleaner" to "Translator's Toolkit" and updates the favicon to a custom SVG. This rebranding aligns with the broader functionality of the tool beyond just cleaning SRT files.
+
+diff --git a/index.html b/index.html
+index 027311c..49811b9 100644
+--- a/index.html
++++ b/index.html
+@@ -1,11 +1,10 @@
+-
+ <!DOCTYPE html>
+ <html lang="en">
+   <head>
+     <meta charset="UTF-8" />
+-    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
++    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3e%3crect width='32' height='32' rx='8' fill='%230ea5e9'/%3e%3ctext x='16' y='22' font-family='Inter, sans-serif' font-size='16' font-weight='bold' fill='white' text-anchor='middle'%3eTT%3c/text%3e%3c/svg%3e" />
+     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+-    <title>SRT Subtitle Cleaner</title>
++    <title>Translator's Toolkit</title>
+     <link rel="preconnect" href="https://fonts.googleapis.com">
+     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap" rel="stylesheet">
+
+commit e4d45cd4120f099af282ac1b4fa287c394d1b3f7
+Author: Kaung Si Thu <kgcthu.kev@gmail.com>
+Date:   Thu Oct 30 14:51:58 2025 +0630
+
+    feat: Integrate new income tracking features
+    
+    Introduces an income tracking module with new types and functionality. This includes interfaces for `IncomeEntry`, `MonthData`, and `IncomeData` to manage financial records.
+    
+    Also, refactors `ForeignLanguageReport` to use string keys for `lineNumber` for improved type safety when iterating over entries.
+    
+    Adds a new Google Font "Inter" and configures Tailwind CSS to use it as the default sans-serif font, enhancing the application's visual appearance.
+
+diff --git a/index.html b/index.html
+index 9bc0769..027311c 100644
+--- a/index.html
++++ b/index.html
+@@ -6,7 +6,19 @@
+     <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+     <title>SRT Subtitle Cleaner</title>
++    <link rel="preconnect" href="https://fonts.googleapis.com">
++    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
++    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap" rel="stylesheet">
+     <script src="https://cdn.tailwindcss.com"></script>
++    <script>
++      tailwind.config = {
++        theme: {
++          fontFamily: {
++            sans: ['Inter', 'sans-serif'],
++          },
++        }
++      }
++    </script>
+   <script type="importmap">
+ {
+   "imports": {
+@@ -21,4 +33,4 @@
+     <div id="root"></div>
+     <script type="module" src="/index.tsx"></script>
+   </body>
+-</html>
++</html>
+\ No newline at end of file
+
+commit f808a088f6b5859cf7963fe426296c79a175076d
+Author: Kaung Si Thu <kgcthu.kev@gmail.com>
+Date:   Tue Oct 21 13:32:30 2025 +0630
+
+    feat: Initialize React project and basic SRT cleaning logic
+    
+    Sets up the project structure for the SRT Subtitle Cleaner & Language Detector.
+    This includes:
+    - Initializing a Vite-based React project.
+    - Adding necessary dependencies (React, ReactDOM, Vite, TypeScript).
+    - Configuring TypeScript and Vite.
+    - Implementing the initial logic for cleaning SRT content, including:
+        - Removing backslashes from timestamps and HTML tags.
+        - Removing text within square brackets and parentheses.
+        - Removing specific Myanmar characters.
+    - Adding placeholder functions and types for language detection and change summaries.
+    - Updating README with local run instructions.
+
+diff --git a/index.html b/index.html
+new file mode 100644
+index 0000000..9bc0769
+--- /dev/null
++++ b/index.html
+@@ -0,0 +1,24 @@
++
++<!DOCTYPE html>
++<html lang="en">
++  <head>
++    <meta charset="UTF-8" />
++    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
++    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
++    <title>SRT Subtitle Cleaner</title>
++    <script src="https://cdn.tailwindcss.com"></script>
++  <script type="importmap">
++{
++  "imports": {
++    "react": "https://aistudiocdn.com/react@^19.2.0",
++    "react/": "https://aistudiocdn.com/react@^19.2.0/",
++    "react-dom/": "https://aistudiocdn.com/react-dom@^19.2.0/"
++  }
++}
++</script>
++</head>
++  <body class="bg-slate-100 dark:bg-slate-900">
++    <div id="root"></div>
++    <script type="module" src="/index.tsx"></script>
++  </body>
++</html>
