@@ -1,17 +1,38 @@
 import React, { useState, useCallback, useMemo, useEffect } from 'react';
 import { cleanSrtContent, detectForeignLanguages, getChangeSummary } from './services/srtCleaner';
 import type { ChangeSummary, ForeignLanguageReport, IncomeData, IncomeEntry, DetectedLanguageInfo } from './types';
-import {
-    UploadCloud, Download, AlertTriangle, Eye, EyeOff,
-    LayoutDashboard, Calculator, BookOpen, Sparkles,
-    ArrowRight, CheckCircle2, Trash2, Link as LinkIcon, Info, MessageSquare
-} from 'lucide-react';
-import { clsx, type ClassValue } from 'clsx';
-import { twMerge } from 'tailwind-merge';
 
-function cn(...inputs: ClassValue[]) {
-    return twMerge(clsx(inputs));
-}
+// SVG Icons
+const UploadIcon = () => (
+    <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
+    </svg>
+);
+
+const DownloadIcon = () => (
+    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+    </svg>
+);
+
+const WarningIcon = () => (
+    <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-yellow-400 mr-3 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+    </svg>
+);
+
+const EyeIcon = () => (
+    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+    </svg>
+);
+
+const EyeOffIcon = () => (
+    <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21" />
+    </svg>
+);
 
 const MOTIVATIONAL_QUOTES = [
     "Good Luck, Thu Thu! You're the best.",
@@ -518,16 +539,6 @@ export default function App() {
     const [fileName, setFileName] = useState<string>('cleaned.srt');
     const [summary, setSummary] = useState<ChangeSummary | null>(null);
     const [foreignReport, setForeignReport] = useState<ForeignLanguageReport | null>(null);
-    const [showQuotes, setShowQuotes] = useState<boolean>(() => {
-        const saved = localStorage.getItem('showQuotes');
-        return saved !== 'false';
-    });
-
-    const toggleQuotes = () => {
-        const newState = !showQuotes;
-        setShowQuotes(newState);
-        localStorage.setItem('showQuotes', String(newState));
-    };
 
     const handleFileSelect = useCallback((content: string, name: string) => {
         setOriginalContent(content);
@@ -547,61 +558,43 @@ export default function App() {
     };
 
     return (
-        <div className="min-h-screen bg-[#f8fafc] dark:bg-[#0f1115] text-gray-900 dark:text-gray-100 font-sans selection:bg-brand-500 selection:text-white transition-colors duration-300 relative overflow-hidden">
-            {/* Background Orbs */}
-            <div className="fixed top-[-10%] left-[-10%] w-[40%] h-[40%] rounded-full bg-brand-500/20 blur-[120px] pointer-events-none mix-blend-multiply dark:mix-blend-lighten animate-blob"></div>
-            <div className="fixed bottom-[-10%] right-[-10%] w-[40%] h-[40%] rounded-full bg-purple-500/20 blur-[120px] pointer-events-none mix-blend-multiply dark:mix-blend-lighten animate-blob animation-delay-2000"></div>
+        <div className="min-h-screen text-slate-800 dark:text-slate-200 p-4 sm:p-6 lg:p-8">
+            <div className="max-w-7xl mx-auto">
+                <header className="text-center mb-10 pt-2">
+                    <h1 className="text-4xl sm:text-5xl font-extrabold text-slate-900 dark:text-white">Translator's Toolkit</h1>
 
-            <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 min-h-screen flex flex-col">
-                <header className="mb-12">
-                    <div className="flex flex-col items-center text-center">
-                        <h1 className="text-4xl sm:text-5xl font-black tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-brand-600 via-purple-600 to-brand-500 dark:from-brand-400 dark:via-purple-400 dark:to-brand-300 pb-2">
-                            Translator's Toolkit
-                        </h1>
-                        <p className="mt-2 text-gray-500 dark:text-gray-400 font-medium">Streamline your subtitle workflow instantly.</p>
+                    {showQuotes && <DailyQuote />}
 
-                        <div className="relative mt-2 flex flex-col items-center">
-                            {showQuotes && <DailyQuote />}
+                    <button
+                        onClick={toggleQuotes}
+                        className="mt-2 mx-auto flex items-center justify-center gap-2 text-xs font-medium text-slate-400 hover:text-sky-600 dark:text-slate-500 dark:hover:text-sky-400 transition-colors"
+                        title={showQuotes ? "Hide Quotes" : "Show Quotes"}
+                    >
+                        {showQuotes ? (
+                            <>
+                                <EyeOffIcon />
+                                <span>Hide Quotes</span>
+                            </>
+                        ) : (
+                            <>
+                                <EyeIcon />
+                                <span>Show Quotes</span>
+                            </>
+                        )}
+                    </button>
+
+                    <div className="mt-6 flex justify-center gap-2 p-1 bg-slate-200/50 dark:bg-slate-800/50 rounded-lg max-w-sm mx-auto shadow-inner">
+                        {(['cleaner', 'tracker', 'guide'] as AppView[]).map((view) => (
                             <button
-                                onClick={toggleQuotes}
-                                className={cn(
-                                    "flex items-center gap-2 px-3 py-1.5 rounded-full text-gray-400 transition-colors text-sm font-medium mt-2",
-                                    showQuotes
-                                        ? "hover:bg-gray-200/50 dark:hover:bg-gray-800/50 opacity-50 hover:opacity-100"
-                                        : "hover:bg-gray-200 dark:hover:bg-gray-800 opacity-100 bg-white/50 dark:bg-dark-surface/50 border border-gray-200 dark:border-gray-800 shadow-sm"
-                                )}
+                                key={view}
+                                onClick={() => setActiveView(view)}
+                                className={`flex-1 px-3 py-2 text-sm font-semibold rounded-md transition-all flex items-center justify-center ${activeView === view ? "bg-white dark:bg-slate-900 text-sky-600 shadow-sm" : "text-slate-600 dark:text-slate-300 hover:bg-white/50"}`}
                             >
-                                {showQuotes ? (
-                                    <><EyeOff className="w-4 h-4" /> <span>Hide</span></>
-                                ) : (
-                                    <><Eye className="w-4 h-4" /> Show</>
-                                )}
+                                {view === 'cleaner' && '🎬 Cleaner'}
+                                {view === 'tracker' && '💰 Tracker'}
+                                {view === 'guide' && '📘 Guide'}
                             </button>
-                        </div>
-                    </div>
-
-                    <div className="mt-3 flex justify-center">
-                        <div className="bg-white/60 dark:bg-black/30 backdrop-blur-md p-1.5 rounded-2xl shadow-sm border border-white/20 dark:border-white/5 inline-flex gap-2">
-                            {([
-                                { id: 'cleaner', label: 'Cleaner', icon: <LayoutDashboard className="w-4 h-4" /> },
-                                { id: 'tracker', label: 'Tracker', icon: <Calculator className="w-4 h-4" /> },
-                                { id: 'guide', label: 'Guide', icon: <BookOpen className="w-4 h-4" /> }
-                            ] as const).map(({ id, label, icon }) => (
-                                <button
-                                    key={id}
-                                    onClick={() => setActiveView(id)}
-                                    className={cn(
-                                        "px-6 py-2.5 text-sm font-bold rounded-xl transition-all flex items-center gap-2",
-                                        activeView === id
-                                            ? "bg-white dark:bg-dark-surface text-brand-600 dark:text-brand-400 shadow-[0_2px_10px_rgba(0,0,0,0.05)] dark:shadow-[0_2px_10px_rgba(0,0,0,0.2)]"
-                                            : "text-gray-500 hover:text-gray-700 dark:text-gray-400 hover:hover:bg-white/50 dark:hover:bg-white/5"
-                                    )}
-                                >
-                                    {icon}
-                                    {label}
-                                </button>
-                            ))}
-                        </div>
+                        ))}
                     </div>
                 </header>
 
