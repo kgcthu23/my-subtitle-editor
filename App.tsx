@@ -567,6 +567,41 @@ const Guide: React.FC = () => {
     );
 };
 
+// --- Letter Modal ---
+const LetterModal: React.FC<{ isOpen: boolean; onClose: () => void }> = ({ isOpen, onClose }) => {
+    if (!isOpen) return null;
+    return (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+            <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={onClose} />
+            <div className="bg-zinc-900/90 border border-zinc-800/80 p-8 rounded-2xl shadow-2xl relative z-10 max-w-sm w-full animate-fade-in text-center">
+                <div className="w-16 h-16 bg-pink-500/10 rounded-full flex items-center justify-center mx-auto mb-4 border border-pink-500/20 shadow-[0_0_15px_rgba(236,72,153,0.3)]">
+                    <span className="text-2xl">🎂</span>
+                </div>
+                <h3 className="text-xl font-bold text-zinc-100 mb-2">Thank you thu thu</h3>
+                <p className="text-sm text-zinc-400 mb-6">
+                    message for you.<br /><br />
+                    ps. this is my first birthday cake ever. and it is yummy i like it
+                </p>
+                <a
+                    href="https://drive.google.com/drive/u/1/folders/1eerOQj3JVxm0bZSwr9LHubD1vnejCBn9"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    onClick={onClose}
+                    className="block w-full py-3 px-4 bg-gradient-to-r from-pink-600 to-rose-600 text-white font-bold rounded-xl hover:from-pink-500 hover:to-rose-500 transition-all shadow-lg shadow-pink-500/25 mb-3"
+                >
+                    Open Letter
+                </a>
+                <button
+                    onClick={onClose}
+                    className="text-xs text-zinc-500 hover:text-zinc-300 transition-colors"
+                >
+                    Dismiss
+                </button>
+            </div>
+        </div>
+    );
+};
+
 // --- Main Application ---
 export default function App() {
     type AppState = 'idle' | 'preview';
@@ -579,6 +614,23 @@ export default function App() {
     const [summary, setSummary] = useState<ChangeSummary | null>(null);
     const [foreignReport, setForeignReport] = useState<ForeignLanguageReport | null>(null);
     const [showQuotes, setShowQuotes] = useState<boolean>(true);
+    const [showLetterModal, setShowLetterModal] = useState<boolean>(false);
+
+    useEffect(() => {
+        // Show modal on load if date is today (March 2, 2026)
+        // This makes it "available for today" without being strictly a one-time thing in localStorage
+        const today = new Date().toISOString().split('T')[0];
+        if (today === '2026-03-02') {
+            setShowLetterModal(true);
+        } else {
+            // fallback: always show if the user's local timezone pushed them to another date
+            setShowLetterModal(true);
+        }
+    }, []);
+
+    const handleCloseLetter = () => {
+        setShowLetterModal(false);
+    };
 
     const toggleQuotes = useCallback(() => {
         setShowQuotes(prev => !prev);
@@ -603,6 +655,7 @@ export default function App() {
 
     return (
         <div className="min-h-screen bg-[#09090b] text-zinc-100 font-sans selection:bg-indigo-500/30 selection:text-white transition-colors duration-300 relative overflow-hidden">
+            <LetterModal isOpen={showLetterModal} onClose={handleCloseLetter} />
             {/* Background Orbs */}
             <div className="fixed top-[-10%] left-[-10%] w-[40%] h-[40%] rounded-full bg-indigo-500/10 blur-[120px] pointer-events-none animate-blob"></div>
             <div className="fixed bottom-[-10%] right-[-10%] w-[40%] h-[40%] rounded-full bg-purple-500/10 blur-[120px] pointer-events-none animate-blob animation-delay-2000"></div>
