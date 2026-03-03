@@ -617,14 +617,10 @@ export default function App() {
     const [showLetterModal, setShowLetterModal] = useState<boolean>(false);
 
     useEffect(() => {
-        // Show modal on load if date is today (March 2, 2026)
-        // This makes it "available for today" without being strictly a one-time thing in localStorage
-        const today = new Date().toISOString().split('T')[0];
-        if (today === '2026-03-02') {
+        const modalShownCount = parseInt(localStorage.getItem('letterModalShownCount') || '0', 10);
+        if (modalShownCount < 2) {
             setShowLetterModal(true);
-        } else {
-            // fallback: always show if the user's local timezone pushed them to another date
-            setShowLetterModal(true);
+            localStorage.setItem('letterModalShownCount', (modalShownCount + 1).toString());
         }
     }, []);
 
