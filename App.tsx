@@ -591,10 +591,15 @@ export default function App() {
                     {activeView === 'tracker' && <IncomeTracker />}
                     {activeView === 'guide' && <Guide />}
                 </main>
-                <footer className="text-center mt-12 text-m text-zinc-600 font-medium tracking-wide">
+                <footer className="text-center mt-12 text-zinc-600 font-medium tracking-wide pb-12">
                     <p>Translator's Toolkit &copy; 2026</p>
                     <p className="mt-2 text-sm text-zinc-500">
-                        Made for <span onClick={handleSecretClick} className="relative inline-block transition-colors duration-300 hover:text-transparent hover:bg-clip-text hover:bg-gradient-to-r hover:from-pink-500 hover:via-purple-500 hover:to-indigo-500 cursor-pointer group font-bold select-none">Thu Zue Zue San<span className="absolute -bottom-1 left-0 w-0 h-[2px] bg-gradient-to-r from-pink-500 via-purple-500 to-indigo-500 transition-all duration-300 group-hover:w-full rounded-full"></span></span>
+                        Made for <span onClick={handleSecretClick} className="relative inline-block transition-colors duration-300 hover:text-pink-400 cursor-pointer group font-bold select-none py-1">
+                            Thu Zue Zue San
+                            <span className="demo2-heart1 absolute -top-1 left-[10%] text-pink-500 text-[10px] opacity-0 pointer-events-none">❤️</span>
+                            <span className="demo2-heart2 absolute top-1 left-[40%] text-purple-500 text-[14px] opacity-0 pointer-events-none">💖</span>
+                            <span className="demo2-heart3 absolute -top-2 left-[70%] text-rose-500 text-[12px] opacity-0 pointer-events-none">💕</span>
+                        </span>
                     </p>
                 </footer>
             </div>
@@ -608,6 +613,15 @@ export default function App() {
                     100% { transform: translateY(-100px) scale(0.8) rotate(0deg); opacity: 0; }
                 }
                 .animate-float-up { animation: floatUp 1s ease-out forwards; }
+
+                @keyframes floatHeart {
+                    0% { transform: translateY(0) scale(0.5); opacity: 0; }
+                    20% { opacity: 1; transform: translateY(-5px) scale(1); filter: drop-shadow(0 0 5px rgba(236,72,153,0.8)); }
+                    100% { transform: translateY(-25px) scale(0.5); opacity: 0; }
+                }
+                .group:hover .demo2-heart1 { animation: floatHeart 1.2s infinite ease-out; }
+                .group:hover .demo2-heart2 { animation: floatHeart 1.4s infinite ease-out 0.2s; }
+                .group:hover .demo2-heart3 { animation: floatHeart 1.3s infinite ease-out 0.4s; }
             `}</style>
         </div>
     );
