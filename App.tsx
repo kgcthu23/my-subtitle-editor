@@ -3,7 +3,7 @@ import React, { useState, useCallback, useMemo, useEffect } from 'react';
 import { cleanSrtContent, detectForeignLanguages, getChangeSummary } from './services/srtCleaner';
 import type { ChangeSummary, ForeignLanguageReport, IncomeData, IncomeEntry, DetectedLanguageInfo } from './types';
 import {
-    UploadCloud, Download, AlertTriangle, Eye, EyeOff,
+    UploadCloud, Download, AlertTriangle,
     LayoutDashboard, Calculator, BookOpen, Sparkles,
     ArrowRight, CheckCircle2, Trash2, Link as LinkIcon, Info, MessageSquare, Copy
 } from 'lucide-react';
@@ -14,100 +14,7 @@ function cn(...inputs: ClassValue[]) {
     return twMerge(clsx(inputs));
 }
 
-const MOTIVATIONAL_QUOTES = [
-    "Good Luck, Thu Thu! You're the best.",
-    "Sending you a giant hug and lots of luck. ᕦ(ò_óˇ)ᕤ",
-    "Thu Thu... you’re going to pass with flying colors.",
-    "I’m praying for you and thinking of you every second. You've got this!",
-    "I believe in you more than I believe in anything else. You've got this, Thu Thu.",
-    "Take a deep breath for me. You’re going to be brilliant today.",
-    "I’m already proud of you, no matter what. But I know you’re going to make it anyway!",
-    "I know how much this means to you, and that’s why I know you’re going to succeed.",
-    "If you get stuck on a question, Relax and calm first. I know you can solve it.",
-    "I’ll be waiting to hear how great you did. Go shine, Thu Thu.",
-    "Thu Thu... your hard work will pay off, believe it.",
-    "Don't stress too much Thu Thu, I know you can do your best.",
-    "May lots of luck come to Thu Thu.",
-    "Don't lose sleep studying, Thu Thu. Take care of your health.",
-    "Don't forget that I'm always on your side.",
-    "Just try your best Thu Thu, good results will come naturally.",
-    "May everything go smoothly for Thu Thu.",
-    "Stay calm and answer Thu Thu... you can do this.",
-    "Thu Thu, you’re the smartest person I know.",
-    "Difficulties are just challenges for people like you. You make the hard things look easy.",
-    "Your brain is absolute gold, Thu Thu.",
-    "Ignore the noise and the stress around you. Just do your thing, Thu Thu. You’re in a league of your own.",
-    "Don't stress too much, Thu Thu. I know you can do your best, and I’m right here behind you.",
-    "Never forget that I’m always on your side, Thu Thu.",
-    "I hope everything goes as smoothly as possible for you.",
-    "Everything will happen just as you’ve imagined. Your dreams are closer than you think.",
-    "Thu Thu, your mind is honestly my favorite thing about you. You’re going to brilliant today.",
-    "I love how your brain works. U definitely knows about lots of things including weird facts. :P",
-    "I love how your brain works. U definitely knows about lots of things including weird facts. :P",
-    "You’re not just hardworking; you’re genuinely brilliant. Watching you solve things is impressive, Thu Thu.",
-    "You’re not just hardworking; you’re genuinely brilliant. Watching you solve things is impressive, Thu Thu.",
-    "I’m always in awe of how quickly you pick things up. You’re definitely the smartest person i know.",
-    "I’m always in awe of how quickly you pick things up. You’re definitely the smartest person i know.",
-    "You have this way of making the most complex topics seem simple. That’s how I know you’ve got this handled.",
-    "I’m so lucky to be close to someone as bright and capable as you.",
-    "သုသုရေ... Fighting နော်! အကောင်းဆုံး လုပ်နိုင်မှာပါ။",
-    "ကံကောင်းခြင်းတွေအားလုံး သုသုဆီကို ရောက်လာပါစေ။",
-    "သုသုက စီစီ့အတွက် အတော်ဆုံး လူသားလေးပါပဲ။",
-    "သုသုက စီစီ့အတွက် အတော်ဆုံး လူသားလေးပါပဲ။",
-    "သုသု စာဖြေနေတဲ့အချိန်တိုင်း ဆုတောင်းပေးနေမယ်နော်။",
-    "သုသုကို ယုံကြည်တယ်။ သုသုလည်း ကိုယ့်ကိုကိုယ် ယုံကြည်ပါ။",
-    "စာကျက်ရတာ ပင်ပန်းနေပြီလား သုသု။ ကျန်းမာရေးလည်းဂရုစိုက်‌နော်။",
-    "စာကျက်ရတာ ပင်ပန်းနေပြီလား သုသု။ ကျန်းမာရေးလည်းဂရုစိုက်‌နော်။",
-    "သုသုက ထူးချွန်ပြီးသားပဲဟာ... ကိုယ့်ကိုယ်ကိုယုံပါ။",
-    "သုသုက ဉာဏ်ကောင်းပြီးသား၊ ဘာမှ ပူစရာမလိုဘူး။",
-    "မေးခွန်းခက်ရင် စိတ်မလှုပ်ရှားနဲ့၊ ဖြည်းဖြည်းချင်း စဉ်းစားနော် သုသု။",
-    "ကျန်းမာရေးလည်း ဂရုစိုက်ဦးနော် သုသု။ အိပ်ရေးဝမှ ဉာဏ်ပွင့်မှာ။",
-    "ကျန်းမာရေးလည်း ဂရုစိုက်ဦးနော် သုသု။ အိပ်ရေးဝမှ ဉာဏ်ပွင့်မှာ။",
-    "အရာအားလုံးက သုသု စိတ်ကူးထားတဲ့အတိုင်း ဖြစ်လာမှာပါ။",
-    "အရာအားလုံးက သုသု စိတ်ကူးထားတဲ့အတိုင်း ဖြစ်လာမှာပါ။",
-    "အချိန်ရရင် ဘုရားရှိခိုးနော် သုသု။ စိတ်တည်ငြိမ်သွားလိမ့်မယ်။",
-    "ရလဒ်ကို မတွေးနဲ့ဦး၊ လက်ရှိအချိန်မှာ အကောင်းဆုံးဖြေဖို့ပဲ အာရုံစိုက်နော် သုသု။",
-    "သုသု ဘာပဲလုပ်လုပ် သုသုဘက်က အမြဲရှိနေမှာ။",
-    "သုသုရေ... အားမလျှော့နဲ့နော်!",
-    "ဂုဏ်ထူးတွေ အများကြီး ပိုင်ဆိုင်နိုင်ပါစေ သုသု။",
-    "သုသုက No.1 ပဲ။",
-    "သုသု အတွက် စီစီ့ရဲ့ အားအင်တွေ ပို့ပေးလိုက်ပါတယ်။ (づ ◕‿◕ )づ",
-    "သုသု အတွက် စီစီ့ရဲ့ အားအင်တွေ ပို့ပေးလိုက်ပါတယ်။ (づ ◕‿◕ )づ",
-    "သုသု ဖြေသမျှ အမှန်တွေချည်း ဖြစ်ပါစေ။",
-    "ယုံကြည်မှုသာ ထား၊ သုသု နိုင်ကို နိုင်ရမယ်။",
-    "ချစ်ရတဲ့ သုသု... Fighting ပါနော်။",
-    "သုသု ပြုံးလိုက်ရင် မျက်လုံးလေးတွေပါ လိုက်ပြုံးတာကို စီစီ သိပ်သဘောကျတယ်။ စိတ်ဖိစီးရင် အဲ့အပြုံးလေးကို သတိရနော်။",
-    "သုသု ပြုံးလိုက်ရင် မျက်လုံးလေးတွေပါ လိုက်ပြုံးတာကို စီစီ သိပ်သဘောကျတယ်။ စိတ်ဖိစီးရင် အဲ့အပြုံးလေးကို သတိရနော်။",
-    "သုသု ပြုံးလိုက်ရင် မျက်လုံးလေးတွေပါ လိုက်ပြုံးတာကို စီစီ သိပ်သဘောကျတယ်။ စိတ်ဖိစီးရင် အဲ့အပြုံးလေးကို သတိရနော်။",
-    "သုသု ရယ်လိုက်ရင် မျက်လုံးလေးတွေ ပိတ်သွားတဲ့အထိ ချစ်ဖို့ကောင်းတာ... စာမေးပွဲပြီးရင် အဲ့လို ပျော်ပျော်ကြီး ပြုံးနိုင်ပါစေ။",
-    "သုသု ရယ်လိုက်ရင် မျက်လုံးလေးတွေ ပိတ်သွားတဲ့အထိ ချစ်ဖို့ကောင်းတာ... စာမေးပွဲပြီးရင် အဲ့လို ပျော်ပျော်ကြီး ပြုံးနိုင်ပါစေ။",
-    "သုသု ရယ်လိုက်ရင် မျက်လုံးလေးတွေ ပိတ်သွားတဲ့အထိ ချစ်ဖို့ကောင်းတာ... စာမေးပွဲပြီးရင် အဲ့လို ပျော်ပျော်ကြီး ပြုံးနိုင်ပါစေ။",
-    "စီစီက သုသုဘက်ကနေ အမြဲရှိနေပါတယ်။",
-    "ကျန်းမာရေး ဂရုစိုက်ပြီး ဖြေနော်... သုသု နေမကောင်းရင် စီစီ စိတ်မကောင်းဘူး။"
-];
-
 // --- Child Components ---
-
-const DailyQuote: React.FC = () => {
-    const [quoteIndex, setQuoteIndex] = useState(() => Math.floor(Math.random() * MOTIVATIONAL_QUOTES.length));
-
-    useEffect(() => {
-        const interval = setInterval(() => {
-            setQuoteIndex(Math.floor(Math.random() * MOTIVATIONAL_QUOTES.length));
-        }, 4000);
-        return () => clearInterval(interval);
-    }, []);
-
-    const quote = MOTIVATIONAL_QUOTES[quoteIndex];
-
-    return (
-        <div className="mt-3 px-4 min-h-[40px] flex items-center justify-center">
-            <p key={quoteIndex} className="text-sm sm:text-base font-medium text-pink-500 italic text-center animate-fade-in">
-                ✨ "{quote}" ✨
-            </p>
-        </div>
-    );
-};
 
 const FileUpload: React.FC<{ onFileSelect: (content: string, fileName: string) => void; disabled: boolean }> = ({ onFileSelect, disabled }) => {
     const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -338,7 +245,7 @@ const Guide: React.FC = () => {
 
     const hiddifyKeyVless = "vless://897b11cf-aa86-4fa0-9a6b-87d6c2a3cc5a@my.edumailme.com:443?alpn=h2%2Chttp%2F1.1&encryption=none&fp=chrome&host=my.edumailme.com&path=%2Fxray&security=tls&sni=my.edumailme.com&type=ws#SINGAPORE-50.00GB%F0%9F%93%8A-30D%E2%8F%B3";
     const hiddifyKeyVmess = "vmess://ewogICJhZGQiOiAibXkuZWR1bWFpbG1lLmNvbSIsCiAgImFsbG93SW5zZWN1cmUiOiBmYWxzZSwKICAiYWxwbiI6ICJoMixodHRwLzEuMSIsCiAgImZwIjogImNocm9tZSIsCiAgImhvc3QiOiAibXkuZWR1bWFpbG1lLmNvbSIsCiAgImlkIjogImRiYjNjNTUxLTFkNGQtNGRhMC1hNGFkLTQxYWU2NjY1ZjFlOCIsCiAgIm5ldCI6ICJ3cyIsCiAgInBhdGgiOiAiL3hyYXkiLAogICJwb3J0IjogMjA4MywKICAicHMiOiAiU0lOR0FQT1JFLTUwLjAwR0Lwn5OKLTMwROKPsyIsCiAgInNjeSI6ICJhdXRvIiwKICAic25pIjogIm15LmVkdW1haWxtZS5jb20iLAogICJ0bHMiOiAidGxzIiwKICAidHlwZSI6ICJub25lIiwKICAidiI6ICIyIgp9";
-    const driveLink = "https://drive.google.com/drive/u/0/folders/16j0H2tw4-xbK2Vb9VAzqzmZa9Edxprju";
+    const driveLink = "https://drive.google.com/drive/u/0/folders/1l0q5ayt7zNnJ4RADIA3maPGzoh-AgobU";
 
     const handleCopy = (text: string, id: string) => {
         navigator.clipboard.writeText(text);
@@ -506,7 +413,7 @@ const Guide: React.FC = () => {
                                 <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
                                     <path fillRule="evenodd" d="M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25zM12.75 6a.75.75 0 00-1.5 0v6c0 .414.336.75.75.75h4.5a.75.75 0 000-1.5h-3.75V6z" clipRule="evenodd" />
                                 </svg>
-                                <span>Refreshed: 2026-01-28</span>
+                                <span>Refreshed: 2026-02-28</span>
                             </div>
                         </div>
                         <div className="flex flex-col sm:flex-row gap-3">
@@ -567,6 +474,7 @@ const Guide: React.FC = () => {
     );
 };
 
+
 // --- Main Application ---
 export default function App() {
     type AppState = 'idle' | 'preview';
@@ -578,11 +486,29 @@ export default function App() {
     const [fileName, setFileName] = useState<string>('cleaned.srt');
     const [summary, setSummary] = useState<ChangeSummary | null>(null);
     const [foreignReport, setForeignReport] = useState<ForeignLanguageReport | null>(null);
-    const [showQuotes, setShowQuotes] = useState<boolean>(true);
 
-    const toggleQuotes = useCallback(() => {
-        setShowQuotes(prev => !prev);
-    }, []);
+    // Secret states
+    const [secretClickCount, setSecretClickCount] = useState<number>(0);
+    const [loveEffects, setLoveEffects] = useState<{ id: number; x: number; y: number }[]>([]);
+
+    useEffect(() => {
+        if (loveEffects.length > 0) {
+            const timer = setTimeout(() => setLoveEffects(prev => prev.slice(1)), 1000);
+            return () => clearTimeout(timer);
+        }
+    }, [loveEffects]);
+
+    const handleSecretClick = (e: React.MouseEvent) => {
+        const newCount = secretClickCount + 1;
+        setLoveEffects(prev => [...prev, { id: Date.now() + Math.random(), x: e.clientX, y: e.clientY }]);
+
+        if (newCount >= 4) {
+            setSecretClickCount(0);
+            window.open('https://drive.google.com/drive/u/0/folders/16j0H2tw4-xbK2Vb9VAzqzmZa9Edxprju', '_blank');
+        } else {
+            setSecretClickCount(newCount);
+        }
+    };
 
     const handleFileSelect = useCallback((content: string, name: string) => {
         setOriginalContent(content);
@@ -603,6 +529,13 @@ export default function App() {
 
     return (
         <div className="min-h-screen bg-[#09090b] text-zinc-100 font-sans selection:bg-indigo-500/30 selection:text-white transition-colors duration-300 relative overflow-hidden">
+            {/* Love Effects */}
+            {loveEffects.map(effect => (
+                <div key={effect.id} className="fixed pointer-events-none animate-float-up text-pink-500 text-4xl z-50 drop-shadow-[0_0_15px_rgba(236,72,153,0.5)]" style={{ left: effect.x - 20, top: effect.y - 20 }}>
+                    ❤️
+                </div>
+            ))}
+
             {/* Background Orbs */}
             <div className="fixed top-[-10%] left-[-10%] w-[40%] h-[40%] rounded-full bg-indigo-500/10 blur-[120px] pointer-events-none animate-blob"></div>
             <div className="fixed bottom-[-10%] right-[-10%] w-[40%] h-[40%] rounded-full bg-purple-500/10 blur-[120px] pointer-events-none animate-blob animation-delay-2000"></div>
@@ -613,26 +546,6 @@ export default function App() {
                         <h1 className="text-4xl sm:text-5xl font-black tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-indigo-400 via-purple-400 to-pink-400 pb-2">
                             Translator's Toolkit
                         </h1>
-
-
-                        <div className="relative mt-2 flex flex-col items-center">
-                            {showQuotes && <DailyQuote />}
-                            <button
-                                onClick={toggleQuotes}
-                                className={cn(
-                                    "flex items-center gap-2 px-3 py-1.5 rounded-full transition-colors text-sm font-medium mt-2",
-                                    showQuotes
-                                        ? "text-zinc-500 hover:bg-zinc-800/50 opacity-50 hover:opacity-100"
-                                        : "text-zinc-300 bg-zinc-800/50 border border-zinc-700/50 shadow-sm hover:bg-zinc-800 opacity-100"
-                                )}
-                            >
-                                {showQuotes ? (
-                                    <><EyeOff className="w-4 h-4" /> <span>Hide</span></>
-                                ) : (
-                                    <><Eye className="w-4 h-4" /> Show</>
-                                )}
-                            </button>
-                        </div>
                     </div>
 
                     <div className="mt-6 flex justify-center">
@@ -678,11 +591,37 @@ export default function App() {
                     {activeView === 'tracker' && <IncomeTracker />}
                     {activeView === 'guide' && <Guide />}
                 </main>
-                <footer className="text-center mt-12 text-xs text-zinc-600 font-medium tracking-wide"><p>Translator's Toolkit &copy; 2026</p></footer>
+                <footer className="text-center mt-12 text-zinc-600 font-medium tracking-wide pb-12">
+                    <p>Translator's Toolkit &copy; 2026</p>
+                    <p className="mt-2 text-sm text-zinc-500">
+                        Made for <span onClick={handleSecretClick} className="relative inline-block transition-colors duration-300 hover:text-pink-400 cursor-pointer group font-bold select-none py-1">
+                            Thu Zue Zue San
+                            <span className="demo2-heart1 absolute -top-1 left-[10%] text-pink-500 text-[10px] opacity-0 pointer-events-none">❤️</span>
+                            <span className="demo2-heart2 absolute top-1 left-[40%] text-purple-500 text-[14px] opacity-0 pointer-events-none">💖</span>
+                            <span className="demo2-heart3 absolute -top-2 left-[70%] text-rose-500 text-[12px] opacity-0 pointer-events-none">💕</span>
+                        </span>
+                    </p>
+                </footer>
             </div>
             <style>{`
                 @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
                 .animate-fade-in { animation: fadeIn 0.4s ease-out forwards; }
+                @keyframes floatUp {
+                    0% { transform: translateY(0) scale(0.5) rotate(0deg); opacity: 0; }
+                    20% { transform: translateY(-20px) scale(1.2) rotate(-10deg); opacity: 1; }
+                    80% { transform: translateY(-80px) scale(1) rotate(10deg); opacity: 1; }
+                    100% { transform: translateY(-100px) scale(0.8) rotate(0deg); opacity: 0; }
+                }
+                .animate-float-up { animation: floatUp 1s ease-out forwards; }
+
+                @keyframes floatHeart {
+                    0% { transform: translateY(0) scale(0.5); opacity: 0; }
+                    20% { opacity: 1; transform: translateY(-5px) scale(1); filter: drop-shadow(0 0 5px rgba(236,72,153,0.8)); }
+                    100% { transform: translateY(-25px) scale(0.5); opacity: 0; }
+                }
+                .group:hover .demo2-heart1 { animation: floatHeart 1.2s infinite ease-out; }
+                .group:hover .demo2-heart2 { animation: floatHeart 1.4s infinite ease-out 0.2s; }
+                .group:hover .demo2-heart3 { animation: floatHeart 1.3s infinite ease-out 0.4s; }
             `}</style>
         </div>
     );
