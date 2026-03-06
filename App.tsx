@@ -525,10 +525,10 @@ const DopamineDispenser: React.FC = () => {
         <>
             <button
                 onClick={handleOpen}
-                className="fixed bottom-6 right-6 lg:bottom-10 lg:right-10 z-[60] bg-zinc-900 hover:bg-zinc-800 text-zinc-300 hover:text-white px-5 py-3 rounded-full font-bold shadow-lg border border-zinc-800 flex items-center gap-2 transition-all hover:scale-105 active:scale-95 group"
+                className="fixed bottom-6 right-6 lg:bottom-10 lg:right-10 z-[60] bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 text-white px-6 py-3.5 rounded-full font-bold shadow-[0_0_20px_rgba(245,158,11,0.4)] hover:shadow-[0_0_30px_rgba(245,158,11,0.6)] border border-amber-400/50 flex items-center gap-3 transition-all hover:scale-110 active:scale-95 group"
             >
                 <span className="text-xl group-hover:animate-bounce">🐾</span>
-                <span>Dopamine</span>
+                <span>Get Dopamine</span>
             </button>
 
             {isOpen && (
