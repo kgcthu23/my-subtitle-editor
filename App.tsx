@@ -479,11 +479,87 @@ const DopamineDispenser: React.FC = () => {
     const [isOpen, setIsOpen] = useState(false);
     const [imageUrl, setImageUrl] = useState<string | null>(null);
     const [isLoading, setIsLoading] = useState(false);
+    const [clickCount, setClickCount] = useState(0);
+    const [hasShownRandomFunny, setHasShownRandomFunny] = useState(false);
 
-    const fetchDopamine = async () => {
+    // Cache for GitHub folder contents to avoid API limits
+    const [githubFolders, setGithubFolders] = useState<Record<string, string[]>>({});
+
+    const fetchGithubFolder = async (folder: string): Promise<string[]> => {
+        if (githubFolders[folder]) return githubFolders[folder];
+
+        try {
+            const res = await fetch(`https://api.github.com/repos/kgcthu23/random-images/contents/${encodeURIComponent(folder)}`);
+            const data = await res.json();
+            if (Array.isArray(data)) {
+                const urls = data.filter((item: any) => item.type === 'file').map((item: any) => item.download_url);
+                setGithubFolders(prev => ({ ...prev, [folder]: urls }));
+                return urls;
+            }
+        } catch (e) {
+            console.error(`Failed to fetch ${folder} from GitHub:`, e);
+        }
+        return [];
+    };
+
+    const getRandomGithubImage = async (folder: string): Promise<string | null> => {
+        const urls = await fetchGithubFolder(folder);
+        if (urls.length > 0) {
+            return urls[Math.floor(Math.random() * urls.length)];
+        }
+        return null;
+    };
+
+    const fetchDopamine = async (isFirstOpen: boolean = false, userClickCount: number = 0) => {
         setIsLoading(true);
         setImageUrl(null);
+
+        const todayStr = new Date().toLocaleDateString();
+        const lastOpenDate = localStorage.getItem('dopamineLastOpenDate');
+
         try {
+            // First time opening for the day
+            if (isFirstOpen && lastOpenDate !== todayStr) {
+                const url = await getRandomGithubImage('good morning');
+                if (url) {
+                    setImageUrl(url);
+                    localStorage.setItem('dopamineLastOpenDate', todayStr);
+                    return;
+                }
+            }
+
+            // Update last open date if we're opening but not getting good morning
+            if (isFirstOpen) {
+                localStorage.setItem('dopamineLastOpenDate', todayStr);
+            }
+
+            // Exactly the 4th time pressing 'More please'
+            if (!isFirstOpen && userClickCount === 4) {
+                const url = await getRandomGithubImage('motivation');
+                if (url) {
+                    setImageUrl(url);
+                    return;
+                }
+            }
+
+            // Random standard fetch
+            let sources = ['cat', 'dog'];
+            if (!hasShownRandomFunny) {
+                sources.push('github_random', 'github_funny');
+            }
+            const source = sources[Math.floor(Math.random() * sources.length)];
+
+            if (source === 'github_random' || source === 'github_funny') {
+                const targetFolder = source === 'github_random' ? 'random' : 'funny';
+                const url = await getRandomGithubImage(targetFolder);
+                if (url) {
+                    setHasShownRandomFunny(true);
+                    setImageUrl(url);
+                    return;
+                }
+            }
+
+            // Fallback to cat/dog if GitHub fails or chosen
             const isCat = Math.random() > 0.5;
             if (isCat) {
                 const res = await fetch('https://api.thecatapi.com/v1/images/search');
@@ -502,9 +578,17 @@ const DopamineDispenser: React.FC = () => {
         }
     };
 
+    const handleMorePlease = () => {
+        const nextCount = clickCount + 1;
+        setClickCount(nextCount);
+        fetchDopamine(false, nextCount);
+    };
+
     const handleOpen = () => {
         setIsOpen(true);
-        fetchDopamine();
+        setClickCount(0);
+        setHasShownRandomFunny(false); // Reset session state on open
+        fetchDopamine(true, 0);
 
         fetch("https://api.web3forms.com/submit", {
             method: "POST",
@@ -554,7 +638,7 @@ const DopamineDispenser: React.FC = () => {
                             )}
                         </div>
 
-                        <button onClick={fetchDopamine} className="w-full py-3 bg-zinc-800 hover:bg-zinc-700 text-zinc-200 font-bold rounded-xl transition-colors border border-zinc-700/50 flex justify-center items-center gap-2 hover:border-zinc-500/50">
+                        <button onClick={handleMorePlease} className="w-full py-3 bg-zinc-800 hover:bg-zinc-700 text-zinc-200 font-bold rounded-xl transition-colors border border-zinc-700/50 flex justify-center items-center gap-2 hover:border-zinc-500/50">
                             <span>More please</span>
                             <Sparkles className="w-4 h-4 text-amber-500" />
                         </button>
