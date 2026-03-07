@@ -533,8 +533,8 @@ const DopamineDispenser: React.FC = () => {
                 localStorage.setItem('dopamineLastOpenDate', todayStr);
             }
 
-            // Exactly the 4th time pressing 'More please'
-            if (!isFirstOpen && userClickCount === 4) {
+            // Exactly the 3rd time pressing 'More please'
+            if (!isFirstOpen && userClickCount === 3) {
                 const url = await getRandomGithubImage('motivation');
                 if (url) {
                     setImageUrl(url);
