@@ -730,7 +730,33 @@ export default function App() {
             <div className="fixed top-[-10%] left-[-10%] w-[40%] h-[40%] rounded-full bg-indigo-500/10 blur-[120px] pointer-events-none animate-blob"></div>
             <div className="fixed bottom-[-10%] right-[-10%] w-[40%] h-[40%] rounded-full bg-purple-500/10 blur-[120px] pointer-events-none animate-blob animation-delay-2000"></div>
 
-            <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 min-h-screen flex flex-col">
+            {/* Announcer Banner */}
+            <div className="w-full bg-gradient-to-r from-indigo-500/10 via-purple-500/10 to-pink-500/10 border-b border-indigo-500/20 overflow-hidden relative z-20 py-3 mt-0 flex items-center shadow-lg backdrop-blur-md">
+                <div className="whitespace-nowrap animate-marquee flex items-center">
+                    <div className="flex items-center">
+                        {[1, 2, 3, 4].map((i) => (
+                            <span key={`a-${i}`} className="text-zinc-200 font-bold text-sm sm:text-base px-8 flex items-center gap-3">
+                                <Sparkles className="w-4 h-4 text-pink-400 drop-shadow-[0_0_8px_rgba(244,114,182,0.8)]" />
+                                <span className="text-transparent bg-clip-text bg-gradient-to-r from-pink-400 to-indigo-400 tracking-wide drop-shadow-sm">
+                                    FIghting Thu Zue Zue San (☆｀• ᴗ •´)૭ Go Go You can do it. I believe in you !!! (づ ᴗ _ᴗ)づ.🍀
+                                </span>
+                            </span>
+                        ))}
+                    </div>
+                    <div className="flex items-center" aria-hidden="true">
+                        {[1, 2, 3, 4].map((i) => (
+                            <span key={`b-${i}`} className="text-zinc-200 font-bold text-sm sm:text-base px-8 flex items-center gap-3">
+                                <Sparkles className="w-4 h-4 text-pink-400 drop-shadow-[0_0_8px_rgba(244,114,182,0.8)]" />
+                                <span className="text-transparent bg-clip-text bg-gradient-to-r from-pink-400 to-indigo-400 tracking-wide drop-shadow-sm">
+                                    FIghting Thu Zue Zue San (☆｀• ᴗ •´)૭ Go Go You can do it. I believe in you !!! (づ ᴗ _ᴗ)づ.🍀
+                                </span>
+                            </span>
+                        ))}
+                    </div>
+                </div>
+            </div>
+
+            <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 min-h-screen flex flex-col">
                 <header className="mb-12">
                     <div className="flex flex-col items-center text-center">
                         <h1 className="text-4xl sm:text-5xl font-black tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-indigo-400 via-purple-400 to-pink-400 pb-2">
@@ -800,6 +826,9 @@ export default function App() {
             <DopamineDispenser />
 
             <style>{`
+                @keyframes marquee { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
+                .animate-marquee { display: flex; width: max-content; animation: marquee 35s linear infinite; }
+
                 @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
                 .animate-fade-in { animation: fadeIn 0.4s ease-out forwards; }
                 @keyframes floatUp {
