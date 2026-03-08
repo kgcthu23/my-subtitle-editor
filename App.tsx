@@ -815,10 +815,10 @@ export default function App() {
             <style>{`
                 @keyframes marquee { 
                     0% { transform: translateX(100vw); }
-                    75% { transform: translateX(-100%); }
+                    66.66% { transform: translateX(-100%); }
                     100% { transform: translateX(-100%); }
                 }
-                .animate-marquee { display: inline-flex; width: max-content; animation: marquee 16s linear infinite; will-change: transform; }
+                .animate-marquee { display: inline-flex; width: max-content; animation: marquee 30s linear infinite; will-change: transform; }
 
                 @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
                 .animate-fade-in { animation: fadeIn 0.4s ease-out forwards; }
