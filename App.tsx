@@ -732,27 +732,14 @@ export default function App() {
 
             {/* Announcer Banner */}
             <div className="w-full bg-gradient-to-r from-indigo-500/10 via-purple-500/10 to-pink-500/10 border-b border-indigo-500/20 overflow-hidden relative z-20 py-3 mt-0 flex items-center shadow-lg backdrop-blur-md">
-                <div className="whitespace-nowrap animate-marquee flex items-center">
-                    <div className="flex items-center">
-                        {[1, 2, 3, 4].map((i) => (
-                            <span key={`a-${i}`} className="text-zinc-200 font-bold text-sm sm:text-base px-8 flex items-center gap-3">
-                                <Sparkles className="w-4 h-4 text-pink-400 drop-shadow-[0_0_8px_rgba(244,114,182,0.8)]" />
-                                <span className="text-transparent bg-clip-text bg-gradient-to-r from-pink-400 to-indigo-400 tracking-wide drop-shadow-sm">
-                                    FIghting Thu Zue Zue San (☆｀• ᴗ •´)૭ Go Go You can do it. I believe in you !!! (づ ᴗ _ᴗ)づ.🍀
-                                </span>
-                            </span>
-                        ))}
-                    </div>
-                    <div className="flex items-center" aria-hidden="true">
-                        {[1, 2, 3, 4].map((i) => (
-                            <span key={`b-${i}`} className="text-zinc-200 font-bold text-sm sm:text-base px-8 flex items-center gap-3">
-                                <Sparkles className="w-4 h-4 text-pink-400 drop-shadow-[0_0_8px_rgba(244,114,182,0.8)]" />
-                                <span className="text-transparent bg-clip-text bg-gradient-to-r from-pink-400 to-indigo-400 tracking-wide drop-shadow-sm">
-                                    FIghting Thu Zue Zue San (☆｀• ᴗ •´)૭ Go Go You can do it. I believe in you !!! (づ ᴗ _ᴗ)づ.🍀
-                                </span>
-                            </span>
-                        ))}
-                    </div>
+                <div className="animate-marquee whitespace-nowrap flex items-center">
+                    <span className="text-zinc-200 font-bold text-sm sm:text-base px-8 flex items-center gap-3">
+                        <Sparkles className="w-4 h-4 text-pink-400 drop-shadow-[0_0_8px_rgba(244,114,182,0.8)]" />
+                        <span className="text-transparent bg-clip-text bg-gradient-to-r from-pink-400 to-indigo-400 tracking-wide drop-shadow-sm">
+                            FIghting Thu Zue Zue San (☆｀• ᴗ •´)૭ Go Go You can do it. I believe in you !!! (づ ᴗ _ᴗ)づ.🍀
+                        </span>
+                        <Sparkles className="w-4 h-4 text-pink-400 drop-shadow-[0_0_8px_rgba(244,114,182,0.8)]" />
+                    </span>
                 </div>
             </div>
 
@@ -828,10 +815,10 @@ export default function App() {
             <style>{`
                 @keyframes marquee { 
                     0% { transform: translateX(100vw); }
+                    75% { transform: translateX(-100%); }
                     100% { transform: translateX(-100%); }
                 }
-                .animate-marquee { display: flex; width: max-content; }
-                .animate-marquee > div { animation: marquee 14s linear infinite; animation-delay: 4s; width: 100%; display: flex; justify-content: center; transform: translateX(100vw); }
+                .animate-marquee { display: inline-flex; width: max-content; animation: marquee 16s linear infinite; will-change: transform; }
 
                 @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
                 .animate-fade-in { animation: fadeIn 0.4s ease-out forwards; }
