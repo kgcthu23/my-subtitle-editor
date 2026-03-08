@@ -826,15 +826,13 @@ export default function App() {
             <DopamineDispenser />
 
             <style>{`
-                @keyframes scrollInPauseOut {
+                @keyframes marquee { 
                     0% { transform: translateX(100vw); }
-                    20% { transform: translateX(0); }
-                    80% { transform: translateX(0); }
-                    100% { transform: translateX(-100vw); }
+                    100% { transform: translateX(-100%); }
                 }
                 .animate-marquee { display: flex; width: max-content; }
-                .animate-marquee > div { animation: scrollInPauseOut 8s ease-in-out infinite; width: 100%; display: flex; justify-content: center; }
-                
+                .animate-marquee > div { animation: marquee 14s linear infinite; animation-delay: 4s; width: 100%; display: flex; justify-content: center; transform: translateX(100vw); }
+
                 @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
                 .animate-fade-in { animation: fadeIn 0.4s ease-out forwards; }
                 @keyframes floatUp {
