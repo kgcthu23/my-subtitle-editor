@@ -736,7 +736,7 @@ export default function App() {
                     <span className="text-zinc-200 font-bold text-sm sm:text-base px-8 flex items-center gap-3">
                         <Sparkles className="w-4 h-4 text-pink-400 drop-shadow-[0_0_8px_rgba(244,114,182,0.8)]" />
                         <span className="text-transparent bg-clip-text bg-gradient-to-r from-pink-400 to-indigo-400 tracking-wide drop-shadow-sm">
-                            FIghting Thu Zue Zue San (☆｀• ᴗ •´)૭ Go Go You can do it. I believe in you !!! (づ ᴗ _ᴗ)づ.🍀
+                            Fighting Thu Thu (☆｀• ᴗ •´)૭ Go Go You can do it. I believe in you !!! (づ ᴗ _ᴗ)づ.🍀
                         </span>
                         <Sparkles className="w-4 h-4 text-pink-400 drop-shadow-[0_0_8px_rgba(244,114,182,0.8)]" />
                     </span>
