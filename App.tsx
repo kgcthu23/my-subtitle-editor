@@ -827,7 +827,7 @@ export default function App() {
 
             <style>{`
                 @keyframes marquee { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
-                .animate-marquee { display: flex; width: max-content; animation: marquee 35s linear infinite; }
+                .animate-marquee { display: flex; width: max-content; animation: marquee 4s linear infinite; }
 
                 @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
                 .animate-fade-in { animation: fadeIn 0.4s ease-out forwards; }
