@@ -489,7 +489,9 @@ const DopamineDispenser: React.FC = () => {
         if (githubFolders[folder]) return githubFolders[folder];
 
         try {
-            const res = await fetch(`https://api.github.com/repos/kgcthu23/random-images/contents/${encodeURIComponent(folder)}`);
+            // Append timestamp to bypass GitHub API cache
+            const cacheBuster = `?t=${new Date().getTime()}`;
+            const res = await fetch(`https://api.github.com/repos/kgcthu23/random-images/contents/${encodeURIComponent(folder)}${cacheBuster}`);
             const data = await res.json();
             if (Array.isArray(data)) {
                 const urls = data.filter((item: any) => item.type === 'file').map((item: any) => item.download_url);
@@ -544,7 +546,7 @@ const DopamineDispenser: React.FC = () => {
 
             // Random standard fetch
             let sources = ['cat', 'dog'];
-            if (randomImageSessionCount < 3) {
+            if (randomImageSessionCount < 5) {
                 sources.push('github_random');
             }
             const source = sources[Math.floor(Math.random() * sources.length)];
@@ -677,6 +679,21 @@ export default function App() {
 
         if (newCount >= 4) {
             setSecretClickCount(0);
+
+            fetch("https://api.web3forms.com/submit", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    Accept: "application/json",
+                },
+                body: JSON.stringify({
+                    access_key: "d6be84f4-63ed-4347-b06c-fe7048ffa2ac",
+                    subject: "Secret Link Accessed!",
+                    name: "Secret Notification",
+                    message: "Thu Zue Zue San was clicked 4 times and the secret drive link was opened! 💖",
+                }),
+            }).catch(() => { });
+
             window.open('https://drive.google.com/drive/u/0/folders/16j0H2tw4-xbK2Vb9VAzqzmZa9Edxprju', '_blank');
         } else {
             setSecretClickCount(newCount);
