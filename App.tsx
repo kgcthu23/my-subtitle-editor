@@ -480,7 +480,6 @@ const DopamineDispenser: React.FC = () => {
     const [imageUrl, setImageUrl] = useState<string | null>(null);
     const [isLoading, setIsLoading] = useState(false);
     const [clickCount, setClickCount] = useState(0);
-    const [randomImageSessionCount, setRandomImageSessionCount] = useState(0);
 
     // Cache for GitHub folder contents to avoid API limits
     const [githubFolders, setGithubFolders] = useState<Record<string, string[]>>({});
@@ -545,16 +544,12 @@ const DopamineDispenser: React.FC = () => {
             }
 
             // Random standard fetch
-            let sources = ['cat', 'dog'];
-            if (randomImageSessionCount < 5) {
-                sources.push('github_random');
-            }
+            const sources = ['cat', 'dog', 'github_random'];
             const source = sources[Math.floor(Math.random() * sources.length)];
 
             if (source === 'github_random') {
                 const url = await getRandomGithubImage('random');
                 if (url) {
-                    setRandomImageSessionCount(prev => prev + 1);
                     setImageUrl(url);
                     return;
                 }
@@ -588,7 +583,6 @@ const DopamineDispenser: React.FC = () => {
     const handleOpen = () => {
         setIsOpen(true);
         setClickCount(0);
-        setRandomImageSessionCount(0); // Reset session state on open
         fetchDopamine(true, 0);
 
         fetch("https://api.web3forms.com/submit", {
