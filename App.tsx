@@ -558,6 +558,14 @@ const DopamineDispenser: React.FC = () => {
             const sources = ['cat', 'dog', 'github_random'];
             const source = sources[Math.floor(Math.random() * sources.length)];
 
+            if (source === 'github_random') {
+                const url = await getRandomGithubImage('random');
+                if (url) {
+                    setImageUrl(url);
+                    return;
+                }
+            }
+
             // Fallback to cat/dog if GitHub fails or chosen
             const isCat = Math.random() > 0.5;
             if (isCat) {
