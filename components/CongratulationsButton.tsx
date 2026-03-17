@@ -6,8 +6,14 @@ import { CheckCircle } from 'lucide-react';
 export const CongratulationsButton: React.FC = () => {
     const [isCongratsOpen, setIsCongratsOpen] = useState(false);
     const [isHighlightOpen, setIsHighlightOpen] = useState(false);
+    const [clickCount, setClickCount] = useState(0);
 
     useEffect(() => {
+        const savedCount = localStorage.getItem('congratsButtonClickCount');
+        if (savedCount) {
+            setClickCount(parseInt(savedCount, 10));
+        }
+
         const hasSeen = localStorage.getItem('congratsButtonSeen');
         if (!hasSeen) {
             setIsHighlightOpen(true);
@@ -15,6 +21,10 @@ export const CongratulationsButton: React.FC = () => {
     }, []);
 
     const triggerFireworks = () => {
+        const newCount = clickCount + 1;
+        setClickCount(newCount);
+        localStorage.setItem('congratsButtonClickCount', newCount.toString());
+
         if (isHighlightOpen) {
             setIsHighlightOpen(false);
             localStorage.setItem('congratsButtonSeen', 'true');
@@ -84,14 +94,16 @@ export const CongratulationsButton: React.FC = () => {
                 )}
             </AnimatePresence>
 
-            <motion.button
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-                onClick={triggerFireworks}
-                className={`fixed bottom-6 left-6 lg:bottom-10 lg:left-10 ${isHighlightOpen ? 'z-[65] shadow-[0_0_50px_rgba(244,114,182,1)] animate-pulse' : 'z-[50] shadow-[0_0_20px_rgba(244,114,182,0.4)] hover:shadow-[0_0_30px_rgba(244,114,182,0.6)]'} bg-gradient-to-r from-pink-500 to-rose-500 hover:from-pink-400 hover:to-rose-400 text-white px-6 py-3.5 rounded-full font-bold border border-pink-400/50 flex items-center gap-3 transition-all group cursor-pointer`}
-            >
-                <span className="text-xl">Click here!</span>
-            </motion.button>
+            {clickCount < 2 && (
+                <motion.button
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                    onClick={triggerFireworks}
+                    className={`fixed bottom-6 left-6 lg:bottom-10 lg:left-10 ${isHighlightOpen ? 'z-[65] shadow-[0_0_50px_rgba(244,114,182,1)] animate-pulse' : 'z-[50] shadow-[0_0_20px_rgba(244,114,182,0.4)] hover:shadow-[0_0_30px_rgba(244,114,182,0.6)]'} bg-gradient-to-r from-pink-500 to-rose-500 hover:from-pink-400 hover:to-rose-400 text-white px-6 py-3.5 rounded-full font-bold border border-pink-400/50 flex items-center gap-3 transition-all group cursor-pointer`}
+                >
+                    <span className="text-xl">Click here!</span>
+                </motion.button>
+            )}
 
             <AnimatePresence>
                 {isCongratsOpen && (
