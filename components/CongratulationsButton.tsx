@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import confetti from 'canvas-confetti';
 import { motion, AnimatePresence } from 'framer-motion';
-import { CheckCircle } from 'lucide-react';
+import { Star } from 'lucide-react';
 
 export const CongratulationsButton: React.FC = () => {
     const [isCongratsOpen, setIsCongratsOpen] = useState(false);
@@ -124,11 +124,11 @@ export const CongratulationsButton: React.FC = () => {
                                 transition={{ repeat: Infinity, duration: 2 }}
                                 className="bg-pink-500/10 p-4 rounded-full border border-pink-500/30 mb-6"
                             >
-                                <CheckCircle className="w-16 h-16 text-pink-400" />
+                                <Star className="w-16 h-16 text-pink-400" />
                             </motion.div>
 
                             <h2 className="text-2xl sm:text-3xl lg:text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-pink-400 via-rose-400 to-indigo-400 mb-6 drop-shadow-sm leading-tight">
-                                congratuations စမရ-၇၁၄
+                                Great Job! စမရ-၇၁၄
                             </h2>
 
                             <p className="text-xl text-zinc-300 font-medium mb-8 leading-relaxed">
