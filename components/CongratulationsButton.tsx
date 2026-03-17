@@ -94,7 +94,7 @@ export const CongratulationsButton: React.FC = () => {
                 )}
             </AnimatePresence>
 
-            {clickCount < 2 && (
+            {clickCount < 1 && (
                 <motion.button
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
