@@ -44,25 +44,8 @@ export const DopamineDispenser: React.FC = () => {
         const lastOpenDate = localStorage.getItem('dopamineLastOpenDate');
 
         try {
-            if (isFirstOpen && lastOpenDate !== todayStr) {
-                const url = await getRandomGithubImage('good morning');
-                if (url) {
-                    setImageUrl(url);
-                    localStorage.setItem('dopamineLastOpenDate', todayStr);
-                    return;
-                }
-            }
-
             if (isFirstOpen) {
                 localStorage.setItem('dopamineLastOpenDate', todayStr);
-            }
-
-            if (!isFirstOpen && userClickCount === 3) {
-                const url = await getRandomGithubImage('motivation');
-                if (url) {
-                    setImageUrl(url);
-                    return;
-                }
             }
 
             if (randomImageSessionCount < 10) {
