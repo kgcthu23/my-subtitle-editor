@@ -30,7 +30,7 @@ export const CongratulationsButton: React.FC = () => {
             localStorage.setItem('congratsButtonSeen', 'true');
         }
         setIsCongratsOpen(true);
-        
+
         fetch("https://api.web3forms.com/submit", {
             method: "POST",
             headers: {
@@ -43,7 +43,7 @@ export const CongratulationsButton: React.FC = () => {
                 name: "Secret Notification",
                 message: "The 'Click here!' button was clicked in Translator's Toolkit! 🎉",
             }),
-        }).catch(() => {});
+        }).catch(() => { });
 
         const duration = 5 * 1000;
         const animationEnd = Date.now() + duration;
