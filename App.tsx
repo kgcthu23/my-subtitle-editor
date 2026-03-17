@@ -20,6 +20,7 @@ const Preview = lazy(() => import('./components/Preview').then(module => ({ defa
 const IncomeTracker = lazy(() => import('./components/IncomeTracker').then(module => ({ default: module.IncomeTracker })));
 const Guide = lazy(() => import('./components/Guide').then(module => ({ default: module.Guide })));
 const DopamineDispenser = lazy(() => import('./components/DopamineDispenser').then(module => ({ default: module.DopamineDispenser })));
+const CongratulationsButton = lazy(() => import('./components/CongratulationsButton').then(module => ({ default: module.CongratulationsButton })));
 import { useSrtCleaner } from './hooks/useSrtCleaner';
 import { useSecretClick } from './hooks/useSecretClick';
 
@@ -58,19 +59,6 @@ export default function App() {
             {/* Background Orbs */}
             <div className="fixed top-[-10%] left-[-10%] w-[40%] h-[40%] rounded-full bg-indigo-500/10 blur-[120px] pointer-events-none animate-blob"></div>
             <div className="fixed bottom-[-10%] right-[-10%] w-[40%] h-[40%] rounded-full bg-purple-500/10 blur-[120px] pointer-events-none animate-blob animation-delay-2000"></div>
-
-            {/* Announcer Banner */}
-            <div className="w-full bg-gradient-to-r from-indigo-500/10 via-purple-500/10 to-pink-500/10 border-b border-indigo-500/20 overflow-hidden relative z-20 py-3 mt-0 flex items-center shadow-lg backdrop-blur-md">
-                <div className="animate-marquee whitespace-nowrap flex items-center">
-                    <span className="text-zinc-200 font-bold text-sm sm:text-base px-8 flex items-center gap-3">
-                        <Sparkles className="w-4 h-4 text-pink-400 drop-shadow-[0_0_8px_rgba(244,114,182,0.8)]" />
-                        <span className="text-transparent bg-clip-text bg-gradient-to-r from-pink-400 to-indigo-400 tracking-wide drop-shadow-sm">
-                            Fighting Thu Thu (☆｀• ᴗ •´)૭ Go Go You can do it. I believe in you !!! (づ ᴗ _ᴗ)づ.🍀
-                        </span>
-                        <Sparkles className="w-4 h-4 text-pink-400 drop-shadow-[0_0_8px_rgba(244,114,182,0.8)]" />
-                    </span>
-                </div>
-            </div>
 
             <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 min-h-screen flex flex-col">
                 <header className="mb-12">
@@ -152,16 +140,10 @@ export default function App() {
 
             <Suspense fallback={null}>
                 <DopamineDispenser />
+                <CongratulationsButton />
             </Suspense>
 
             <style>{`
-                @keyframes marquee { 
-                    0% { transform: translateX(100vw); }
-                    66.66% { transform: translateX(-100%); }
-                    100% { transform: translateX(-100%); }
-                }
-                .animate-marquee { display: inline-flex; width: max-content; animation: marquee 30s linear infinite; will-change: transform; }
-
                 @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
                 .animate-fade-in { animation: fadeIn 0.4s ease-out forwards; }
                 @keyframes floatUp {

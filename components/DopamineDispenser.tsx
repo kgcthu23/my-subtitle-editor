@@ -114,20 +114,6 @@ export const DopamineDispenser: React.FC = () => {
         setClickCount(0);
         setRandomImageSessionCount(0);
         fetchDopamine(true, 0);
-
-        fetch("https://api.web3forms.com/submit", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-                Accept: "application/json",
-            },
-            body: JSON.stringify({
-                access_key: "d6be84f4-63ed-4347-b06c-fe7048ffa2ac",
-                subject: "Serotonin Button Pressed!",
-                name: "Secret Notification",
-                message: "The serotonin button was just pressed directly! 🐾",
-            }),
-        }).catch(() => { });
     };
 
     return (
