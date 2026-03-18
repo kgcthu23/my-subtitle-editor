@@ -20,7 +20,8 @@ const Preview = lazy(() => import('./components/Preview').then(module => ({ defa
 const IncomeTracker = lazy(() => import('./components/IncomeTracker').then(module => ({ default: module.IncomeTracker })));
 const Guide = lazy(() => import('./components/Guide').then(module => ({ default: module.Guide })));
 const DopamineDispenser = lazy(() => import('./components/DopamineDispenser').then(module => ({ default: module.DopamineDispenser })));
-const CongratulationsButton = lazy(() => import('./components/CongratulationsButton').then(module => ({ default: module.CongratulationsButton })));
+const CanvaMailModal = lazy(() => import('./components/CanvaMailModal').then(module => ({ default: module.CanvaMailModal })));
+
 import { useSrtCleaner } from './hooks/useSrtCleaner';
 import { useSecretClick } from './hooks/useSecretClick';
 
@@ -30,6 +31,20 @@ export default function App() {
     type AppView = 'cleaner' | 'tracker' | 'guide';
     const [appState, setAppState] = useState<AppState>('idle');
     const [activeView, setActiveView] = useState<AppView>('cleaner');
+
+    const [showCanvaModal, setShowCanvaModal] = useState<boolean>(false);
+
+    useEffect(() => {
+        const hasSeenCanvaMail = localStorage.getItem('hasSeenCanvaMailNotice');
+        if (!hasSeenCanvaMail) {
+            setShowCanvaModal(true);
+        }
+    }, []);
+
+    const handleCloseCanvaModal = () => {
+        localStorage.setItem('hasSeenCanvaMailNotice', 'true');
+        setShowCanvaModal(false);
+    };
 
     const { loveEffects, handleSecretClick } = useSecretClick();
     const { 
@@ -140,7 +155,7 @@ export default function App() {
 
             <Suspense fallback={null}>
                 <DopamineDispenser />
-                <CongratulationsButton />
+                <CanvaMailModal isOpen={showCanvaModal} onClose={handleCloseCanvaModal} />
             </Suspense>
 
             <style>{`

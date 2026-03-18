@@ -62,53 +62,6 @@ export const Guide: React.FC = () => {
         <div className="max-w-4xl mx-auto space-y-8 animate-fade-in">
             <div className="bg-zinc-900/40 backdrop-blur-xl p-6 sm:p-8 rounded-2xl shadow-xl border border-zinc-800/50">
                 <h2 className="text-2xl font-bold mb-6 text-zinc-100 flex items-center gap-3">
-                    <span className="bg-sky-500/10 text-sky-400 p-2.5 rounded-xl border border-sky-500/20 shadow-[0_0_15px_rgba(14,165,233,0.1)]">
-                        <Film className="w-6 h-6" />
-                    </span>
-                    Helpful Resources
-                </h2>
-
-                <div className="mb-6 bg-amber-950/20 border border-amber-900/50 p-4 rounded-xl">
-                    <div className="flex items-start gap-3">
-                        <AlertTriangle className="w-5 h-5 text-amber-500 flex-shrink-0 mt-0.5" />
-                        <p className="text-sm text-amber-200/80">
-                            <strong>Note:</strong> Most sites should be okay without VPN, try one by one. If none of them work, try with VPN
-                        </p>
-                    </div>
-                </div>
-
-                <div className="space-y-6">
-                    <div>
-                        <h3 className="text-lg font-bold text-zinc-200 mb-3 border-b border-zinc-800 pb-2">English Series and Movies</h3>
-                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-                            <a href="https://www.cineby.gd/" target="_blank" rel="noopener noreferrer" className="flex items-center justify-center px-4 py-3 bg-zinc-950/50 border border-zinc-800/80 rounded-lg hover:border-sky-500/50 hover:bg-sky-500/5 transition-all text-sm font-bold text-zinc-300">
-                                🍿 Cineby
-                            </a>
-                            <a href="https://www.fmovies.gd/" target="_blank" rel="noopener noreferrer" className="flex items-center justify-center px-4 py-3 bg-zinc-950/50 border border-zinc-800/80 rounded-lg hover:border-sky-500/50 hover:bg-sky-500/5 transition-all text-sm font-bold text-zinc-300">
-                                🎬 FMovies
-                            </a>
-                            <a href="https://www.bitcine.app/" target="_blank" rel="noopener noreferrer" className="flex items-center justify-center px-4 py-3 bg-zinc-950/50 border border-zinc-800/80 rounded-lg hover:border-sky-500/50 hover:bg-sky-500/5 transition-all text-sm font-bold text-zinc-300">
-                                📺 BitCine
-                            </a>
-                        </div>
-                    </div>
-
-                    <div>
-                        <h3 className="text-lg font-bold text-zinc-200 mb-3 border-b border-zinc-800 pb-2">Anime</h3>
-                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-                            <a href="https://animekai.to" target="_blank" rel="noopener noreferrer" className="flex items-center justify-center px-4 py-3 bg-zinc-950/50 border border-zinc-800/80 rounded-lg hover:border-rose-500/50 hover:bg-rose-500/5 transition-all text-sm font-bold text-zinc-300">
-                                🌸 AnimeKai
-                            </a>
-                            <a href="https://www.miruro.tv/" target="_blank" rel="noopener noreferrer" className="flex items-center justify-center px-4 py-3 bg-zinc-950/50 border border-zinc-800/80 rounded-lg hover:border-rose-500/50 hover:bg-rose-500/5 transition-all text-sm font-bold text-zinc-300">
-                                ✨ Miruro
-                            </a>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div className="bg-zinc-900/40 backdrop-blur-xl p-6 sm:p-8 rounded-2xl shadow-xl border border-zinc-800/50">
-                <h2 className="text-2xl font-bold mb-6 text-zinc-100 flex items-center gap-3">
                     <span className="bg-indigo-500/10 text-indigo-400 p-2.5 rounded-xl border border-indigo-500/20 shadow-[0_0_15px_rgba(99,102,241,0.1)]">
                         <LinkIcon className="w-6 h-6" />
                     </span>
@@ -171,6 +124,53 @@ export const Guide: React.FC = () => {
                         </div>
                     )}
                 </form>
+            </div>
+
+            <div className="bg-zinc-900/40 backdrop-blur-xl p-6 sm:p-8 rounded-2xl shadow-xl border border-zinc-800/50">
+                <h2 className="text-2xl font-bold mb-6 text-zinc-100 flex items-center gap-3">
+                    <span className="bg-sky-500/10 text-sky-400 p-2.5 rounded-xl border border-sky-500/20 shadow-[0_0_15px_rgba(14,165,233,0.1)]">
+                        <Film className="w-6 h-6" />
+                    </span>
+                    Helpful Resources
+                </h2>
+
+                <div className="mb-6 bg-amber-950/20 border border-amber-900/50 p-4 rounded-xl">
+                    <div className="flex items-start gap-3">
+                        <AlertTriangle className="w-5 h-5 text-amber-500 shrink-0 mt-0.5" />
+                        <p className="text-sm text-amber-200/80">
+                            <strong>Note:</strong> Most sites should be okay without VPN, try one by one. If none of them work, try with VPN
+                        </p>
+                    </div>
+                </div>
+
+                <div className="space-y-6">
+                    <div>
+                        <h3 className="text-lg font-bold text-zinc-200 mb-3 border-b border-zinc-800 pb-2">English Series and Movies</h3>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                            <a href="https://www.cineby.gd/" target="_blank" rel="noopener noreferrer" className="flex items-center justify-center px-4 py-3 bg-zinc-950/50 border border-zinc-800/80 rounded-lg hover:border-sky-500/50 hover:bg-sky-500/5 transition-all text-sm font-bold text-zinc-300">
+                                🍿 Cineby
+                            </a>
+                            <a href="https://www.fmovies.gd/" target="_blank" rel="noopener noreferrer" className="flex items-center justify-center px-4 py-3 bg-zinc-950/50 border border-zinc-800/80 rounded-lg hover:border-sky-500/50 hover:bg-sky-500/5 transition-all text-sm font-bold text-zinc-300">
+                                🎬 FMovies
+                            </a>
+                            <a href="https://www.bitcine.app/" target="_blank" rel="noopener noreferrer" className="flex items-center justify-center px-4 py-3 bg-zinc-950/50 border border-zinc-800/80 rounded-lg hover:border-sky-500/50 hover:bg-sky-500/5 transition-all text-sm font-bold text-zinc-300">
+                                📺 BitCine
+                            </a>
+                        </div>
+                    </div>
+
+                    <div>
+                        <h3 className="text-lg font-bold text-zinc-200 mb-3 border-b border-zinc-800 pb-2">Anime</h3>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                            <a href="https://animekai.to" target="_blank" rel="noopener noreferrer" className="flex items-center justify-center px-4 py-3 bg-zinc-950/50 border border-zinc-800/80 rounded-lg hover:border-rose-500/50 hover:bg-rose-500/5 transition-all text-sm font-bold text-zinc-300">
+                                🌸 AnimeKai
+                            </a>
+                            <a href="https://www.miruro.tv/" target="_blank" rel="noopener noreferrer" className="flex items-center justify-center px-4 py-3 bg-zinc-950/50 border border-zinc-800/80 rounded-lg hover:border-rose-500/50 hover:bg-rose-500/5 transition-all text-sm font-bold text-zinc-300">
+                                ✨ Miruro
+                            </a>
+                        </div>
+                    </div>
+                </div>
             </div>
 
             <div className="bg-zinc-900/40 backdrop-blur-xl p-6 sm:p-8 rounded-2xl shadow-xl border border-zinc-800/50 relative overflow-hidden">
