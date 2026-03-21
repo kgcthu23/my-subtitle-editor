@@ -153,10 +153,12 @@ export default function App() {
                 </footer>
             </div>
 
+            {/* Temporarily removed from UI
             <Suspense fallback={null}>
                 <DopamineDispenser />
                 <CanvaMailModal isOpen={showCanvaModal} onClose={handleCloseCanvaModal} />
             </Suspense>
+            */}
 
             <style>{`
                 @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
