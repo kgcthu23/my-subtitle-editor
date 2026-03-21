@@ -80,52 +80,6 @@ export const Guide: React.FC = () => {
                 </div>
             </div>
 
-            <div className="bg-amber-950/20 backdrop-blur-xl border border-amber-900/40 p-6 sm:p-8 rounded-2xl shadow-xl relative overflow-hidden group hover:border-amber-500/30 transition-colors">
-                <div className="absolute top-0 right-0 w-32 h-32 bg-amber-500/10 blur-[50px] rounded-full pointer-events-none group-hover:bg-amber-500/20 transition-colors"></div>
-                <h3 className="text-xl font-bold text-amber-400 mb-3 flex items-center gap-2 relative z-10">
-                    <MessageSquare className="w-6 h-6" />
-                    Report an Issue
-                </h3>
-                <p className="text-amber-200/70 text-sm mb-5 relative z-10">
-                    Encountering problems with the toolkit, VPN, or access? Describe the issue below so I can help.
-                </p>
-                <form onSubmit={handleReportSubmit} className="space-y-3 relative z-10">
-                    <div className="relative">
-                        <input
-                            type="text"
-                            placeholder="What's the issue?"
-                            value={issue}
-                            onChange={(e) => setIssue(e.target.value)}
-                            className="w-full px-5 py-3 rounded-xl border border-amber-900/50 bg-black/40 focus:ring-2 focus:ring-amber-500/50 outline-none transition-all disabled:opacity-50 text-sm pr-24 text-amber-100 placeholder:text-amber-700/50"
-                            required
-                            disabled={isSubmitting}
-                        />
-                        <button
-                            type="submit"
-                            disabled={isSubmitting}
-                            className={`absolute right-1.5 top-1.5 bottom-1.5 px-6 text-amber-950 font-bold rounded-lg transition-colors flex items-center justify-center text-sm ${isSubmitting ? 'bg-amber-500/80 cursor-wait' : 'bg-amber-400 hover:bg-amber-300 shadow-[0_0_15px_rgba(251,191,36,0.3)]'}`}
-                        >
-                            {isSubmitting ? (
-                                <svg className="animate-spin h-5 w-5 text-amber-950" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                                </svg>
-                            ) : 'Send'}
-                        </button>
-                    </div>
-                    {submitStatus === 'success' && (
-                        <div className="text-sm text-emerald-400 font-bold animate-pulse mt-3 flex items-center gap-2">
-                            <CheckCircle2 className="w-4 h-4" /> Issue reported successfully!
-                        </div>
-                    )}
-                    {submitStatus === 'error' && (
-                        <div className="text-sm text-rose-400 font-bold mt-3 flex items-center gap-2">
-                            <AlertTriangle className="w-4 h-4" /> Failed to send report.
-                        </div>
-                    )}
-                </form>
-            </div>
-
             <div className="bg-zinc-900/40 backdrop-blur-xl p-6 sm:p-8 rounded-2xl shadow-xl border border-zinc-800/50">
                 <h2 className="text-2xl font-bold mb-6 text-zinc-100 flex items-center gap-3">
                     <span className="bg-sky-500/10 text-sky-400 p-2.5 rounded-xl border border-sky-500/20 shadow-[0_0_15px_rgba(14,165,233,0.1)]">
@@ -133,15 +87,6 @@ export const Guide: React.FC = () => {
                     </span>
                     Helpful Resources
                 </h2>
-
-                <div className="mb-6 bg-amber-950/20 border border-amber-900/50 p-4 rounded-xl">
-                    <div className="flex items-start gap-3">
-                        <AlertTriangle className="w-5 h-5 text-amber-500 shrink-0 mt-0.5" />
-                        <p className="text-sm text-amber-200/80">
-                            <strong>Note:</strong> Most sites should be okay without VPN, try one by one. If none of them work, try with VPN
-                        </p>
-                    </div>
-                </div>
 
                 <div className="space-y-6">
                     <div>
