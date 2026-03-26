@@ -73,6 +73,43 @@ export const Guide: React.FC = () => {
 
             <div className="bg-zinc-900/40 backdrop-blur-xl p-6 sm:p-8 rounded-2xl shadow-xl border border-zinc-800/50">
                 <h2 className="text-2xl font-bold mb-6 text-zinc-100 flex items-center gap-3">
+                    <span className="bg-violet-500/10 text-violet-400 p-2.5 rounded-xl border border-violet-500/20 shadow-[0_0_15px_rgba(139,92,246,0.1)]">
+                        <MessageSquare className="w-6 h-6" />
+                    </span>
+                    Report an Issue
+                </h2>
+                <form onSubmit={handleReportSubmit} className="space-y-4">
+                    <textarea
+                        value={issue}
+                        onChange={(e) => setIssue(e.target.value)}
+                        placeholder="If there is problems with pc or vpn, let me know!"
+                        className="w-full h-32 bg-zinc-950/50 border border-zinc-800/80 rounded-xl p-4 text-zinc-200 placeholder-zinc-500 focus:outline-none focus:border-violet-500/50 focus:ring-1 focus:ring-violet-500/50 resize-none transition-all"
+                        disabled={isSubmitting}
+                    />
+                    <div className="flex items-center justify-between">
+                        <button
+                            type="submit"
+                            disabled={isSubmitting || !issue.trim()}
+                            className="bg-violet-600 hover:bg-violet-500 text-white px-6 py-2.5 rounded-lg font-semibold transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 shadow-[0_0_15px_rgba(139,92,246,0.2)] hover:shadow-[0_0_20px_rgba(139,92,246,0.4)]"
+                        >
+                            {isSubmitting ? 'Sending...' : 'Submit Report'}
+                        </button>
+                        {submitStatus === 'success' && (
+                            <div className="text-sm text-emerald-400 font-bold animate-pulse flex items-center gap-2">
+                                Issue reported successfully!
+                            </div>
+                        )}
+                        {submitStatus === 'error' && (
+                            <div className="text-sm text-rose-400 font-bold flex items-center gap-2">
+                                Failed to send report. Please try again.
+                            </div>
+                        )}
+                    </div>
+                </form>
+            </div>
+
+            <div className="bg-zinc-900/40 backdrop-blur-xl p-6 sm:p-8 rounded-2xl shadow-xl border border-zinc-800/50">
+                <h2 className="text-2xl font-bold mb-6 text-zinc-100 flex items-center gap-3">
                     <span className="bg-sky-500/10 text-sky-400 p-2.5 rounded-xl border border-sky-500/20 shadow-[0_0_15px_rgba(14,165,233,0.1)]">
                         <Film className="w-6 h-6" />
                     </span>
