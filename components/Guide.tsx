@@ -92,6 +92,7 @@ export const Guide: React.FC = () => {
                 </div>
             </div>
 
+            {/* Temporarily removed from UI
             <div className="bg-zinc-900/40 backdrop-blur-xl p-6 sm:p-8 rounded-2xl shadow-xl border border-zinc-800/50">
                 <h2 className="text-2xl font-bold mb-6 text-zinc-100 flex items-center gap-3">
                     <span className="bg-violet-500/10 text-violet-400 p-2.5 rounded-xl border border-violet-500/20 shadow-[0_0_15px_rgba(139,92,246,0.1)]">
@@ -128,6 +129,7 @@ export const Guide: React.FC = () => {
                     </div>
                 </form>
             </div>
+            */}
 
             <div className="bg-zinc-900/40 backdrop-blur-xl p-6 sm:p-8 rounded-2xl shadow-xl border border-zinc-800/50">
                 <h2 className="text-2xl font-bold mb-6 text-zinc-100 flex items-center gap-3">

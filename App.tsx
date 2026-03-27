@@ -24,6 +24,7 @@ const CanvaMailModal = lazy(() => import('./components/CanvaMailModal').then(mod
 
 import { useSrtCleaner } from './hooks/useSrtCleaner';
 import { useSecretClick } from './hooks/useSecretClick';
+import { TawkToWidget } from './components/TawkToWidget';
 
 // --- Main Application ---
 export default function App() {
@@ -159,6 +160,12 @@ export default function App() {
                 <CanvaMailModal isOpen={showCanvaModal} onClose={handleCloseCanvaModal} />
             </Suspense>
             */}
+
+            {/* Tawk.to Live Chat Widget */}
+            <TawkToWidget 
+                propertyId="69a9307538c5261c36a8319d" 
+                widgetId="1jiueajcg" 
+            />
 
             <style>{`
                 @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
