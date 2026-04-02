@@ -46,9 +46,8 @@ export function ProjectNotes() {
 
     useEffect(() => {
         fetchNotes();
-        // Poll for new notes every 30 seconds
-        const interval = setInterval(fetchNotes, 30000);
-        return () => clearInterval(interval);
+        // Removed polling to prevent overwriting user input automatically. 
+        // Use the manual refresh button instead.
     }, []);
 
     const handleSave = async () => {
