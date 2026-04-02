@@ -19,6 +19,7 @@ import { FileUpload } from './components/FileUpload';
 const Preview = lazy(() => import('./components/Preview').then(module => ({ default: module.Preview })));
 const IncomeTracker = lazy(() => import('./components/IncomeTracker').then(module => ({ default: module.IncomeTracker })));
 const Guide = lazy(() => import('./components/Guide').then(module => ({ default: module.Guide })));
+const ProjectNotes = lazy(() => import('./components/ProjectNotes').then(module => ({ default: module.ProjectNotes })));
 const DopamineDispenser = lazy(() => import('./components/DopamineDispenser').then(module => ({ default: module.DopamineDispenser })));
 const CanvaMailModal = lazy(() => import('./components/CanvaMailModal').then(module => ({ default: module.CanvaMailModal })));
 
@@ -28,7 +29,7 @@ import { useSecretClick } from './hooks/useSecretClick';
 // --- Main Application ---
 export default function App() {
     type AppState = 'idle' | 'preview';
-    type AppView = 'cleaner' | 'tracker' | 'guide';
+    type AppView = 'cleaner' | 'tracker' | 'guide' | 'notes';
     const [appState, setAppState] = useState<AppState>('idle');
     const [activeView, setActiveView] = useState<AppView>('cleaner');
 
@@ -88,7 +89,8 @@ export default function App() {
                             {([
                                 { id: 'cleaner', label: 'Cleaner', icon: <LayoutDashboard className="w-4 h-4" /> },
                                 { id: 'tracker', label: 'Tracker', icon: <Calculator className="w-4 h-4" /> },
-                                { id: 'guide', label: 'Guide', icon: <BookOpen className="w-4 h-4" /> }
+                                { id: 'guide', label: 'Guide', icon: <BookOpen className="w-4 h-4" /> },
+                                { id: 'notes', label: 'Notes', icon: <MessageSquare className="w-4 h-4" /> }
                             ] as const).map(({ id, label, icon }) => (
                                 <button
                                     key={id}
@@ -135,6 +137,11 @@ export default function App() {
                                         {activeView === 'guide' && (
                                             <motion.div key="guide" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} transition={{ duration: 0.2 }}>
                                                 <Guide />
+                                            </motion.div>
+                                        )}
+                                        {activeView === 'notes' && (
+                                            <motion.div key="notes" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} transition={{ duration: 0.2 }}>
+                                                <ProjectNotes />
                                             </motion.div>
                                         )}
                                     </AnimatePresence>

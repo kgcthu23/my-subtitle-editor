@@ -1,0 +1,86 @@
+commit 97dc1f543dee25a51b9427b1411d048d376aeb1f
+Author: kaung ce <kgcthu.kev.com>
+Date:   Thu Apr 2 17:57:25 2026 +0630
+
+    refactor: replace ProjectNotes component with a new Guide component featuring integrated reporting and resource links
+
+M	App.tsx
+M	components/Guide.tsx
+D	components/ProjectNotes.tsx
+
+commit e97aeb75887491466fd4ebf1a64d94b202ea1d3c
+Author: kaung ce <kgcthu.kev.com>
+Date:   Wed Apr 1 18:17:08 2026 +0630
+
+    feat: add ProjectNotes component with Supabase integration and navigation support
+
+M	App.tsx
+A	components/ProjectNotes.tsx
+
+commit 6c6f4331274148ff64e13379180384cff3383b2d
+Author: kaung ce <kgcthu.kev.com>
+Date:   Sun Mar 29 12:28:56 2026 +0630
+
+    refactor: remove Tawk.to live chat widget from App component
+
+M	App.tsx
+D	components/TawkToWidget.tsx
+
+commit 68e941e2e071b89bfff2196942f122e1207c0e1d
+Author: kaung ce <kgcthu.kev.com>
+Date:   Fri Mar 27 08:14:34 2026 +0630
+
+    feat: add Guide component with resources and integrate Tawk.to live chat widget.
+
+M	App.tsx
+M	components/Guide.tsx
+A	components/TawkToWidget.tsx
+
+commit 43b6f1dabe37079bc37a7e8bc3b96070e31edbed
+Author: kaung ce <kgcthu.kev.com>
+Date:   Thu Mar 26 17:51:43 2026 +0630
+
+    feat: add Guide component with links to resources, VPN, and an issue reporting form.
+
+M	components/Guide.tsx
+
+commit e4e24e1f83c7a36052cb8fe52f7fe92629880f42
+Author: kaung ce <kgcthu.kev.com>
+Date:   Thu Mar 26 17:45:32 2026 +0630
+
+    feat: add Guide component with Google Drive link, issue reporting form, and helpful streaming resources.
+
+M	components/Guide.tsx
+
+commit 4650bf602f9519ce050f784ad4c77553e796c4d9
+Merge: 2ff3369 e43fc31
+Author: Kaung Si Thu <kgcthu.kev@gmail.com>
+Date:   Mon Mar 23 07:32:18 2026 +0630
+
+    Merge pull request #3 from kgcthu23/exam-prepare-
+    
+    Exam prepare
+
+commit e43fc3150b2daddda15573df4587123004334ad2
+Author: kaung ce <kgcthu.kev.com>
+Date:   Mon Mar 23 07:30:56 2026 +0630
+
+    feat: add Guide component displaying external resource links and an issue reporting form.
+
+M	components/Guide.tsx
+
+commit 08aecec74520393e95662f354064b5d64a1fb063
+Author: kaung ce <kgcthu.kev.com>
+Date:   Sat Mar 21 14:00:45 2026 +0630
+
+    feat: Add Guide component providing helpful resources, VPN access details, and an issue reporting form.
+
+M	components/Guide.tsx
+
+commit c8f576b906dafd177193332ceb65b39d42932312
+Author: kaung ce <kgcthu.kev.com>
+Date:   Sat Mar 21 10:41:00 2026 +0630
+
+    chore: Temporarily remove DopamineDispenser and CanvaMailModal components from the UI.
+
+M	App.tsx
