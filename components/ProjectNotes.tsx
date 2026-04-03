@@ -71,18 +71,25 @@ export function ProjectNotes() {
                 try {
                     // The Chat ID will need to be configured so the bot knows where to send the message
                     const TELEGRAM_BOT_TOKEN = "8487227254:AAHBAxAwLWwv6L_KESAygLm2DrTOphFpcCo";
-                    const CHAT_ID = "5638537734"; // Setup complete
+                    // Send to both Telegram accounts
+                    const CHAT_IDS = ["5638537734", "5777458528"]; 
 
-                    await fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`, {
-                        method: "POST",
-                        headers: {
-                            "Content-Type": "application/json",
-                        },
-                        body: JSON.stringify({
-                            chat_id: CHAT_ID,
-                            text: `📝 New Scratch Pad Update\n\n${notes}`
-                        }),
-                    });
+                    for (const chatId of CHAT_IDS) {
+                        try {
+                            await fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`, {
+                                method: "POST",
+                                headers: {
+                                    "Content-Type": "application/json",
+                                },
+                                body: JSON.stringify({
+                                    chat_id: chatId,
+                                    text: `📝 New Scratch Pad Update\n\n${notes}`
+                                }),
+                            });
+                        } catch (err) {
+                            console.error('Failed to notify chat ' + chatId, err);
+                        }
+                    }
                 } catch (notifyErr) {
                     console.error('Failed to send Telegram notification', notifyErr);
                 }
