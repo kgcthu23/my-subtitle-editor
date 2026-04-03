@@ -1,0 +1,2 @@
+{"ok":true,"result":[{"update_id":174505221,
+"message":{"message_id":1,"from":{"id":5638537734,"is_bot":false,"first_name":"k","username":"kaungce","language_code":"en"},"chat":{"id":5638537734,"first_name":"k","username":"kaungce","type":"private"},"date":1775219721,"text":"/start","entities":[{"offset":0,"length":6,"type":"bot_command"}]}}]}

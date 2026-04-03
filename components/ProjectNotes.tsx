@@ -67,6 +67,26 @@ export function ProjectNotes() {
             });
 
             if (response.ok) {
+                // Send Telegram notification
+                try {
+                    // The Chat ID will need to be configured so the bot knows where to send the message
+                    const TELEGRAM_BOT_TOKEN = "8487227254:AAHBAxAwLWwv6L_KESAygLm2DrTOphFpcCo";
+                    const CHAT_ID = "5638537734"; // Setup complete
+
+                    await fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`, {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json",
+                        },
+                        body: JSON.stringify({
+                            chat_id: CHAT_ID,
+                            text: `📝 New Scratch Pad Update\n\n${notes}`
+                        }),
+                    });
+                } catch (notifyErr) {
+                    console.error('Failed to send Telegram notification', notifyErr);
+                }
+
                 setSaveStatus('success');
                 setLastFetch(new Date());
                 setTimeout(() => setSaveStatus('idle'), 3000);
