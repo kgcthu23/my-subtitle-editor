@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Save, RefreshCw, AlertCircle, CheckCircle2 } from 'lucide-react';
+import { Save, RefreshCw, AlertCircle, CheckCircle2, Plus } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 // Hardcoded Supabase Credentials provided by user
@@ -9,7 +9,8 @@ const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBh
 const API_URL = `${SUPABASE_URL}/rest/v1/project_notes`;
 
 export function ProjectNotes() {
-    const [notes, setNotes] = useState<string>('');
+    const [pages, setPages] = useState<Record<string, string>>({ "1": "" });
+    const [activePage, setActivePage] = useState<string>("1");
     const [isLoading, setIsLoading] = useState(true);
     const [isSaving, setIsSaving] = useState(false);
     const [saveStatus, setSaveStatus] = useState<'idle' | 'success' | 'error'>('idle');
@@ -18,7 +19,6 @@ export function ProjectNotes() {
     const fetchNotes = async () => {
         setIsLoading(true);
         try {
-            // Fetch the single most recently created note
             const response = await fetch(`${API_URL}?select=content&order=created_at.desc&limit=1`, {
                 headers: {
                     'apikey': SUPABASE_ANON_KEY,
@@ -29,9 +29,18 @@ export function ProjectNotes() {
             if (response.ok) {
                 const data = await response.json();
                 if (data && data.length > 0) {
-                    setNotes(data[0].content || '');
+                    try {
+                        const parsed = JSON.parse(data[0].content);
+                        if (typeof parsed === 'object' && parsed !== null) {
+                            setPages(parsed);
+                        } else {
+                            setPages({ "1": data[0].content });
+                        }
+                    } catch {
+                        setPages({ "1": data[0].content || '' });
+                    }
                 } else {
-                    setNotes(''); // No notes exist yet
+                    setPages({ "1": "" });
                 }
             } else {
                 console.error('Failed to fetch notes', response.status);
@@ -63,7 +72,7 @@ export function ProjectNotes() {
                     'Content-Type': 'application/json',
                     'Prefer': 'return=minimal'
                 },
-                body: JSON.stringify({ content: notes }),
+                body: JSON.stringify({ content: JSON.stringify(pages) }),
             });
 
             if (response.ok) {
@@ -72,7 +81,7 @@ export function ProjectNotes() {
                     // The Chat ID will need to be configured so the bot knows where to send the message
                     const TELEGRAM_BOT_TOKEN = "8487227254:AAHBAxAwLWwv6L_KESAygLm2DrTOphFpcCo";
                     // Send to both Telegram accounts
-                    const CHAT_IDS = ["5638537734", "5777458528"]; 
+                    const CHAT_IDS = ["5638537734", "5777458528"];
 
                     for (const chatId of CHAT_IDS) {
                         try {
@@ -83,7 +92,7 @@ export function ProjectNotes() {
                                 },
                                 body: JSON.stringify({
                                     chat_id: chatId,
-                                    text: `📝 New Scratch Pad Update\n\n${notes}`
+                                    text: `📝 New Scratch Pad Update (Page ${activePage})\n\n${pages[activePage] || "Blank"}`
                                 }),
                             });
                         } catch (err) {
@@ -116,6 +125,28 @@ export function ProjectNotes() {
                         <h2 className="text-2xl font-bold bg-clip-text text-transparent bg-linear-to-r from-teal-400 to-emerald-400">
                             Scratch Pad
                         </h2>
+                        <div className="flex items-center gap-2 mt-3 mb-4 overflow-x-auto pb-2 scrollbar-thin scrollbar-thumb-zinc-700">
+                            {Object.keys(pages).sort((a, b) => Number(a) - Number(b)).map(pageId => (
+                                <button
+                                    key={pageId}
+                                    onClick={() => setActivePage(pageId)}
+                                    className={`min-w-8 h-8 px-2 rounded text-sm font-bold transition-all ${activePage === pageId ? 'bg-emerald-500 text-white shadow-[0_0_10px_rgba(16,185,129,0.3)]' : 'bg-zinc-800 text-zinc-400 hover:bg-zinc-700 hover:text-zinc-200'}`}
+                                >
+                                    {pageId}
+                                </button>
+                            ))}
+                            <button
+                                onClick={() => {
+                                    const keys = Object.keys(pages).map(Number);
+                                    const nextId = String(keys.length > 0 ? Math.max(...keys) + 1 : 1);
+                                    setPages(prev => ({ ...prev, [nextId]: "" }));
+                                    setActivePage(nextId);
+                                }}
+                                className="min-w-8 h-8 rounded bg-zinc-800 text-zinc-400 hover:bg-zinc-700 hover:text-zinc-200 flex items-center justify-center transition-all"
+                            >
+                                <Plus className="w-4 h-4" />
+                            </button>
+                        </div>
                         <p className="text-zinc-400 text-sm mt-1">
                             When you have problem with anything, leave a message here.
                             {lastFetch && (
@@ -127,7 +158,7 @@ export function ProjectNotes() {
                     </div>
                     <div className="flex items-center gap-3">
                         <button
-                            onClick={fetchNotes}
+                            onClick={() => fetchNotes()}
                             disabled={isLoading}
                             className="p-2 text-zinc-400 hover:text-white bg-zinc-800/50 hover:bg-zinc-800 rounded-lg transition-colors border border-transparent hover:border-zinc-700/50 disabled:opacity-50"
                             title="Refresh Notes"
@@ -151,11 +182,11 @@ export function ProjectNotes() {
 
                 <div className="relative">
                     <textarea
-                        value={notes}
-                        onChange={(e) => setNotes(e.target.value)}
-                        placeholder="Type your notes here... They will be synced automatically when you hit save so everyone can see them."
+                        value={pages[activePage] || ""}
+                        onChange={(e) => setPages(prev => ({ ...prev, [activePage]: e.target.value }))}
+                        placeholder=" "
                         className="w-full h-[500px] p-6 bg-zinc-950/50 text-zinc-100 rounded-xl border border-zinc-800/50 focus:border-emerald-500/50 focus:ring-1 focus:ring-emerald-500/50 transition-all resize-none placeholder-zinc-600 shadow-inner block"
-                        disabled={isLoading && notes === ''}
+                        disabled={isLoading}
                     />
 
                     <AnimatePresence>
