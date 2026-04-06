@@ -34,6 +34,24 @@ export default function App() {
     const [activeView, setActiveView] = useState<AppView>('cleaner');
 
     const [showCanvaModal, setShowCanvaModal] = useState<boolean>(false);
+    
+    // Admin Login State
+    const [showAdminLogin, setShowAdminLogin] = useState<boolean>(false);
+    const [adminUser, setAdminUser] = useState<string>('');
+    const [adminPass, setAdminPass] = useState<string>('');
+
+    const handleAdminLoginSubmit = (e: React.FormEvent) => {
+        e.preventDefault();
+        if (adminUser === 'admin' && adminPass === 'admin') {
+            sessionStorage.setItem('isAdmin', 'true');
+            window.dispatchEvent(new Event('adminAuthChanged'));
+            setShowAdminLogin(false);
+            setAdminUser('');
+            setAdminPass('');
+        } else {
+            alert('Invalid admin credentials');
+        }
+    };
 
     useEffect(() => {
         const hasSeenCanvaMail = localStorage.getItem('hasSeenCanvaMailNotice');
@@ -147,8 +165,10 @@ export default function App() {
                                     </AnimatePresence>
                                 </Suspense>
                             </main>
-                <footer className="text-center mt-12 text-zinc-600 font-medium tracking-wide pb-12">
-                    <p>Translator's Toolkit &copy; 2026</p>
+                <footer className="text-center mt-12 text-zinc-600 font-medium tracking-wide pb-12 relative z-20">
+                    <p className="cursor-pointer hover:text-zinc-400 transition-colors inline-block" onClick={() => setShowAdminLogin(true)}>
+                        Translator's Toolkit &copy; 2026
+                    </p>
                     <p className="mt-2 text-sm text-zinc-500">
                         Made for <span onClick={handleSecretClick} className="relative inline-block transition-colors duration-300 hover:text-pink-400 cursor-pointer group font-bold select-none py-1">
                             Thu Zue Zue San
@@ -166,6 +186,41 @@ export default function App() {
                 <CanvaMailModal isOpen={showCanvaModal} onClose={handleCloseCanvaModal} />
             </Suspense>
             */}
+
+            {showAdminLogin && (
+                <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fade-in">
+                    <div className="bg-zinc-900 border border-zinc-800 p-6 rounded-2xl w-full max-w-sm shadow-2xl relative">
+                        <button 
+                            onClick={() => setShowAdminLogin(false)} 
+                            className="absolute top-4 right-4 text-zinc-500 hover:text-zinc-300"
+                        >
+                            &times;
+                        </button>
+                        <h3 className="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-red-400 to-orange-400 mb-4">Admin Login</h3>
+                        <form onSubmit={handleAdminLoginSubmit} className="space-y-4">
+                            <input 
+                                autoFocus 
+                                type="text" 
+                                placeholder="Username" 
+                                value={adminUser} 
+                                onChange={e => setAdminUser(e.target.value)} 
+                                className="w-full bg-zinc-950 border border-zinc-800 rounded-lg px-4 py-2 text-zinc-100 focus:outline-none focus:border-red-500 focus:ring-1 focus:ring-red-500/50 transition-all placeholder-zinc-600" 
+                            />
+                            <input 
+                                type="password" 
+                                placeholder="Password" 
+                                value={adminPass} 
+                                onChange={e => setAdminPass(e.target.value)} 
+                                className="w-full bg-zinc-950 border border-zinc-800 rounded-lg px-4 py-2 text-zinc-100 focus:outline-none focus:border-red-500 focus:ring-1 focus:ring-red-500/50 transition-all placeholder-zinc-600" 
+                            />
+                            <div className="flex gap-3 justify-end pt-2">
+                                <button type="button" onClick={() => setShowAdminLogin(false)} className="px-4 py-2 text-sm font-semibold text-zinc-400 hover:text-white transition-colors">Cancel</button>
+                                <button type="submit" className="px-4 py-2 text-sm font-bold bg-red-600 hover:bg-red-500 text-white rounded-lg transition-all shadow-lg shadow-red-500/20">Login</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            )}
 
             <style>{`
                 @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }

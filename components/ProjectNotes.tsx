@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Save, RefreshCw, AlertCircle, CheckCircle2, Plus } from 'lucide-react';
+import { Save, RefreshCw, AlertCircle, CheckCircle2, Plus, Archive, Trash2, ArchiveRestore } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 // Hardcoded Supabase Credentials provided by user
@@ -15,8 +15,65 @@ export function ProjectNotes() {
     const [isSaving, setIsSaving] = useState(false);
     const [saveStatus, setSaveStatus] = useState<'idle' | 'success' | 'error'>('idle');
     const [lastFetch, setLastFetch] = useState<Date | null>(null);
+    const [isAdmin, setIsAdmin] = useState(false);
 
-    const fetchNotes = async () => {
+    useEffect(() => {
+        const checkAuth = () => setIsAdmin(sessionStorage.getItem('isAdmin') === 'true');
+        checkAuth(); // Check initial state
+        window.addEventListener('adminAuthChanged', checkAuth);
+        return () => window.removeEventListener('adminAuthChanged', checkAuth);
+    }, []);
+
+    const activePages = Object.keys(pages).filter(k => !k.startsWith('archived_')).sort((a, b) => Number(a) - Number(b));
+    const archivedPages = Object.keys(pages).filter(k => k.startsWith('archived_')).sort((a, b) => Number(a.replace('archived_','')) - Number(b.replace('archived_','')));
+
+    const handleArchive = () => {
+        setPages(prev => {
+            const next = { ...prev };
+            next[`archived_${activePage}`] = next[activePage];
+            delete next[activePage];
+            return next;
+        });
+        setActivePage(`archived_${activePage}`);
+    };
+
+    const handleUnarchive = () => {
+        const originalId = activePage.replace('archived_', '');
+        let newId = originalId;
+        const keys = Object.keys(pages).filter(k => !k.startsWith('archived_')).map(Number);
+        if (pages[newId] !== undefined) {
+            newId = String(keys.length > 0 ? Math.max(...keys) + 1 : 1);
+        }
+        setPages(prev => {
+            const next = { ...prev };
+            next[newId] = next[activePage];
+            delete next[activePage];
+            return next;
+        });
+        setActivePage(newId);
+    };
+
+    const handleDelete = () => {
+        if (window.confirm("Delete this page permanently? This action cannot be undone.")) {
+            const nextPages = { ...pages };
+            delete nextPages[activePage];
+            
+            const remainingActive = Object.keys(nextPages).filter(k => !k.startsWith('archived_')).sort((a,b) => Number(a) - Number(b));
+            const remainingArchived = Object.keys(nextPages).filter(k => k.startsWith('archived_'));
+            
+            if (remainingActive.length === 0 && remainingArchived.length === 0) {
+                nextPages["1"] = "";
+                setActivePage("1");
+            } else if (remainingActive.length > 0) {
+                setActivePage(remainingActive[remainingActive.length - 1]);
+            } else {
+                setActivePage(remainingArchived[0]);
+            }
+            setPages(nextPages);
+        }
+    };
+
+    const fetchNotes = async (isInitialLoad = false) => {
         setIsLoading(true);
         try {
             const response = await fetch(`${API_URL}?select=content&order=created_at.desc&limit=1`, {
@@ -33,6 +90,12 @@ export function ProjectNotes() {
                         const parsed = JSON.parse(data[0].content);
                         if (typeof parsed === 'object' && parsed !== null) {
                             setPages(parsed);
+                            if (isInitialLoad) {
+                                const activeKeys = Object.keys(parsed).filter(k => !k.startsWith('archived_')).sort((a, b) => Number(a) - Number(b));
+                                if (activeKeys.length > 0) {
+                                    setActivePage(activeKeys[activeKeys.length - 1]);
+                                }
+                            }
                         } else {
                             setPages({ "1": data[0].content });
                         }
@@ -54,7 +117,7 @@ export function ProjectNotes() {
     };
 
     useEffect(() => {
-        fetchNotes();
+        fetchNotes(true);
         // Removed polling to prevent overwriting user input automatically. 
         // Use the manual refresh button instead.
     }, []);
@@ -83,6 +146,7 @@ export function ProjectNotes() {
                     // Send to both Telegram accounts
                     const CHAT_IDS = ["5638537734", "5777458528"];
 
+                    const timeString = new Date().toLocaleString('en-US', { timeZone: 'Asia/Yangon', dateStyle: 'medium', timeStyle: 'short' });
                     for (const chatId of CHAT_IDS) {
                         try {
                             await fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`, {
@@ -92,7 +156,7 @@ export function ProjectNotes() {
                                 },
                                 body: JSON.stringify({
                                     chat_id: chatId,
-                                    text: `📝 New Scratch Pad Update (Page ${activePage})\n\n${pages[activePage] || "Blank"}`
+                                    text: `📝 New Scratch Pad Update (Page ${activePage})\n🕒 ${timeString}\n\n${pages[activePage] || "Blank"}`
                                 }),
                             });
                         } catch (err) {
@@ -126,7 +190,7 @@ export function ProjectNotes() {
                             Scratch Pad
                         </h2>
                         <div className="flex items-center gap-2 mt-3 mb-4 overflow-x-auto pb-2 scrollbar-thin scrollbar-thumb-zinc-700">
-                            {Object.keys(pages).sort((a, b) => Number(a) - Number(b)).map(pageId => (
+                            {activePages.map(pageId => (
                                 <button
                                     key={pageId}
                                     onClick={() => setActivePage(pageId)}
@@ -137,7 +201,7 @@ export function ProjectNotes() {
                             ))}
                             <button
                                 onClick={() => {
-                                    const keys = Object.keys(pages).map(Number);
+                                    const keys = activePages.map(Number);
                                     const nextId = String(keys.length > 0 ? Math.max(...keys) + 1 : 1);
                                     setPages(prev => ({ ...prev, [nextId]: "" }));
                                     setActivePage(nextId);
@@ -147,6 +211,21 @@ export function ProjectNotes() {
                                 <Plus className="w-4 h-4" />
                             </button>
                         </div>
+
+                        {archivedPages.length > 0 && isAdmin && (
+                            <div className="flex items-center gap-2 mb-4 overflow-x-auto pb-2 scrollbar-thin scrollbar-thumb-zinc-700">
+                                <span className="text-xs text-zinc-500 font-bold uppercase mr-1">Archived:</span>
+                                {archivedPages.map(pageId => (
+                                    <button
+                                        key={pageId}
+                                        onClick={() => setActivePage(pageId)}
+                                        className={`min-w-8 h-8 px-2 rounded text-sm font-bold transition-all ${activePage === pageId ? 'bg-zinc-600 text-white shadow-[0_0_10px_rgba(82,82,91,0.3)]' : 'bg-zinc-800/50 text-zinc-500 hover:bg-zinc-700 hover:text-zinc-300'}`}
+                                    >
+                                        {pageId.replace('archived_', '')}
+                                    </button>
+                                ))}
+                            </div>
+                        )}
                         <p className="text-zinc-400 text-sm mt-1">
                             When you have problem with anything, leave a message here.
                             {lastFetch && (
@@ -157,6 +236,34 @@ export function ProjectNotes() {
                         </p>
                     </div>
                     <div className="flex items-center gap-3">
+                        {isAdmin && (
+                            <div className="flex items-center gap-2 mr-2 border-r border-zinc-800 pr-4">
+                                {activePage.startsWith('archived_') ? (
+                                    <button
+                                        onClick={handleUnarchive}
+                                        className="p-2 text-zinc-400 hover:text-emerald-400 bg-zinc-800/50 hover:bg-zinc-800 rounded-lg transition-colors border border-transparent hover:border-zinc-700/50"
+                                        title="Unarchive Page"
+                                    >
+                                        <ArchiveRestore className="w-5 h-5" />
+                                    </button>
+                                ) : (
+                                    <button
+                                        onClick={handleArchive}
+                                        className="p-2 text-zinc-400 hover:text-amber-400 bg-zinc-800/50 hover:bg-zinc-800 rounded-lg transition-colors border border-transparent hover:border-zinc-700/50"
+                                        title="Archive Page"
+                                    >
+                                        <Archive className="w-5 h-5" />
+                                    </button>
+                                )}
+                                <button
+                                    onClick={handleDelete}
+                                    className="p-2 text-zinc-400 hover:text-red-400 bg-zinc-800/50 hover:bg-zinc-800 rounded-lg transition-colors border border-transparent hover:border-zinc-700/50"
+                                    title="Delete permanently"
+                                >
+                                    <Trash2 className="w-5 h-5" />
+                                </button>
+                            </div>
+                        )}
                         <button
                             onClick={() => fetchNotes()}
                             disabled={isLoading}
