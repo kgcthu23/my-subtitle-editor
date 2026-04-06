@@ -102,19 +102,19 @@ export default function App() {
                         </h1>
                     </div>
 
-                    <div className="mt-6 flex justify-center">
-                        <div className="bg-zinc-900/40 backdrop-blur-xl p-1.5 rounded-2xl shadow-lg border border-zinc-800/50 inline-flex gap-2">
+                    <div className="mt-6 flex justify-center w-full px-2 sm:px-0">
+                        <div className="bg-zinc-900/40 backdrop-blur-xl p-1.5 rounded-2xl shadow-lg border border-zinc-800/50 flex w-full sm:w-auto justify-between sm:justify-center gap-1 sm:gap-2">
                             {([
-                                { id: 'cleaner', label: 'Cleaner', icon: <LayoutDashboard className="w-4 h-4" /> },
-                                { id: 'tracker', label: 'Tracker', icon: <Calculator className="w-4 h-4" /> },
-                                { id: 'guide', label: 'Guide', icon: <BookOpen className="w-4 h-4" /> },
-                                { id: 'notes', label: 'Notes', icon: <MessageSquare className="w-4 h-4" /> }
+                                { id: 'cleaner', label: 'Cleaner', icon: <LayoutDashboard className="w-4 h-4 sm:w-4 sm:h-4" /> },
+                                { id: 'tracker', label: 'Tracker', icon: <Calculator className="w-4 h-4 sm:w-4 sm:h-4" /> },
+                                { id: 'guide', label: 'Guide', icon: <BookOpen className="w-4 h-4 sm:w-4 sm:h-4" /> },
+                                { id: 'notes', label: 'Notes', icon: <MessageSquare className="w-4 h-4 sm:w-4 sm:h-4" /> }
                             ] as const).map(({ id, label, icon }) => (
                                 <button
                                     key={id}
                                     onClick={() => setActiveView(id)}
                                     className={cn(
-                                        "px-6 py-2.5 text-sm font-bold rounded-xl transition-all flex items-center gap-2",
+                                        "px-2 sm:px-6 py-2 sm:py-2.5 text-[10px] sm:text-sm font-bold rounded-xl transition-all flex flex-col sm:flex-row items-center justify-center gap-1 sm:gap-2 flex-1 sm:flex-none",
                                         activeView === id
                                             ? "bg-zinc-800 text-indigo-400 shadow-[0_2px_10px_rgba(0,0,0,0.3)] border border-zinc-700/50"
                                             : "text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800/50"

@@ -1,21 +1,30 @@
-import React, { useState, useEffect } from 'react';
-import { Save, RefreshCw, AlertCircle, CheckCircle2, Plus, Archive, Trash2, ArchiveRestore } from 'lucide-react';
+import React, { useState, useEffect, useRef } from 'react';
+import { Save, RefreshCw, AlertCircle, CheckCircle2, Plus, Archive, Trash2, ArchiveRestore, Type, Palette } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { createClient } from '@supabase/supabase-js';
+import { SharedCanvas } from './SharedCanvas';
 
 // Hardcoded Supabase Credentials provided by user
 const SUPABASE_URL = 'https://bnzfqmuxzmjlrinkujoc.supabase.co';
 const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJuemZxbXV4em1qbHJpbmt1am9jIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzUwMzY5MjcsImV4cCI6MjA5MDYxMjkyN30.T5MWNGeRCUeaW3aRjmYoZBwsakzFJpu5o0bArHn1SxY';
-// Supabase REST endpoint to fetch the latest note and insert new ones
-const API_URL = `${SUPABASE_URL}/rest/v1/project_notes`;
+
+const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 export function ProjectNotes() {
     const [pages, setPages] = useState<Record<string, string>>({ "1": "" });
     const [activePage, setActivePage] = useState<string>("1");
+    const [viewMode, setViewMode] = useState<'text' | 'canvas'>('text');
+    
     const [isLoading, setIsLoading] = useState(true);
     const [isSaving, setIsSaving] = useState(false);
     const [saveStatus, setSaveStatus] = useState<'idle' | 'success' | 'error'>('idle');
     const [lastFetch, setLastFetch] = useState<Date | null>(null);
     const [isAdmin, setIsAdmin] = useState(false);
+    
+    // Typing indicator state
+    const [remoteTyping, setRemoteTyping] = useState(false);
+    const typingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+    const broadcastChannel = useRef<ReturnType<typeof supabase.channel> | null>(null);
 
     useEffect(() => {
         const checkAuth = () => setIsAdmin(sessionStorage.getItem('isAdmin') === 'true');
@@ -24,7 +33,7 @@ export function ProjectNotes() {
         return () => window.removeEventListener('adminAuthChanged', checkAuth);
     }, []);
 
-    const activePages = Object.keys(pages).filter(k => !k.startsWith('archived_')).sort((a, b) => Number(a) - Number(b));
+    const activePages = Object.keys(pages).filter(k => !k.startsWith('archived_') && !k.startsWith('canvas_')).sort((a, b) => Number(a) - Number(b));
     const archivedPages = Object.keys(pages).filter(k => k.startsWith('archived_')).sort((a, b) => Number(a.replace('archived_','')) - Number(b.replace('archived_','')));
 
     const handleArchive = () => {
@@ -32,6 +41,12 @@ export function ProjectNotes() {
             const next = { ...prev };
             next[`archived_${activePage}`] = next[activePage];
             delete next[activePage];
+            
+            // Move canvas too if it exists
+            if (next[`canvas_${activePage}`]) {
+                 next[`canvas_archived_${activePage}`] = next[`canvas_${activePage}`];
+                 delete next[`canvas_${activePage}`];
+            }
             return next;
         });
         setActivePage(`archived_${activePage}`);
@@ -40,7 +55,7 @@ export function ProjectNotes() {
     const handleUnarchive = () => {
         const originalId = activePage.replace('archived_', '');
         let newId = originalId;
-        const keys = Object.keys(pages).filter(k => !k.startsWith('archived_')).map(Number);
+        const keys = Object.keys(pages).filter(k => !k.startsWith('archived_') && !k.startsWith('canvas_')).map(Number);
         if (pages[newId] !== undefined) {
             newId = String(keys.length > 0 ? Math.max(...keys) + 1 : 1);
         }
@@ -48,6 +63,11 @@ export function ProjectNotes() {
             const next = { ...prev };
             next[newId] = next[activePage];
             delete next[activePage];
+            
+            if (next[`canvas_${activePage}`]) {
+                 next[`canvas_${newId}`] = next[`canvas_${activePage}`];
+                 delete next[`canvas_${activePage}`];
+            }
             return next;
         });
         setActivePage(newId);
@@ -57,8 +77,9 @@ export function ProjectNotes() {
         if (window.confirm("Delete this page permanently? This action cannot be undone.")) {
             const nextPages = { ...pages };
             delete nextPages[activePage];
+            delete nextPages[`canvas_${activePage}`]; // delete doodle too
             
-            const remainingActive = Object.keys(nextPages).filter(k => !k.startsWith('archived_')).sort((a,b) => Number(a) - Number(b));
+            const remainingActive = Object.keys(nextPages).filter(k => !k.startsWith('archived_') && !k.startsWith('canvas_')).sort((a,b) => Number(a) - Number(b));
             const remainingArchived = Object.keys(nextPages).filter(k => k.startsWith('archived_'));
             
             if (remainingActive.length === 0 && remainingArchived.length === 0) {
@@ -76,37 +97,31 @@ export function ProjectNotes() {
     const fetchNotes = async (isInitialLoad = false) => {
         setIsLoading(true);
         try {
-            const response = await fetch(`${API_URL}?select=content&order=created_at.desc&limit=1`, {
-                headers: {
-                    'apikey': SUPABASE_ANON_KEY,
-                    'Authorization': `Bearer ${SUPABASE_ANON_KEY}`
-                }
-            });
+            const { data, error } = await supabase
+                .from('project_notes')
+                .select('content')
+                .order('created_at', { ascending: false })
+                .limit(1);
 
-            if (response.ok) {
-                const data = await response.json();
-                if (data && data.length > 0) {
-                    try {
-                        const parsed = JSON.parse(data[0].content);
-                        if (typeof parsed === 'object' && parsed !== null) {
-                            setPages(parsed);
-                            if (isInitialLoad) {
-                                const activeKeys = Object.keys(parsed).filter(k => !k.startsWith('archived_')).sort((a, b) => Number(a) - Number(b));
-                                if (activeKeys.length > 0) {
-                                    setActivePage(activeKeys[activeKeys.length - 1]);
-                                }
+            if (data && data.length > 0) {
+                try {
+                    const parsed = JSON.parse(data[0].content);
+                    if (typeof parsed === 'object' && parsed !== null) {
+                        setPages(parsed);
+                        if (isInitialLoad) {
+                            const activeKeys = Object.keys(parsed).filter(k => !k.startsWith('archived_') && !k.startsWith('canvas_')).sort((a, b) => Number(a) - Number(b));
+                            if (activeKeys.length > 0) {
+                                setActivePage(activeKeys[activeKeys.length - 1]);
                             }
-                        } else {
-                            setPages({ "1": data[0].content });
                         }
-                    } catch {
-                        setPages({ "1": data[0].content || '' });
+                    } else {
+                        setPages({ "1": data[0].content });
                     }
-                } else {
-                    setPages({ "1": "" });
+                } catch {
+                    setPages({ "1": data[0].content || '' });
                 }
             } else {
-                console.error('Failed to fetch notes', response.status);
+                setPages({ "1": "" });
             }
             setLastFetch(new Date());
         } catch (err) {
@@ -118,53 +133,105 @@ export function ProjectNotes() {
 
     useEffect(() => {
         fetchNotes(true);
-        // Removed polling to prevent overwriting user input automatically. 
-        // Use the manual refresh button instead.
+        
+        // 1. Setup Postgres Changes for live updates
+        const dbChannel = supabase.channel('schema-db-changes')
+            .on(
+                'postgres_changes',
+                {
+                    event: 'INSERT', // Only checking for inserts since that's what handleSave does
+                    schema: 'public',
+                    table: 'project_notes',
+                },
+                (payload) => {
+                    const newRecord = payload.new as { content: string };
+                    try {
+                        const parsed = JSON.parse(newRecord.content);
+                        if (typeof parsed === 'object' && parsed !== null) {
+                            setPages(parsed);
+                            setLastFetch(new Date());
+                        }
+                    } catch (e) {
+                         // silently ignore
+                    }
+                }
+            )
+            .subscribe();
+
+        // 2. Setup Broadcast channel for typing indicator
+        broadcastChannel.current = supabase.channel('room-1', {
+            config: {
+                broadcast: { ack: false }
+            }
+        });
+
+        broadcastChannel.current
+            .on('broadcast', { event: 'typing' }, (payload) => {
+                setRemoteTyping(true);
+                if (typingTimeoutRef.current) {
+                    clearTimeout(typingTimeoutRef.current);
+                }
+                typingTimeoutRef.current = setTimeout(() => {
+                    setRemoteTyping(false);
+                }, 2000);
+            })
+            .subscribe((status) => {
+                if (status === 'SUBSCRIBED') {
+                    // console.log("Subscribed to typing broadcasts")
+                }
+            });
+
+        return () => {
+            supabase.removeChannel(dbChannel);
+            if (broadcastChannel.current) {
+                supabase.removeChannel(broadcastChannel.current);
+            }
+            if (typingTimeoutRef.current) {
+                clearTimeout(typingTimeoutRef.current);
+            }
+        };
     }, []);
 
-    const handleSave = async () => {
+    const sendTypingIndicator = () => {
+        if (broadcastChannel.current) {
+            broadcastChannel.current.send({
+                type: 'broadcast',
+                event: 'typing',
+                payload: { page: activePage },
+            });
+        }
+    };
+
+    const handleSave = async (updatedPages?: Record<string, string>, isCanvasUpdate: boolean = false) => {
+        const payloadData = updatedPages || pages;
         setIsSaving(true);
         setSaveStatus('idle');
         try {
-            // Insert a new row with the latest content
-            const response = await fetch(API_URL, {
-                method: 'POST',
-                headers: {
-                    'apikey': SUPABASE_ANON_KEY,
-                    'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
-                    'Content-Type': 'application/json',
-                    'Prefer': 'return=minimal'
-                },
-                body: JSON.stringify({ content: JSON.stringify(pages) }),
-            });
+            const { error } = await supabase
+                .from('project_notes')
+                .insert([{ content: JSON.stringify(payloadData) }]);
 
-            if (response.ok) {
-                // Send Telegram notification
-                try {
-                    // The Chat ID will need to be configured so the bot knows where to send the message
-                    const TELEGRAM_BOT_TOKEN = "8487227254:AAHBAxAwLWwv6L_KESAygLm2DrTOphFpcCo";
-                    // Send to both Telegram accounts
-                    const CHAT_IDS = ["5638537734", "5777458528"];
-
-                    const timeString = new Date().toLocaleString('en-US', { timeZone: 'Asia/Yangon', dateStyle: 'medium', timeStyle: 'short' });
-                    for (const chatId of CHAT_IDS) {
-                        try {
-                            await fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`, {
-                                method: "POST",
-                                headers: {
-                                    "Content-Type": "application/json",
-                                },
-                                body: JSON.stringify({
-                                    chat_id: chatId,
-                                    text: `📝 New Scratch Pad Update (Page ${activePage})\n🕒 ${timeString}\n\n${pages[activePage] || "Blank"}`
-                                }),
-                            });
-                        } catch (err) {
-                            console.error('Failed to notify chat ' + chatId, err);
+            if (!error) {
+                // Send Telegram notification (only for text saves)
+                if (!isCanvasUpdate) {
+                    try {
+                        const TELEGRAM_BOT_TOKEN = "8487227254:AAHBAxAwLWwv6L_KESAygLm2DrTOphFpcCo";
+                        const CHAT_IDS = ["5638537734", "5777458528"];
+                        const timeString = new Date().toLocaleString('en-US', { timeZone: 'Asia/Yangon', dateStyle: 'medium', timeStyle: 'short' });
+                        
+                        const textContent = payloadData[activePage] || "Blank";
+                        const msg = `📝 Scratch Pad Updated (Page ${activePage})\n🕒 ${timeString}\n\n${textContent.slice(0, 500)}${textContent.length > 500 ? '...' : ''}`;
+                        
+                        for (const chatId of CHAT_IDS) {
+                            try {
+                                await fetch(`https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`, {
+                                    method: "POST",
+                                    headers: { "Content-Type": "application/json" },
+                                    body: JSON.stringify({ chat_id: chatId, text: msg }),
+                                });
+                            } catch (err) {}
                         }
-                    }
-                } catch (notifyErr) {
-                    console.error('Failed to send Telegram notification', notifyErr);
+                    } catch (notifyErr) {}
                 }
 
                 setSaveStatus('success');
@@ -181,15 +248,36 @@ export function ProjectNotes() {
         }
     };
 
+    const handleCanvasSave = (dataUrl: string) => {
+        const canvasKey = `canvas_${activePage}`;
+        const updatedPages = { ...pages, [canvasKey]: dataUrl };
+        setPages(updatedPages);
+        handleSave(updatedPages, true);
+    };
+
     return (
-        <div className="max-w-4xl mx-auto space-y-6 animate-fade-in relative">
-            <div className="bg-zinc-900/40 backdrop-blur-xl p-8 rounded-2xl shadow-xl border border-zinc-800/50">
+        <div className="max-w-4xl mx-auto space-y-6 animate-fade-in relative z-10 w-full px-4 sm:px-0">
+            <div className="bg-zinc-900/40 backdrop-blur-xl p-4 sm:p-8 rounded-2xl shadow-xl border border-zinc-800/50">
                 <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
                     <div>
-                        <h2 className="text-2xl font-bold bg-clip-text text-transparent bg-linear-to-r from-teal-400 to-emerald-400">
+                        <h2 className="text-2xl font-bold bg-clip-text text-transparent bg-linear-to-r from-teal-400 to-emerald-400 flex items-center gap-3">
                             Scratch Pad
+                            {remoteTyping && (
+                                <motion.span 
+                                    initial={{ opacity: 0, scale: 0.8 }}
+                                    animate={{ opacity: 1, scale: 1 }}
+                                    className="text-xs px-2 py-1 bg-emerald-500/20 text-emerald-400 rounded-full border border-emerald-500/30 flex items-center gap-1"
+                                >
+                                    <span className="flex gap-0.5">
+                                      <span className="w-1 h-1 bg-emerald-400 rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
+                                      <span className="w-1 h-1 bg-emerald-400 rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
+                                      <span className="w-1 h-1 bg-emerald-400 rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
+                                    </span>
+                                    typing...
+                                </motion.span>
+                            )}
                         </h2>
-                        <div className="flex items-center gap-2 mt-3 mb-4 overflow-x-auto pb-2 scrollbar-thin scrollbar-thumb-zinc-700">
+                        <div className="flex items-center gap-2 mt-3 mb-4 overflow-x-auto pb-2 flex-wrap sm:flex-nowrap">
                             {activePages.map(pageId => (
                                 <button
                                     key={pageId}
@@ -227,7 +315,7 @@ export function ProjectNotes() {
                             </div>
                         )}
                         <p className="text-zinc-400 text-sm mt-1">
-                            When you have problem with anything, leave a message here.
+                            When you have problem with anything, leave a message here. (Live synchronized)
                             {lastFetch && (
                                 <span className="ml-2 text-zinc-500">
                                     Last synced: {lastFetch.toLocaleTimeString()}
@@ -235,89 +323,113 @@ export function ProjectNotes() {
                             )}
                         </p>
                     </div>
-                    <div className="flex items-center gap-3">
-                        {isAdmin && (
-                            <div className="flex items-center gap-2 mr-2 border-r border-zinc-800 pr-4">
-                                {activePage.startsWith('archived_') ? (
+                    
+                    <div className="flex flex-col sm:flex-row items-end sm:items-center gap-3">
+                        <div className="flex bg-zinc-800/50 p-1 rounded-lg border border-zinc-700/50">
+                            <button
+                                onClick={() => setViewMode('text')}
+                                className={`px-3 py-1.5 rounded-md text-sm font-medium flex items-center gap-2 transition-all ${viewMode === 'text' ? 'bg-zinc-700 text-white shadow-sm' : 'text-zinc-400 hover:text-zinc-200'}`}
+                            >
+                                <Type className="w-4 h-4" /> Text
+                            </button>
+                            <button
+                                onClick={() => setViewMode('canvas')}
+                                className={`px-3 py-1.5 rounded-md text-sm font-medium flex items-center gap-2 transition-all ${viewMode === 'canvas' ? 'bg-zinc-700 text-white shadow-sm' : 'text-zinc-400 hover:text-zinc-200'}`}
+                            >
+                                <Palette className="w-4 h-4" /> Doodle
+                            </button>
+                        </div>
+                        
+                        <div className="flex items-center gap-2">
+                            {isAdmin && (
+                                <div className="flex items-center gap-2 mr-2 border-r border-zinc-800 pr-4">
+                                    {activePage.startsWith('archived_') ? (
+                                        <button
+                                            onClick={handleUnarchive}
+                                            className="p-2 text-zinc-400 hover:text-emerald-400 bg-zinc-800/50 hover:bg-zinc-800 rounded-lg transition-colors border border-transparent hover:border-zinc-700/50"
+                                            title="Unarchive Page"
+                                        >
+                                            <ArchiveRestore className="w-5 h-5" />
+                                        </button>
+                                    ) : (
+                                        <button
+                                            onClick={handleArchive}
+                                            className="p-2 text-zinc-400 hover:text-amber-400 bg-zinc-800/50 hover:bg-zinc-800 rounded-lg transition-colors border border-transparent hover:border-zinc-700/50"
+                                            title="Archive Page"
+                                        >
+                                            <Archive className="w-5 h-5" />
+                                        </button>
+                                    )}
                                     <button
-                                        onClick={handleUnarchive}
-                                        className="p-2 text-zinc-400 hover:text-emerald-400 bg-zinc-800/50 hover:bg-zinc-800 rounded-lg transition-colors border border-transparent hover:border-zinc-700/50"
-                                        title="Unarchive Page"
+                                        onClick={handleDelete}
+                                        className="p-2 text-zinc-400 hover:text-red-400 bg-zinc-800/50 hover:bg-zinc-800 rounded-lg transition-colors border border-transparent hover:border-zinc-700/50"
+                                        title="Delete permanently"
                                     >
-                                        <ArchiveRestore className="w-5 h-5" />
+                                        <Trash2 className="w-5 h-5" />
                                     </button>
-                                ) : (
-                                    <button
-                                        onClick={handleArchive}
-                                        className="p-2 text-zinc-400 hover:text-amber-400 bg-zinc-800/50 hover:bg-zinc-800 rounded-lg transition-colors border border-transparent hover:border-zinc-700/50"
-                                        title="Archive Page"
-                                    >
-                                        <Archive className="w-5 h-5" />
-                                    </button>
-                                )}
-                                <button
-                                    onClick={handleDelete}
-                                    className="p-2 text-zinc-400 hover:text-red-400 bg-zinc-800/50 hover:bg-zinc-800 rounded-lg transition-colors border border-transparent hover:border-zinc-700/50"
-                                    title="Delete permanently"
-                                >
-                                    <Trash2 className="w-5 h-5" />
-                                </button>
-                            </div>
-                        )}
-                        <button
-                            onClick={() => fetchNotes()}
-                            disabled={isLoading}
-                            className="p-2 text-zinc-400 hover:text-white bg-zinc-800/50 hover:bg-zinc-800 rounded-lg transition-colors border border-transparent hover:border-zinc-700/50 disabled:opacity-50"
-                            title="Refresh Notes"
-                        >
-                            <RefreshCw className={`w-5 h-5 ${isLoading ? 'animate-spin' : ''}`} />
-                        </button>
-                        <button
-                            onClick={handleSave}
-                            disabled={isSaving || isLoading}
-                            className="px-5 py-2.5 text-sm font-semibold text-white bg-emerald-600 rounded-lg hover:bg-emerald-500 shadow-lg shadow-emerald-500/20 flex items-center gap-2 transition-all disabled:opacity-50"
-                        >
-                            {isSaving ? (
-                                <RefreshCw className="w-4 h-4 animate-spin" />
-                            ) : (
-                                <Save className="w-4 h-4" />
+                                </div>
                             )}
-                            Save Notes
-                        </button>
+                            
+                            {viewMode === 'text' && (
+                                <button
+                                    onClick={() => handleSave()}
+                                    disabled={isSaving || isLoading}
+                                    className="px-5 py-2.5 text-sm font-semibold text-white bg-emerald-600 rounded-lg hover:bg-emerald-500 shadow-lg shadow-emerald-500/20 flex items-center gap-2 transition-all disabled:opacity-50"
+                                >
+                                    {isSaving ? (
+                                        <RefreshCw className="w-4 h-4 animate-spin" />
+                                    ) : (
+                                        <Save className="w-4 h-4" />
+                                    )}
+                                    Save
+                                </button>
+                            )}
+                        </div>
                     </div>
                 </div>
 
                 <div className="relative">
-                    <textarea
-                        value={pages[activePage] || ""}
-                        onChange={(e) => setPages(prev => ({ ...prev, [activePage]: e.target.value }))}
-                        placeholder=" "
-                        className="w-full h-[500px] p-6 bg-zinc-950/50 text-zinc-100 rounded-xl border border-zinc-800/50 focus:border-emerald-500/50 focus:ring-1 focus:ring-emerald-500/50 transition-all resize-none placeholder-zinc-600 shadow-inner block"
-                        disabled={isLoading}
-                    />
+                    {viewMode === 'text' ? (
+                        <textarea
+                            value={pages[activePage] || ""}
+                            onChange={(e) => {
+                                setPages(prev => ({ ...prev, [activePage]: e.target.value }));
+                                sendTypingIndicator();
+                            }}
+                            placeholder="Type a message..."
+                            className="w-full h-[500px] p-6 bg-zinc-950/50 text-zinc-100 rounded-xl border border-zinc-800/50 focus:border-emerald-500/50 focus:ring-1 focus:ring-emerald-500/50 transition-all resize-none placeholder-zinc-600 shadow-inner block"
+                            disabled={isLoading}
+                        />
+                    ) : (
+                        <SharedCanvas 
+                             canvasData={pages[`canvas_${activePage}`]} 
+                             onSave={handleCanvasSave} 
+                             disabled={isLoading || isSaving}
+                        />
+                    )}
 
                     <AnimatePresence>
-                        {saveStatus === 'success' && (
+                        {saveStatus === 'success' && viewMode === 'text' && (
                             <motion.div
                                 initial={{ opacity: 0, y: 10 }}
                                 animate={{ opacity: 1, y: 0 }}
                                 exit={{ opacity: 0 }}
-                                className="absolute bottom-4 right-4 bg-emerald-500/10 text-emerald-400 px-4 py-2 rounded-lg border border-emerald-500/20 flex items-center gap-2 text-sm font-medium backdrop-blur-md"
+                                className="absolute bottom-4 right-4 bg-emerald-500/10 text-emerald-400 px-4 py-2 rounded-lg border border-emerald-500/20 flex items-center gap-2 text-sm font-medium backdrop-blur-md pointer-events-none"
                             >
                                 <CheckCircle2 className="w-4 h-4" />
-                                Saved successfully to Supabase!
+                                Saved successfully!
                             </motion.div>
                         )}
-
+                        
                         {saveStatus === 'error' && (
                             <motion.div
                                 initial={{ opacity: 0, y: 10 }}
                                 animate={{ opacity: 1, y: 0 }}
                                 exit={{ opacity: 0 }}
-                                className="absolute bottom-4 right-4 bg-red-500/10 text-red-500 px-4 py-2 rounded-lg border border-red-500/20 flex items-center gap-2 text-sm font-medium backdrop-blur-md"
+                                className="absolute bottom-4 right-4 bg-red-500/10 text-red-500 px-4 py-2 rounded-lg border border-red-500/20 flex items-center gap-2 text-sm font-medium backdrop-blur-md pointer-events-none"
                             >
                                 <AlertCircle className="w-4 h-4" />
-                                Failed to save. Ensure your table exists!
+                                Failed to save!
                             </motion.div>
                         )}
                     </AnimatePresence>
