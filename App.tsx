@@ -5,7 +5,7 @@ import type { ChangeSummary, ForeignLanguageReport, IncomeData, IncomeEntry, Det
 import {
     UploadCloud, Download, AlertTriangle,
     LayoutDashboard, Calculator, BookOpen, Sparkles,
-    ArrowRight, CheckCircle2, Trash2, Link as LinkIcon, Info, MessageSquare, Copy, Palette, ArrowLeft
+    ArrowRight, CheckCircle2, Trash2, Link as LinkIcon, Info, MessageSquare, Copy, Palette, ArrowLeft, Image as ImageIcon
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { clsx, type ClassValue } from 'clsx';
@@ -29,7 +29,7 @@ import { useSecretClick } from './hooks/useSecretClick';
 // --- Main Application ---
 export default function App() {
     type AppState = 'idle' | 'preview';
-    type AppView = 'cleaner' | 'tracker' | 'guide' | 'notes' | 'canvas';
+    type AppView = 'cleaner' | 'tracker' | 'guide' | 'notes' | 'canvas' | 'gallery';
     const [appState, setAppState] = useState<AppState>('idle');
     const [activeView, setActiveView] = useState<AppView>('cleaner');
 
@@ -95,7 +95,7 @@ export default function App() {
             <div className="fixed bottom-[-10%] right-[-10%] w-[40%] h-[40%] rounded-full bg-purple-500/10 blur-[120px] pointer-events-none animate-blob animation-delay-2000"></div>
 
             {activeView === 'canvas' ? (
-                <div className="absolute inset-0 z-50 bg-[#09090b] flex flex-col p-4 pt-16 sm:p-6 sm:pt-20">
+                <div className="absolute inset-0 z-50 bg-[#09090b] flex flex-col">
                     <button 
                         onClick={() => setActiveView('cleaner')} 
                         className="fixed top-4 left-4 z-[60] p-3 sm:p-2 bg-zinc-900/80 backdrop-blur border border-zinc-800 text-zinc-300 hover:text-white hover:bg-zinc-800 rounded-full shadow-xl transition-all flex items-center justify-center group"
@@ -103,8 +103,8 @@ export default function App() {
                     >
                         <ArrowLeft className="w-6 h-6 sm:w-5 sm:h-5 group-hover:-translate-x-1 transition-transform" />
                     </button>
-                    <div className="flex-1 w-full h-full min-h-0 relative z-10 max-w-7xl mx-auto flex flex-col">
-                        <Suspense fallback={<div className="flex justify-center items-center py-20 w-full h-full"><div className="w-8 h-8 rounded-full border-4 border-emerald-500/20 border-t-emerald-500 animate-spin"></div></div>}>
+                    <div className="flex-1 w-full h-full min-h-0 relative z-10 flex flex-col">
+                        <Suspense fallback={<div className="flex justify-center items-center h-full w-full"><div className="w-8 h-8 rounded-full border-4 border-emerald-500/20 border-t-emerald-500 animate-spin"></div></div>}>
                             <ProjectNotes mode="canvas" fillParent={true} />
                         </Suspense>
                     </div>
@@ -125,7 +125,7 @@ export default function App() {
                                 { id: 'tracker', label: 'Tracker', icon: <Calculator className="w-4 h-4 sm:w-4 sm:h-4" /> },
                                 { id: 'guide', label: 'Guide', icon: <BookOpen className="w-4 h-4 sm:w-4 sm:h-4" /> },
                                 { id: 'notes', label: 'Notes', icon: <MessageSquare className="w-4 h-4 sm:w-4 sm:h-4" /> },
-                                { id: 'canvas', label: 'Canva', icon: <Palette className="w-4 h-4 sm:w-4 sm:h-4" /> }
+                                { id: 'gallery', label: 'Gallery', icon: <ImageIcon className="w-4 h-4 sm:w-4 sm:h-4" /> }
                             ] as const).map(({ id, label, icon }) => (
                                 <button
                                     key={id}
@@ -177,6 +177,11 @@ export default function App() {
                                         {activeView === 'notes' && (
                                             <motion.div key="notes" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} transition={{ duration: 0.2 }}>
                                                 <ProjectNotes mode="text" />
+                                            </motion.div>
+                                        )}
+                                        {activeView === 'gallery' && (
+                                            <motion.div key="gallery" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} transition={{ duration: 0.2 }}>
+                                                <ProjectNotes mode="gallery" />
                                             </motion.div>
                                         )}
                                     </AnimatePresence>
