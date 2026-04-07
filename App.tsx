@@ -5,7 +5,7 @@ import type { ChangeSummary, ForeignLanguageReport, IncomeData, IncomeEntry, Det
 import {
     UploadCloud, Download, AlertTriangle,
     LayoutDashboard, Calculator, BookOpen, Sparkles,
-    ArrowRight, CheckCircle2, Trash2, Link as LinkIcon, Info, MessageSquare, Copy
+    ArrowRight, CheckCircle2, Trash2, Link as LinkIcon, Info, MessageSquare, Copy, Palette
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { clsx, type ClassValue } from 'clsx';
@@ -29,7 +29,7 @@ import { useSecretClick } from './hooks/useSecretClick';
 // --- Main Application ---
 export default function App() {
     type AppState = 'idle' | 'preview';
-    type AppView = 'cleaner' | 'tracker' | 'guide' | 'notes';
+    type AppView = 'cleaner' | 'tracker' | 'guide' | 'notes' | 'canvas';
     const [appState, setAppState] = useState<AppState>('idle');
     const [activeView, setActiveView] = useState<AppView>('cleaner');
 
@@ -108,7 +108,8 @@ export default function App() {
                                 { id: 'cleaner', label: 'Cleaner', icon: <LayoutDashboard className="w-4 h-4 sm:w-4 sm:h-4" /> },
                                 { id: 'tracker', label: 'Tracker', icon: <Calculator className="w-4 h-4 sm:w-4 sm:h-4" /> },
                                 { id: 'guide', label: 'Guide', icon: <BookOpen className="w-4 h-4 sm:w-4 sm:h-4" /> },
-                                { id: 'notes', label: 'Notes', icon: <MessageSquare className="w-4 h-4 sm:w-4 sm:h-4" /> }
+                                { id: 'notes', label: 'Notes', icon: <MessageSquare className="w-4 h-4 sm:w-4 sm:h-4" /> },
+                                { id: 'canvas', label: 'Canva', icon: <Palette className="w-4 h-4 sm:w-4 sm:h-4" /> }
                             ] as const).map(({ id, label, icon }) => (
                                 <button
                                     key={id}
@@ -159,7 +160,12 @@ export default function App() {
                                         )}
                                         {activeView === 'notes' && (
                                             <motion.div key="notes" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} transition={{ duration: 0.2 }}>
-                                                <ProjectNotes />
+                                                <ProjectNotes mode="text" />
+                                            </motion.div>
+                                        )}
+                                        {activeView === 'canvas' && (
+                                            <motion.div key="canvas" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} transition={{ duration: 0.2 }}>
+                                                <ProjectNotes mode="canvas" />
                                             </motion.div>
                                         )}
                                     </AnimatePresence>

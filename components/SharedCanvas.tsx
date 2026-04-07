@@ -1,5 +1,5 @@
 import React, { useRef, useState, useEffect } from 'react';
-import { Eraser } from 'lucide-react';
+import { Eraser, Maximize, Minimize, Hand } from 'lucide-react';
 
 interface SharedCanvasProps {
     canvasData: string | undefined;
@@ -13,6 +13,8 @@ export function SharedCanvas({ canvasData, onSave, disabled }: SharedCanvasProps
     const [color, setColor] = useState('#ffffff');
     const [brushSize, setBrushSize] = useState(3);
     const [isEraser, setIsEraser] = useState(false);
+    const [isPanning, setIsPanning] = useState(false);
+    const [isFullscreen, setIsFullscreen] = useState(false);
 
     const colors = ['#ffffff', '#ef4444', '#3b82f6', '#ec4899', '#10b981', '#f59e0b'];
 
@@ -27,7 +29,7 @@ export function SharedCanvas({ canvasData, onSave, disabled }: SharedCanvasProps
             const img = new Image();
             img.onload = () => {
                 ctx.clearRect(0, 0, canvas.width, canvas.height);
-                ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+                ctx.drawImage(img, 0, 0, img.width, img.height);
             };
             img.src = canvasData;
         } else {
@@ -36,6 +38,7 @@ export function SharedCanvas({ canvasData, onSave, disabled }: SharedCanvasProps
     }, [canvasData]);
 
     const startDrawing = (e: React.MouseEvent<HTMLCanvasElement> | React.TouchEvent<HTMLCanvasElement>) => {
+        if (isPanning) return;
         setIsDrawing(true);
         const canvas = canvasRef.current;
         if (!canvas) return;
@@ -56,6 +59,7 @@ export function SharedCanvas({ canvasData, onSave, disabled }: SharedCanvasProps
         const x = clientX - rect.left;
         const y = clientY - rect.top;
 
+        // Since canvas display size equals internal size when style width/height match width/height attrs
         const scaleX = canvas.width / rect.width;
         const scaleY = canvas.height / rect.height;
 
@@ -77,7 +81,7 @@ export function SharedCanvas({ canvasData, onSave, disabled }: SharedCanvasProps
     };
 
     const draw = (e: React.MouseEvent<HTMLCanvasElement> | React.TouchEvent<HTMLCanvasElement>) => {
-        if (!isDrawing) return;
+        if (!isDrawing || isPanning) return;
         const canvas = canvasRef.current;
         if (!canvas) return;
         const ctx = canvas.getContext('2d');
@@ -112,32 +116,50 @@ export function SharedCanvas({ canvasData, onSave, disabled }: SharedCanvasProps
     };
 
     return (
-        <div className="flex flex-col gap-4">
-            <div className="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-thin scrollbar-thumb-zinc-700">
+        <div className={isFullscreen ? "fixed inset-0 z-50 bg-black/95 p-4 flex flex-col gap-4" : "flex flex-col gap-4"}>
+            <div className="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-thin scrollbar-thumb-zinc-700 w-full">
                 {colors.map((c) => (
                     <button
                         key={c}
-                        onClick={() => { setColor(c); setIsEraser(false); }}
-                        className={`w-8 h-8 rounded-full border-2 transition-transform ${color === c && !isEraser ? 'scale-110 border-white' : 'border-transparent scale-100'}`}
+                        onClick={() => { setColor(c); setIsEraser(false); setIsPanning(false); }}
+                        className={`w-8 h-8 rounded-full border-2 shrink-0 transition-transform ${color === c && !isEraser && !isPanning ? 'scale-110 border-white' : 'border-transparent scale-100'}`}
                         style={{ backgroundColor: c }}
                         title={c}
                     />
                 ))}
-                <div className="w-px h-6 bg-zinc-700 mx-2" />
+                <div className="w-px h-6 bg-zinc-700 mx-2 shrink-0" />
                 <button
-                    onClick={() => setIsEraser(true)}
-                    className={`min-w-8 h-8 px-2 rounded flex items-center justify-center transition-all border-2 ${isEraser ? 'bg-zinc-700 border-white scale-110' : 'bg-zinc-800 border-transparent text-zinc-400 hover:text-white'}`}
+                    onClick={() => { setIsEraser(true); setIsPanning(false); }}
+                    className={`min-w-8 h-8 px-2 shrink-0 rounded flex items-center justify-center transition-all border-2 ${isEraser ? 'bg-zinc-700 border-white scale-110' : 'bg-zinc-800 border-transparent text-zinc-400 hover:text-white'}`}
                     title="Eraser"
                 >
                     <Eraser className="w-4 h-4" />
                 </button>
+                <div className="w-px h-6 bg-zinc-700 mx-2 shrink-0" />
+                <button
+                    onClick={() => { setIsPanning(true); setIsEraser(false); }}
+                    className={`min-w-8 h-8 px-2 shrink-0 rounded flex items-center justify-center transition-all border-2 ${isPanning ? 'bg-zinc-700 border-white scale-110' : 'bg-zinc-800 border-transparent text-zinc-400 hover:text-white'}`}
+                    title="Pan / Swipe Tool"
+                >
+                    <Hand className="w-4 h-4" />
+                </button>
+                <div className="w-px h-6 bg-zinc-700 mx-2 shrink-0" />
+                <button
+                    onClick={() => setIsFullscreen(!isFullscreen)}
+                    className="min-w-8 h-8 px-2 shrink-0 rounded bg-zinc-800 text-zinc-400 hover:text-white flex items-center justify-center transition-all"
+                    title={isFullscreen ? "Exit Fullscreen" : "Fullscreen"}
+                >
+                    {isFullscreen ? <Minimize className="w-4 h-4" /> : <Maximize className="w-4 h-4" />}
+                </button>
             </div>
-            <div className="relative w-full h-[500px] bg-zinc-950/50 rounded-xl border border-zinc-800/50 overflow-hidden cursor-crosshair">
+            
+            <div className={`relative w-full ${isFullscreen ? 'flex-1' : 'h-[500px]'} bg-zinc-950/50 rounded-xl border border-zinc-800/50 overflow-auto`}>
                 <canvas
                     ref={canvasRef}
-                    width={800} // internal resolution
-                    height={500}
-                    className="w-full h-full block touch-none"
+                    width={2000} // Expand significantly for scrollability
+                    height={2000}
+                    className={`block ${!isPanning ? 'touch-none cursor-crosshair' : 'cursor-grab active:cursor-grabbing'}`}
+                    style={{ minWidth: '2000px', minHeight: '2000px' }}
                     onMouseDown={startDrawing}
                     onMouseUp={stopDrawing}
                     onMouseOut={stopDrawing}

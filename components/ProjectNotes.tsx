@@ -10,10 +10,9 @@ const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBh
 
 const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-export function ProjectNotes() {
+export function ProjectNotes({ mode = 'text' }: { mode?: 'text' | 'canvas' }) {
     const [pages, setPages] = useState<Record<string, string>>({ "1": "" });
     const [activePage, setActivePage] = useState<string>("1");
-    const [viewMode, setViewMode] = useState<'text' | 'canvas'>('text');
     
     const [isLoading, setIsLoading] = useState(true);
     const [isSaving, setIsSaving] = useState(false);
@@ -220,7 +219,7 @@ export function ProjectNotes() {
                         const timeString = new Date().toLocaleString('en-US', { timeZone: 'Asia/Yangon', dateStyle: 'medium', timeStyle: 'short' });
                         
                         const textContent = payloadData[activePage] || "Blank";
-                        const msg = `📝 Scratch Pad Updated (Page ${activePage})\n🕒 ${timeString}\n\n${textContent.slice(0, 500)}${textContent.length > 500 ? '...' : ''}`;
+                        const msg = `📝 Doodle Canva Updated (Page ${activePage})\n🕒 ${timeString}\n\n${textContent.slice(0, 500)}${textContent.length > 500 ? '...' : ''}`;
                         
                         for (const chatId of CHAT_IDS) {
                             try {
@@ -261,7 +260,7 @@ export function ProjectNotes() {
                 <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
                     <div>
                         <h2 className="text-2xl font-bold bg-clip-text text-transparent bg-linear-to-r from-teal-400 to-emerald-400 flex items-center gap-3">
-                            Scratch Pad
+                            {mode === 'text' ? 'Notes' : 'Doodle Canva'}
                             {remoteTyping && (
                                 <motion.span 
                                     initial={{ opacity: 0, scale: 0.8 }}
@@ -325,20 +324,6 @@ export function ProjectNotes() {
                     </div>
                     
                     <div className="flex flex-col sm:flex-row items-end sm:items-center gap-3">
-                        <div className="flex bg-zinc-800/50 p-1 rounded-lg border border-zinc-700/50">
-                            <button
-                                onClick={() => setViewMode('text')}
-                                className={`px-3 py-1.5 rounded-md text-sm font-medium flex items-center gap-2 transition-all ${viewMode === 'text' ? 'bg-zinc-700 text-white shadow-sm' : 'text-zinc-400 hover:text-zinc-200'}`}
-                            >
-                                <Type className="w-4 h-4" /> Text
-                            </button>
-                            <button
-                                onClick={() => setViewMode('canvas')}
-                                className={`px-3 py-1.5 rounded-md text-sm font-medium flex items-center gap-2 transition-all ${viewMode === 'canvas' ? 'bg-zinc-700 text-white shadow-sm' : 'text-zinc-400 hover:text-zinc-200'}`}
-                            >
-                                <Palette className="w-4 h-4" /> Doodle
-                            </button>
-                        </div>
                         
                         <div className="flex items-center gap-2">
                             {isAdmin && (
@@ -370,7 +355,7 @@ export function ProjectNotes() {
                                 </div>
                             )}
                             
-                            {viewMode === 'text' && (
+                            {mode === 'text' && (
                                 <button
                                     onClick={() => handleSave()}
                                     disabled={isSaving || isLoading}
@@ -389,7 +374,7 @@ export function ProjectNotes() {
                 </div>
 
                 <div className="relative">
-                    {viewMode === 'text' ? (
+                    {mode === 'text' ? (
                         <textarea
                             value={pages[activePage] || ""}
                             onChange={(e) => {
@@ -409,7 +394,7 @@ export function ProjectNotes() {
                     )}
 
                     <AnimatePresence>
-                        {saveStatus === 'success' && viewMode === 'text' && (
+                        {saveStatus === 'success' && mode === 'text' && (
                             <motion.div
                                 initial={{ opacity: 0, y: 10 }}
                                 animate={{ opacity: 1, y: 0 }}
