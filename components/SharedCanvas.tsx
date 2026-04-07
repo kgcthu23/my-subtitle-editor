@@ -5,9 +5,10 @@ interface SharedCanvasProps {
     canvasData: string | undefined;
     onSave: (dataUrl: string) => void;
     disabled?: boolean;
+    fillParent?: boolean;
 }
 
-export function SharedCanvas({ canvasData, onSave, disabled }: SharedCanvasProps) {
+export function SharedCanvas({ canvasData, onSave, disabled, fillParent }: SharedCanvasProps) {
     const canvasRef = useRef<HTMLCanvasElement>(null);
     const [isDrawing, setIsDrawing] = useState(false);
     const [color, setColor] = useState('#ffffff');
@@ -116,7 +117,7 @@ export function SharedCanvas({ canvasData, onSave, disabled }: SharedCanvasProps
     };
 
     return (
-        <div className={isFullscreen ? "fixed inset-0 z-50 bg-black/95 p-4 flex flex-col gap-4" : "flex flex-col gap-4"}>
+        <div className={isFullscreen || fillParent ? "flex-1 flex flex-col min-h-0 w-full" : "flex flex-col gap-4"}>
             <div className="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-thin scrollbar-thumb-zinc-700 w-full">
                 {colors.map((c) => (
                     <button
@@ -146,14 +147,14 @@ export function SharedCanvas({ canvasData, onSave, disabled }: SharedCanvasProps
                 <div className="w-px h-6 bg-zinc-700 mx-2 shrink-0" />
                 <button
                     onClick={() => setIsFullscreen(!isFullscreen)}
-                    className="min-w-8 h-8 px-2 shrink-0 rounded bg-zinc-800 text-zinc-400 hover:text-white flex items-center justify-center transition-all"
+                    className={`min-w-8 h-8 px-2 shrink-0 rounded text-zinc-400 flex items-center justify-center transition-all ${fillParent ? 'hidden' : 'bg-zinc-800 hover:text-white'}`}
                     title={isFullscreen ? "Exit Fullscreen" : "Fullscreen"}
                 >
                     {isFullscreen ? <Minimize className="w-4 h-4" /> : <Maximize className="w-4 h-4" />}
                 </button>
             </div>
             
-            <div className={`relative w-full ${isFullscreen ? 'flex-1' : 'h-[500px]'} bg-zinc-950/50 rounded-xl border border-zinc-800/50 overflow-auto`}>
+            <div className={`relative w-full ${isFullscreen || fillParent ? 'flex-1 min-h-0 h-full' : 'h-[500px]'} bg-zinc-950/50 rounded-xl border border-zinc-800/50 overflow-auto`}>
                 <canvas
                     ref={canvasRef}
                     width={2000} // Expand significantly for scrollability

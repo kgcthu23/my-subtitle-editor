@@ -5,7 +5,7 @@ import type { ChangeSummary, ForeignLanguageReport, IncomeData, IncomeEntry, Det
 import {
     UploadCloud, Download, AlertTriangle,
     LayoutDashboard, Calculator, BookOpen, Sparkles,
-    ArrowRight, CheckCircle2, Trash2, Link as LinkIcon, Info, MessageSquare, Copy, Palette
+    ArrowRight, CheckCircle2, Trash2, Link as LinkIcon, Info, MessageSquare, Copy, Palette, ArrowLeft
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { clsx, type ClassValue } from 'clsx';
@@ -94,8 +94,24 @@ export default function App() {
             <div className="fixed top-[-10%] left-[-10%] w-[40%] h-[40%] rounded-full bg-indigo-500/10 blur-[120px] pointer-events-none animate-blob"></div>
             <div className="fixed bottom-[-10%] right-[-10%] w-[40%] h-[40%] rounded-full bg-purple-500/10 blur-[120px] pointer-events-none animate-blob animation-delay-2000"></div>
 
-            <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 min-h-screen flex flex-col">
-                <header className="mb-12">
+            {activeView === 'canvas' ? (
+                <div className="absolute inset-0 z-50 bg-[#09090b] flex flex-col p-4 pt-16 sm:p-6 sm:pt-20">
+                    <button 
+                        onClick={() => setActiveView('cleaner')} 
+                        className="fixed top-4 left-4 z-[60] p-3 sm:p-2 bg-zinc-900/80 backdrop-blur border border-zinc-800 text-zinc-300 hover:text-white hover:bg-zinc-800 rounded-full shadow-xl transition-all flex items-center justify-center group"
+                        title="Back to App"
+                    >
+                        <ArrowLeft className="w-6 h-6 sm:w-5 sm:h-5 group-hover:-translate-x-1 transition-transform" />
+                    </button>
+                    <div className="flex-1 w-full h-full min-h-0 relative z-10 max-w-7xl mx-auto flex flex-col">
+                        <Suspense fallback={<div className="flex justify-center items-center py-20 w-full h-full"><div className="w-8 h-8 rounded-full border-4 border-emerald-500/20 border-t-emerald-500 animate-spin"></div></div>}>
+                            <ProjectNotes mode="canvas" fillParent={true} />
+                        </Suspense>
+                    </div>
+                </div>
+            ) : (
+                <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 min-h-screen flex flex-col">
+                    <header className="mb-12">
                     <div className="flex flex-col items-center text-center">
                         <h1 className="text-4xl sm:text-5xl font-black tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-indigo-400 via-purple-400 to-pink-400 pb-2">
                             Translator's Toolkit
@@ -163,11 +179,6 @@ export default function App() {
                                                 <ProjectNotes mode="text" />
                                             </motion.div>
                                         )}
-                                        {activeView === 'canvas' && (
-                                            <motion.div key="canvas" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} transition={{ duration: 0.2 }}>
-                                                <ProjectNotes mode="canvas" />
-                                            </motion.div>
-                                        )}
                                     </AnimatePresence>
                                 </Suspense>
                             </main>
@@ -185,6 +196,7 @@ export default function App() {
                     </p>
                 </footer>
             </div>
+            )}
 
             {/* Temporarily removed from UI
             <Suspense fallback={null}>

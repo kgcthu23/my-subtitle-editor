@@ -10,7 +10,7 @@ const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBh
 
 const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-export function ProjectNotes({ mode = 'text' }: { mode?: 'text' | 'canvas' }) {
+export function ProjectNotes({ mode = 'text', fillParent = false }: { mode?: 'text' | 'canvas', fillParent?: boolean }) {
     const [pages, setPages] = useState<Record<string, string>>({ "1": "" });
     const [activePage, setActivePage] = useState<string>("1");
     
@@ -255,8 +255,8 @@ export function ProjectNotes({ mode = 'text' }: { mode?: 'text' | 'canvas' }) {
     };
 
     return (
-        <div className="max-w-4xl mx-auto space-y-6 animate-fade-in relative z-10 w-full px-4 sm:px-0">
-            <div className="bg-zinc-900/40 backdrop-blur-xl p-4 sm:p-8 rounded-2xl shadow-xl border border-zinc-800/50">
+        <div className={fillParent ? "flex-1 flex flex-col relative z-10 w-full min-h-0 animate-fade-in" : "max-w-4xl mx-auto space-y-6 animate-fade-in relative z-10 w-full px-4 sm:px-0"}>
+            <div className={fillParent ? "flex-1 flex flex-col min-h-0 bg-zinc-900/40 backdrop-blur-xl p-4 sm:p-6 rounded-2xl shadow-xl border border-zinc-800/50" : "bg-zinc-900/40 backdrop-blur-xl p-4 sm:p-8 rounded-2xl shadow-xl border border-zinc-800/50"}>
                 <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
                     <div>
                         <h2 className="text-2xl font-bold bg-clip-text text-transparent bg-linear-to-r from-teal-400 to-emerald-400 flex items-center gap-3">
@@ -373,7 +373,7 @@ export function ProjectNotes({ mode = 'text' }: { mode?: 'text' | 'canvas' }) {
                     </div>
                 </div>
 
-                <div className="relative">
+                <div className={fillParent ? "flex-1 min-h-0 relative flex flex-col" : "relative"}>
                     {mode === 'text' ? (
                         <textarea
                             value={pages[activePage] || ""}
@@ -390,6 +390,7 @@ export function ProjectNotes({ mode = 'text' }: { mode?: 'text' | 'canvas' }) {
                              canvasData={pages[`canvas_${activePage}`]} 
                              onSave={handleCanvasSave} 
                              disabled={isLoading || isSaving}
+                             fillParent={fillParent}
                         />
                     )}
 
