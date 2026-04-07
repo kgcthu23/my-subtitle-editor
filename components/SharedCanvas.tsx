@@ -119,6 +119,14 @@ export function SharedCanvas({ canvasData, onSave, disabled, fillParent }: Share
     return (
         <div className={isFullscreen || fillParent ? "flex-1 flex flex-col min-h-0 w-full" : "flex flex-col gap-4"}>
             <div className="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-thin scrollbar-thumb-zinc-700 w-full">
+                <button
+                    onClick={() => { setIsPanning(true); setIsEraser(false); }}
+                    className={`min-w-8 h-8 px-2 shrink-0 rounded flex items-center justify-center transition-all border-2 ${isPanning ? 'bg-zinc-700 border-white scale-110' : 'bg-zinc-800 border-transparent text-zinc-400 hover:text-white'}`}
+                    title="Pan / Swipe Tool"
+                >
+                    <Hand className="w-4 h-4" />
+                </button>
+                <div className="w-px h-6 bg-zinc-700 mx-2 shrink-0" />
                 {colors.map((c) => (
                     <button
                         key={c}
@@ -137,14 +145,7 @@ export function SharedCanvas({ canvasData, onSave, disabled, fillParent }: Share
                     <Eraser className="w-4 h-4" />
                 </button>
                 <div className="w-px h-6 bg-zinc-700 mx-2 shrink-0" />
-                <button
-                    onClick={() => { setIsPanning(true); setIsEraser(false); }}
-                    className={`min-w-8 h-8 px-2 shrink-0 rounded flex items-center justify-center transition-all border-2 ${isPanning ? 'bg-zinc-700 border-white scale-110' : 'bg-zinc-800 border-transparent text-zinc-400 hover:text-white'}`}
-                    title="Pan / Swipe Tool"
-                >
-                    <Hand className="w-4 h-4" />
-                </button>
-                <div className="w-px h-6 bg-zinc-700 mx-2 shrink-0" />
+
                 <button
                     onClick={() => setIsFullscreen(!isFullscreen)}
                     className={`min-w-8 h-8 px-2 shrink-0 rounded text-zinc-400 flex items-center justify-center transition-all ${fillParent ? 'hidden' : 'bg-zinc-800 hover:text-white'}`}
