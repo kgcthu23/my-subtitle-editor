@@ -24,6 +24,7 @@ export function ProjectNotes({ mode = 'text', fillParent = false }: { mode?: 'te
     const [remoteTyping, setRemoteTyping] = useState(false);
     const typingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
     const broadcastChannel = useRef<ReturnType<typeof supabase.channel> | null>(null);
+    const lastDbStateRef = useRef<Record<string, string>>({ "1": "" });
 
     useEffect(() => {
         const checkAuth = () => setIsAdmin(sessionStorage.getItem('isAdmin') === 'true');
@@ -112,6 +113,7 @@ export function ProjectNotes({ mode = 'text', fillParent = false }: { mode?: 'te
                     const parsed = JSON.parse(data[0].content);
                     if (typeof parsed === 'object' && parsed !== null) {
                         setPages(parsed);
+                        lastDbStateRef.current = parsed;
                         if (isInitialLoad) {
                             if (mode === 'canvas') {
                                 setActivePage('4');
@@ -156,7 +158,28 @@ export function ProjectNotes({ mode = 'text', fillParent = false }: { mode?: 'te
                     try {
                         const parsed = JSON.parse(newRecord.content);
                         if (typeof parsed === 'object' && parsed !== null) {
-                            setPages(parsed);
+                            setPages(prev => {
+                                const merged = { ...parsed };
+                                for (const key of Object.keys(prev)) {
+                                    if (prev[key] !== lastDbStateRef.current[key]) {
+                                        // We have local un-saved changes!
+                                        if (parsed[key] !== lastDbStateRef.current[key] && !key.startsWith('canvas_') && !key.startsWith('photo_')) {
+                                            // Both changed text! Concatenate safely.
+                                            // Avoid duplicating if parsed[key] already includes our text or vice versa.
+                                            if (typeof parsed[key] === 'string' && typeof prev[key] === 'string') {
+                                                merged[key] = parsed[key].includes(prev[key]) ? parsed[key] : parsed[key] + "\n\n" + prev[key];
+                                            } else {
+                                                merged[key] = prev[key];
+                                            }
+                                        } else {
+                                            // Keep our un-saved change
+                                            merged[key] = prev[key];
+                                        }
+                                    }
+                                }
+                                return merged;
+                            });
+                            lastDbStateRef.current = parsed;
                             setLastFetch(new Date());
                         }
                     } catch (e) {
@@ -221,7 +244,21 @@ export function ProjectNotes({ mode = 'text', fillParent = false }: { mode?: 'te
                 if (data && data.length > 0) {
                     const parsed = JSON.parse(data[0].content);
                     if (typeof parsed === 'object' && parsed !== null) {
-                        payloadData = { ...parsed, ...payloadData };
+                        const merged = { ...parsed };
+                        for (const key of Object.keys(payloadData)) {
+                            // If local payload differs from our last known DB state, it's a local edit
+                            if (payloadData[key] !== lastDbStateRef.current[key]) {
+                                merged[key] = payloadData[key];
+                            }
+                        }
+                        // Handle deleted pages
+                        for (const key of Object.keys(lastDbStateRef.current)) {
+                             if (!(key in payloadData) && (key in parsed) && parsed[key] === lastDbStateRef.current[key]) {
+                                 // We deleted it locally, and it hasn't changed remotely: so delete it from merged
+                                 delete merged[key];
+                             }
+                        }
+                        payloadData = merged;
                     }
                 }
             } catch (e) {}
@@ -254,6 +291,7 @@ export function ProjectNotes({ mode = 'text', fillParent = false }: { mode?: 'te
                 }
 
                 setSaveStatus('success');
+                lastDbStateRef.current = payloadData;
                 setLastFetch(new Date());
                 setTimeout(() => setSaveStatus('idle'), 3000);
             } else {
