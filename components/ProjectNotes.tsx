@@ -102,6 +102,11 @@ export function ProjectNotes({ mode = 'text', fillParent = false }: { mode?: 'te
                 .order('created_at', { ascending: false })
                 .limit(1);
 
+            if (error) {
+                console.error('Database error fetching notes:', error);
+                throw error;
+            }
+
             if (data && data.length > 0) {
                 try {
                     const parsed = JSON.parse(data[0].content);
@@ -206,10 +211,21 @@ export function ProjectNotes({ mode = 'text', fillParent = false }: { mode?: 'te
     };
 
     const handleSave = async (updatedPages?: Record<string, string>, isCanvasUpdate: boolean = false) => {
-        const payloadData = updatedPages || pages;
+        let payloadData = updatedPages || pages;
         setIsSaving(true);
         setSaveStatus('idle');
         try {
+            // Pre-fetch latest to avoid wiping other tabs/data on concurrent edit or partial local state
+            try {
+                const { data } = await supabase.from('project_notes').select('content').order('created_at', { ascending: false }).limit(1);
+                if (data && data.length > 0) {
+                    const parsed = JSON.parse(data[0].content);
+                    if (typeof parsed === 'object' && parsed !== null) {
+                        payloadData = { ...parsed, ...payloadData };
+                    }
+                }
+            } catch (e) {}
+
             const { error } = await supabase
                 .from('project_notes')
                 .insert([{ content: JSON.stringify(payloadData) }]);
