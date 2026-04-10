@@ -19,6 +19,8 @@ export function ProjectNotes({ mode = 'text', fillParent = false }: { mode?: 'te
     const [saveStatus, setSaveStatus] = useState<'idle' | 'success' | 'error'>('idle');
     const [lastFetch, setLastFetch] = useState<Date | null>(null);
     const [isAdmin, setIsAdmin] = useState(false);
+    const [storyIndex, setStoryIndex] = useState<number | null>(null);
+    const [expiryHours, setExpiryHours] = useState<number | null>(24);
     
     // Typing indicator state
     const [remoteTyping, setRemoteTyping] = useState(false);
@@ -33,8 +35,29 @@ export function ProjectNotes({ mode = 'text', fillParent = false }: { mode?: 'te
         return () => window.removeEventListener('adminAuthChanged', checkAuth);
     }, []);
 
-    const activePages = Object.keys(pages).filter(k => !k.startsWith('archived_') && !k.startsWith('canvas_') && !k.startsWith('photo_')).sort((a, b) => Number(a) - Number(b));
+    const activePages = Object.keys(pages).filter(k => !k.startsWith('archived_') && !k.startsWith('canvas_') && !k.startsWith('photo_') && !k.startsWith('caption_') && !k.startsWith('expiry_')).sort((a, b) => Number(a) - Number(b));
     const archivedPages = Object.keys(pages).filter(k => k.startsWith('archived_')).sort((a, b) => Number(a.replace('archived_','')) - Number(b.replace('archived_','')));
+
+    const sortedStoryPhotos = Object.keys(pages)
+        .filter(k => k.startsWith('photo_'))
+        .filter(k => {
+            const expiry = pages[`expiry_${k}`];
+            if (expiry && Date.now() > Number(expiry)) return false;
+            return true;
+        })
+        .sort((a,b) => a.localeCompare(b));
+
+    useEffect(() => {
+        if (storyIndex === null) return;
+        const timer = setTimeout(() => {
+            if (storyIndex < sortedStoryPhotos.length - 1) {
+                setStoryIndex(storyIndex + 1);
+            } else {
+                setStoryIndex(null);
+            }
+        }, 5000);
+        return () => clearTimeout(timer);
+    }, [storyIndex, sortedStoryPhotos.length]);
 
     const handleArchive = () => {
         setPages(prev => {
@@ -55,7 +78,7 @@ export function ProjectNotes({ mode = 'text', fillParent = false }: { mode?: 'te
     const handleUnarchive = () => {
         const originalId = activePage.replace('archived_', '');
         let newId = originalId;
-        const keys = Object.keys(pages).filter(k => !k.startsWith('archived_') && !k.startsWith('canvas_') && !k.startsWith('photo_')).map(Number);
+        const keys = Object.keys(pages).filter(k => !k.startsWith('archived_') && !k.startsWith('canvas_') && !k.startsWith('photo_') && !k.startsWith('caption_') && !k.startsWith('expiry_')).map(Number);
         if (pages[newId] !== undefined) {
             newId = String(keys.length > 0 ? Math.max(...keys) + 1 : 1);
         }
@@ -79,7 +102,7 @@ export function ProjectNotes({ mode = 'text', fillParent = false }: { mode?: 'te
             delete nextPages[activePage];
             delete nextPages[`canvas_${activePage}`]; // delete doodle too
             
-            const remainingActive = Object.keys(nextPages).filter(k => !k.startsWith('archived_') && !k.startsWith('canvas_') && !k.startsWith('photo_')).sort((a,b) => Number(a) - Number(b));
+            const remainingActive = Object.keys(nextPages).filter(k => !k.startsWith('archived_') && !k.startsWith('canvas_') && !k.startsWith('photo_') && !k.startsWith('caption_') && !k.startsWith('expiry_')).sort((a,b) => Number(a) - Number(b));
             const remainingArchived = Object.keys(nextPages).filter(k => k.startsWith('archived_'));
             
             if (remainingActive.length === 0 && remainingArchived.length === 0) {
@@ -118,7 +141,7 @@ export function ProjectNotes({ mode = 'text', fillParent = false }: { mode?: 'te
                             if (mode === 'canvas') {
                                 setActivePage('4');
                             } else {
-                                const activeKeys = Object.keys(parsed).filter(k => !k.startsWith('archived_') && !k.startsWith('canvas_') && !k.startsWith('photo_')).sort((a, b) => Number(a) - Number(b));
+                                const activeKeys = Object.keys(parsed).filter(k => !k.startsWith('archived_') && !k.startsWith('canvas_') && !k.startsWith('photo_') && !k.startsWith('caption_') && !k.startsWith('expiry_')).sort((a, b) => Number(a) - Number(b));
                                 if (activeKeys.length > 0) {
                                     setActivePage(activeKeys[activeKeys.length - 1]);
                                 }
@@ -163,7 +186,7 @@ export function ProjectNotes({ mode = 'text', fillParent = false }: { mode?: 'te
                                 for (const key of Object.keys(prev)) {
                                     if (prev[key] !== lastDbStateRef.current[key]) {
                                         // We have local un-saved changes!
-                                        if (parsed[key] !== lastDbStateRef.current[key] && !key.startsWith('canvas_') && !key.startsWith('photo_')) {
+                                        if (parsed[key] !== lastDbStateRef.current[key] && !key.startsWith('canvas_') && !key.startsWith('photo_') && !key.startsWith('caption_')) {
                                             // Both changed text! Concatenate safely.
                                             // Avoid duplicating if parsed[key] already includes our text or vice versa.
                                             if (typeof parsed[key] === 'string' && typeof prev[key] === 'string') {
@@ -322,6 +345,9 @@ export function ProjectNotes({ mode = 'text', fillParent = false }: { mode?: 'te
             if (dataUrl) {
                 const photoKey = `photo_${activePage}_${Date.now()}`;
                 const updatedPages = { ...pages, [photoKey]: dataUrl };
+                if (expiryHours !== null) {
+                    updatedPages[`expiry_${photoKey}`] = String(Date.now() + expiryHours * 3600 * 1000);
+                }
                 setPages(updatedPages);
                 handleSave(updatedPages, true);
             }
@@ -333,6 +359,8 @@ export function ProjectNotes({ mode = 'text', fillParent = false }: { mode?: 'te
         if (window.confirm("Delete this photo?")) {
             const updatedPages = { ...pages };
             delete updatedPages[photoKey];
+            delete updatedPages[`caption_${photoKey}`];
+            delete updatedPages[`expiry_${photoKey}`];
             setPages(updatedPages);
             handleSave(updatedPages, true);
         }
@@ -462,40 +490,79 @@ export function ProjectNotes({ mode = 'text', fillParent = false }: { mode?: 'te
                 <div className={mode === 'canvas' ? "flex-1 min-h-0 w-full h-full relative" : (fillParent ? "flex-1 min-h-0 relative flex flex-col" : "relative")}>
                     {mode === 'gallery' ? (
                         <div className="flex flex-col h-full md:h-[600px] bg-zinc-950/40 rounded-xl border border-zinc-800/50 p-6 shadow-inner">
-                            <div className="flex justify-between items-center mb-6">
+                            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
                                 <h3 className="text-xl font-bold bg-clip-text text-transparent bg-linear-to-r from-teal-400 to-emerald-400">Photo Gallery</h3>
-                                <label className="px-4 py-2 cursor-pointer text-sm font-semibold text-white bg-emerald-600 hover:bg-emerald-500 rounded-lg shadow-lg shadow-emerald-500/20 flex items-center gap-2 transition-all">
-                                    <UploadCloud className="w-4 h-4" />
-                                    Upload Photo
-                                    <input type="file" accept="image/*" className="hidden" onChange={handlePhotoUpload} />
-                                </label>
+                                <div className="flex items-center gap-2 w-full sm:w-auto">
+                                    <select 
+                                        value={expiryHours || ''}
+                                        onChange={(e) => setExpiryHours(e.target.value ? Number(e.target.value) : null)}
+                                        className="bg-zinc-800 text-zinc-300 text-sm rounded-lg px-2 py-2 border border-zinc-700 outline-none hover:bg-zinc-700 transition w-1/3 sm:w-auto"
+                                        title="Auto-delete after"
+                                    >
+                                        <option value="1">1 Hour</option>
+                                        <option value="12">12 Hours</option>
+                                        <option value="24">24 Hours</option>
+                                        <option value="">Never</option>
+                                    </select>
+                                    <label className="flex-1 sm:flex-none justify-center px-4 py-2 cursor-pointer text-sm font-semibold text-white bg-emerald-600 hover:bg-emerald-500 rounded-lg shadow-lg shadow-emerald-500/20 flex items-center gap-2 transition-all whitespace-nowrap">
+                                        <UploadCloud className="w-4 h-4" />
+                                        Upload Photo
+                                        <input type="file" accept="image/*" className="hidden" onChange={handlePhotoUpload} />
+                                    </label>
+                                </div>
                             </div>
-                            {Object.keys(pages).filter(k => k.startsWith('photo_')).length === 0 ? (
+                            {sortedStoryPhotos.length === 0 ? (
                                 <div className="flex-1 flex flex-col items-center justify-center text-zinc-500 gap-4">
                                     <ImageIcon className="w-12 h-12 opacity-50" />
                                     <p>No photos uploaded yet.</p>
                                 </div>
                             ) : (
                                 <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4 overflow-y-auto custom-scrollbar pr-2 pb-4">
-                                    {Object.keys(pages)
-                                        .filter(k => k.startsWith('photo_'))
-                                        .sort((a,b) => b.localeCompare(a))
-                                        .map(photoKey => (
-                                            <div key={photoKey} className="relative group rounded-xl overflow-hidden aspect-square border border-zinc-700/50 bg-zinc-900 shadow-lg">
-                                                <img src={pages[photoKey]} alt="Gallery Item" className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" />
-                                                <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col items-center justify-center gap-3 backdrop-blur-sm">
-                                                    <a href={pages[photoKey]} target="_blank" rel="noreferrer" className="px-4 py-2 bg-emerald-500/90 hover:bg-emerald-500 text-white text-sm font-bold rounded-full transition-all shadow-xl hover:scale-105">
-                                                        View Full
-                                                    </a>
+                                    {[...sortedStoryPhotos].reverse().map(photoKey => {
+                                        const captionKey = `caption_${photoKey}`;
+                                        return (
+                                        <div key={photoKey} className="flex flex-col rounded-xl overflow-hidden border border-zinc-700/50 bg-zinc-900 shadow-lg">
+                                            <div 
+                                                className="relative group aspect-square cursor-pointer overflow-hidden" 
+                                                onClick={() => setStoryIndex(sortedStoryPhotos.indexOf(photoKey))}
+                                            >
+                                                    <img src={pages[photoKey]} alt="Gallery Item" className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" />
+                                                    
+                                                    <div className="absolute inset-0 bg-black/30 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center pointer-events-none">
+                                                        <div className="bg-white/20 backdrop-blur-md px-4 py-2 rounded-full text-white text-sm font-bold shadow-lg">
+                                                            View Full
+                                                        </div>
+                                                    </div>
+
                                                     <button 
-                                                        onClick={() => handleDeletePhoto(photoKey)}
-                                                        className="px-4 py-2 bg-red-500/90 hover:bg-red-500 text-white text-sm font-bold rounded-full transition-all shadow-xl hover:scale-105"
+                                                        onClick={(e) => { e.stopPropagation(); handleDeletePhoto(photoKey); }}
+                                                        className="absolute top-2 right-2 p-2 bg-red-500/90 hover:bg-red-500 text-white rounded-full transition-all shadow-xl opacity-100 sm:opacity-0 sm:group-hover:opacity-100 z-10"
+                                                        title="Delete Photo"
                                                     >
-                                                        Delete
+                                                        <Trash2 className="w-4 h-4" />
                                                     </button>
                                                 </div>
+                                                <div className="p-2 bg-zinc-950">
+                                                    <input
+                                                        type="text"
+                                                        placeholder="Add caption..."
+                                                        value={pages[captionKey] || ''}
+                                                        onChange={(e) => {
+                                                            setPages(prev => ({ ...prev, [captionKey]: e.target.value }));
+                                                        }}
+                                                        onBlur={(e) => {
+                                                            const updatedPages = { ...pages, [captionKey]: e.target.value };
+                                                            handleSave(updatedPages, true);
+                                                        }}
+                                                        onKeyDown={(e) => {
+                                                            if (e.key === 'Enter') e.currentTarget.blur();
+                                                        }}
+                                                        className="w-full bg-zinc-900 border border-zinc-800 rounded px-2 py-1.5 text-xs text-zinc-300 focus:outline-none focus:border-emerald-500/50 transition-colors"
+                                                    />
+                                                </div>
                                             </div>
-                                        ))}
+                                            );
+                                        })}
                                 </div>
                             )}
                         </div>
@@ -549,6 +616,88 @@ export function ProjectNotes({ mode = 'text', fillParent = false }: { mode?: 'te
                     </AnimatePresence>
                 </div>
             </div>
+
+            <AnimatePresence>
+                {storyIndex !== null && sortedStoryPhotos[storyIndex] && (
+                    <motion.div 
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        className="fixed inset-0 z-200 flex flex-col bg-black/95 backdrop-blur-xl touch-none select-none"
+                    >
+                        {/* Progress Bars */}
+                        <div className="absolute top-0 left-0 right-0 p-4 pt-6 z-220 flex gap-1 pointer-events-none">
+                            {sortedStoryPhotos.map((key, i) => (
+                                <div key={key} className="h-1 flex-1 bg-white/30 rounded-full overflow-hidden">
+                                    <motion.div 
+                                        initial={{ width: i < storyIndex ? '100%' : '0%' }}
+                                        animate={{ width: i === storyIndex ? '100%' : i < storyIndex ? '100%' : '0%' }}
+                                        transition={{ duration: i === storyIndex ? 5 : 0, ease: "linear" }}
+                                        className="h-full bg-white rounded-full"
+                                    />
+                                </div>
+                            ))}
+                        </div>
+
+                        {/* Top Controls */}
+                        <button 
+                            className="absolute top-10 right-4 text-zinc-300 hover:text-white p-2 z-220 bg-black/50 hover:bg-black/80 rounded-full transition-colors"
+                            onClick={() => setStoryIndex(null)}
+                        >
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+                        </button>
+                        
+                        {/* Tap & Swipe Area */}
+                        <motion.div 
+                            className="absolute inset-0 z-210 flex items-center justify-center cursor-pointer"
+                            drag="y"
+                            dragConstraints={{ top: 0, bottom: 0 }}
+                            dragElastic={0.7}
+                            onDragEnd={(e, info) => {
+                                if (Math.abs(info.offset.y) > 100 || Math.abs(info.velocity.y) > 500) {
+                                    setStoryIndex(null);
+                                }
+                            }}
+                            onClick={(e) => {
+                                const clickX = e.clientX;
+                                const width = window.innerWidth;
+                                if (clickX < width * 0.3) {
+                                    if (storyIndex > 0) setStoryIndex(storyIndex - 1);
+                                } else {
+                                    if (storyIndex < sortedStoryPhotos.length - 1) setStoryIndex(storyIndex + 1);
+                                    else setStoryIndex(null);
+                                }
+                            }}
+                        >
+                            <motion.img 
+                                key={sortedStoryPhotos[storyIndex]}
+                                initial={{ opacity: 0.8, scale: 0.98 }}
+                                animate={{ opacity: 1, scale: 1 }}
+                                src={pages[sortedStoryPhotos[storyIndex]]} 
+                                alt="Story View" 
+                                className="max-w-full max-h-full object-contain pointer-events-none" 
+                            />
+                        </motion.div>
+
+                        {/* Caption Overlay */}
+                        <AnimatePresence mode="wait">
+                            {pages[`caption_${sortedStoryPhotos[storyIndex]}`] && (
+                                <motion.div 
+                                    key={`cap_${storyIndex}`}
+                                    initial={{ opacity: 0, y: 10 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    exit={{ opacity: 0 }}
+                                    className="absolute bottom-0 left-0 right-0 p-8 pt-32 bg-linear-to-t from-black/90 via-black/60 to-transparent z-220 pointer-events-none"
+                                >
+                                    <p className="text-white text-center font-medium text-lg drop-shadow-md">
+                                        {pages[`caption_${sortedStoryPhotos[storyIndex]}`]}
+                                    </p>
+                                </motion.div>
+                            )}
+                        </AnimatePresence>
+                    </motion.div>
+                )}
+            </AnimatePresence>
         </div>
     );
 }

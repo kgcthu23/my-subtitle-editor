@@ -124,8 +124,8 @@ export default function App() {
                                 { id: 'cleaner', label: 'Cleaner', icon: <LayoutDashboard className="w-4 h-4 sm:w-4 sm:h-4" /> },
                                 { id: 'tracker', label: 'Tracker', icon: <Calculator className="w-4 h-4 sm:w-4 sm:h-4" /> },
                                 { id: 'guide', label: 'Guide', icon: <BookOpen className="w-4 h-4 sm:w-4 sm:h-4" /> },
-                                { id: 'notes', label: 'Notes', icon: <MessageSquare className="w-4 h-4 sm:w-4 sm:h-4" /> }
-                                // { id: 'gallery', label: 'Gallery', icon: <ImageIcon className="w-4 h-4 sm:w-4 sm:h-4" /> }
+                                { id: 'notes', label: 'Notes', icon: <MessageSquare className="w-4 h-4 sm:w-4 sm:h-4" /> },
+                                { id: 'gallery', label: 'Gallery', icon: <ImageIcon className="w-4 h-4 sm:w-4 sm:h-4" /> }
                             ] as const).map(({ id, label, icon }) => (
                                 <button
                                     key={id}
