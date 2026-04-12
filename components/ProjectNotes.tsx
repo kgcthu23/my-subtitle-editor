@@ -22,11 +22,7 @@ export function ProjectNotes({ mode = 'text', fillParent = false }: { mode?: 'te
     const [storyIndex, setStoryIndex] = useState<number | null>(null);
     const [expiryHours, setExpiryHours] = useState<number | null>(24);
     
-    const [isUnlocked, setIsUnlocked] = useState(() => {
-        if (mode !== 'text') return true;
-        return localStorage.getItem('notesUnlocked') === 'true';
-    });
-    const [pinInput, setPinInput] = useState('');
+
     
     // Typing indicator state
     const [remoteTyping, setRemoteTyping] = useState(false);
@@ -371,49 +367,6 @@ export function ProjectNotes({ mode = 'text', fillParent = false }: { mode?: 'te
             handleSave(updatedPages, true);
         }
     };
-
-    const handlePinSubmit = (e: React.FormEvent) => {
-        e.preventDefault();
-        if (pinInput === '1410') {
-            setIsUnlocked(true);
-            localStorage.setItem('notesUnlocked', 'true');
-        } else {
-            alert('Incorrect PIN');
-            setPinInput('');
-        }
-    };
-
-    if (!isUnlocked) {
-        return (
-            <div className={fillParent ? "flex-1 flex flex-col items-center justify-center relative z-10 w-full min-h-0 animate-fade-in" : "max-w-4xl mx-auto flex items-center justify-center space-y-6 animate-fade-in relative z-10 w-full px-4 sm:px-0 min-h-[60vh]"}>
-                <div className="bg-zinc-900/80 backdrop-blur-xl p-8 rounded-2xl shadow-2xl border border-zinc-800/50 w-full max-w-sm text-center">
-                    <div className="mx-auto w-16 h-16 bg-red-500/10 rounded-full flex items-center justify-center mb-6">
-                        <Lock className="w-8 h-8 text-red-500" />
-                    </div>
-                    <h2 className="text-2xl font-bold text-white mb-2">Secure Area</h2>
-                    <p className="text-zinc-400 text-sm mb-8">Enter your PIN to access your notes.</p>
-                    <form onSubmit={handlePinSubmit} className="space-y-4">
-                        <input
-                            type="password"
-                            autoFocus
-                            maxLength={4}
-                            value={pinInput}
-                            onChange={(e) => setPinInput(e.target.value.replace(/\\D/g, ''))}
-                            placeholder="••••"
-                            className="w-full bg-zinc-950 border border-zinc-800 rounded-xl px-4 py-3 text-center text-2xl tracking-widest text-zinc-100 focus:outline-none focus:border-red-500 focus:ring-1 focus:ring-red-500/50 transition-all font-mono"
-                        />
-                        <button 
-                            type="submit" 
-                            disabled={pinInput.length !== 4}
-                            className="w-full px-4 py-3 font-bold bg-red-600 hover:bg-red-500 text-white rounded-xl transition-all shadow-lg shadow-red-500/20 disabled:opacity-50 disabled:cursor-not-allowed"
-                        >
-                            Unlock Notes
-                        </button>
-                    </form>
-                </div>
-            </div>
-        );
-    }
 
     return (
         <div className={mode === 'canvas' ? "flex-1 flex flex-col relative z-10 w-full h-full animate-fade-in" : (fillParent ? "flex-1 flex flex-col relative z-10 w-full min-h-0 animate-fade-in" : "max-w-4xl mx-auto space-y-6 animate-fade-in relative z-10 w-full px-4 sm:px-0")}>

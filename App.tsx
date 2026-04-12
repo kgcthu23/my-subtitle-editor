@@ -5,7 +5,7 @@ import type { ChangeSummary, ForeignLanguageReport, IncomeData, IncomeEntry, Det
 import {
     UploadCloud, Download, AlertTriangle,
     LayoutDashboard, Calculator, BookOpen, Sparkles,
-    ArrowRight, CheckCircle2, Trash2, Link as LinkIcon, Info, MessageSquare, Copy, Palette, ArrowLeft, Image as ImageIcon
+    ArrowRight, CheckCircle2, Trash2, Link as LinkIcon, Info, MessageSquare, Copy, Palette, ArrowLeft, Image as ImageIcon, Lock
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { clsx, type ClassValue } from 'clsx';
@@ -32,6 +32,21 @@ export default function App() {
     type AppView = 'cleaner' | 'tracker' | 'guide' | 'notes' | 'canvas' | 'gallery';
     const [appState, setAppState] = useState<AppState>('idle');
     const [activeView, setActiveView] = useState<AppView>('cleaner');
+
+    const [isAppUnlocked, setIsAppUnlocked] = useState(() => localStorage.getItem('appUnlocked') === 'true');
+    const [loginUser, setLoginUser] = useState('');
+    const [loginPass, setLoginPass] = useState('');
+
+    const handleAppLogin = (e: React.FormEvent) => {
+        e.preventDefault();
+        if (loginUser === 'admin' && loginPass === '1234zzz') {
+            setIsAppUnlocked(true);
+            localStorage.setItem('appUnlocked', 'true');
+        } else {
+            alert('Incorrect Credentials');
+            setLoginPass('');
+        }
+    };
 
     const [showCanvaModal, setShowCanvaModal] = useState<boolean>(false);
     
@@ -80,6 +95,54 @@ export default function App() {
         resetCleaner();
         setAppState('idle');
     };
+
+    if (!isAppUnlocked) {
+        return (
+            <div className="min-h-screen bg-[#09090b] flex items-center justify-center p-4 relative overflow-hidden">
+                <div className="fixed top-[-10%] left-[-10%] w-[40%] h-[40%] rounded-full bg-indigo-500/10 blur-[120px] pointer-events-none animate-blob"></div>
+                <div className="fixed bottom-[-10%] right-[-10%] w-[40%] h-[40%] rounded-full bg-purple-500/10 blur-[120px] pointer-events-none animate-blob animation-delay-2000"></div>
+
+                <div className="bg-zinc-900/80 backdrop-blur-xl p-8 rounded-2xl shadow-2xl border border-zinc-800/50 w-full max-w-sm text-center relative z-10 animate-fade-in">
+                    <div className="mx-auto w-16 h-16 bg-red-500/10 rounded-full flex items-center justify-center mb-6">
+                        <Lock className="w-8 h-8 text-red-500" />
+                    </div>
+                    <h2 className="text-2xl font-bold text-white mb-2">Restricted Access</h2>
+                    <p className="text-zinc-400 text-sm mb-6">Please sign in to access the system.</p>
+                    <form onSubmit={handleAppLogin} className="space-y-4">
+                        <input
+                            type="text"
+                            autoFocus
+                            value={loginUser}
+                            onChange={(e) => setLoginUser(e.target.value)}
+                            placeholder="Username"
+                            className="w-full bg-zinc-950 border border-zinc-800 rounded-xl px-4 py-3 text-zinc-100 focus:outline-none focus:border-red-500 focus:ring-1 focus:ring-red-500/50 transition-all"
+                        />
+                        <input
+                            type="password"
+                            value={loginPass}
+                            onChange={(e) => setLoginPass(e.target.value)}
+                            placeholder="Password"
+                            className="w-full bg-zinc-950 border border-zinc-800 rounded-xl px-4 py-3 text-zinc-100 focus:outline-none focus:border-red-500 focus:ring-1 focus:ring-red-500/50 transition-all font-mono tracking-widest"
+                        />
+                        <button 
+                            type="submit" 
+                            disabled={!loginUser || !loginPass}
+                            className="w-full px-4 py-3 font-bold bg-red-600 hover:bg-red-500 text-white rounded-xl transition-all shadow-lg shadow-red-500/20 disabled:opacity-50 disabled:cursor-not-allowed"
+                        >
+                            Enter System
+                        </button>
+                    </form>
+                </div>
+                <style>{`
+                    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+                    .animate-fade-in { animation: fadeIn 0.4s ease-out forwards; }
+                    @keyframes blob { 0% { transform: translate(0px, 0px) scale(1); } 33% { transform: translate(30px, -50px) scale(1.1); } 66% { transform: translate(-20px, 20px) scale(0.9); } 100% { transform: translate(0px, 0px) scale(1); } }
+                    .animate-blob { animation: blob 7s infinite; }
+                    .animation-delay-2000 { animation-delay: 2s; }
+                `}</style>
+            </div>
+        );
+    }
 
     return (
         <div className="min-h-screen bg-[#09090b] text-zinc-100 font-sans selection:bg-indigo-500/30 selection:text-white transition-colors duration-300 relative overflow-hidden">
