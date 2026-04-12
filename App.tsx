@@ -33,7 +33,7 @@ export default function App() {
     const [appState, setAppState] = useState<AppState>('idle');
     const [activeView, setActiveView] = useState<AppView>('cleaner');
 
-    const [isAppUnlocked, setIsAppUnlocked] = useState(() => localStorage.getItem('appUnlocked') === 'true');
+    const [isAppUnlocked, setIsAppUnlocked] = useState(true);
     const [loginUser, setLoginUser] = useState('');
     const [loginPass, setLoginPass] = useState('');
 
