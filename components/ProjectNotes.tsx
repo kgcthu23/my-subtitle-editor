@@ -18,24 +18,14 @@ export function ProjectNotes({ mode = 'text', fillParent = false }: { mode?: 'te
     const [isSaving, setIsSaving] = useState(false);
     const [saveStatus, setSaveStatus] = useState<'idle' | 'success' | 'error'>('idle');
     const [lastFetch, setLastFetch] = useState<Date | null>(null);
-    const [isAdmin, setIsAdmin] = useState(false);
     const [storyIndex, setStoryIndex] = useState<number | null>(null);
     const [expiryHours, setExpiryHours] = useState<number | null>(24);
-    
-
     
     // Typing indicator state
     const [remoteTyping, setRemoteTyping] = useState(false);
     const typingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
     const broadcastChannel = useRef<ReturnType<typeof supabase.channel> | null>(null);
     const lastDbStateRef = useRef<Record<string, string>>({ "1": "" });
-
-    useEffect(() => {
-        const checkAuth = () => setIsAdmin(sessionStorage.getItem('isAdmin') === 'true');
-        checkAuth(); // Check initial state
-        window.addEventListener('adminAuthChanged', checkAuth);
-        return () => window.removeEventListener('adminAuthChanged', checkAuth);
-    }, []);
 
     const activePages = Object.keys(pages).filter(k => !k.startsWith('archived_') && !k.startsWith('canvas_') && !k.startsWith('photo_') && !k.startsWith('caption_') && !k.startsWith('expiry_')).sort((a, b) => Number(a) - Number(b));
     const archivedPages = Object.keys(pages).filter(k => k.startsWith('archived_')).sort((a, b) => Number(a.replace('archived_','')) - Number(b.replace('archived_','')));
@@ -61,63 +51,7 @@ export function ProjectNotes({ mode = 'text', fillParent = false }: { mode?: 'te
         return () => clearTimeout(timer);
     }, [storyIndex, sortedStoryPhotos.length]);
 
-    const handleArchive = () => {
-        setPages(prev => {
-            const next = { ...prev };
-            next[`archived_${activePage}`] = next[activePage];
-            delete next[activePage];
-            
-            // Move canvas too if it exists
-            if (next[`canvas_${activePage}`]) {
-                 next[`canvas_archived_${activePage}`] = next[`canvas_${activePage}`];
-                 delete next[`canvas_${activePage}`];
-            }
-            return next;
-        });
-        setActivePage(`archived_${activePage}`);
-    };
 
-    const handleUnarchive = () => {
-        const originalId = activePage.replace('archived_', '');
-        let newId = originalId;
-        const keys = Object.keys(pages).filter(k => !k.startsWith('archived_') && !k.startsWith('canvas_') && !k.startsWith('photo_') && !k.startsWith('caption_') && !k.startsWith('expiry_')).map(Number);
-        if (pages[newId] !== undefined) {
-            newId = String(keys.length > 0 ? Math.max(...keys) + 1 : 1);
-        }
-        setPages(prev => {
-            const next = { ...prev };
-            next[newId] = next[activePage];
-            delete next[activePage];
-            
-            if (next[`canvas_${activePage}`]) {
-                 next[`canvas_${newId}`] = next[`canvas_${activePage}`];
-                 delete next[`canvas_${activePage}`];
-            }
-            return next;
-        });
-        setActivePage(newId);
-    };
-
-    const handleDelete = () => {
-        if (window.confirm("Delete this page permanently? This action cannot be undone.")) {
-            const nextPages = { ...pages };
-            delete nextPages[activePage];
-            delete nextPages[`canvas_${activePage}`]; // delete doodle too
-            
-            const remainingActive = Object.keys(nextPages).filter(k => !k.startsWith('archived_') && !k.startsWith('canvas_') && !k.startsWith('photo_') && !k.startsWith('caption_') && !k.startsWith('expiry_')).sort((a,b) => Number(a) - Number(b));
-            const remainingArchived = Object.keys(nextPages).filter(k => k.startsWith('archived_'));
-            
-            if (remainingActive.length === 0 && remainingArchived.length === 0) {
-                nextPages["1"] = "";
-                setActivePage("1");
-            } else if (remainingActive.length > 0) {
-                setActivePage(remainingActive[remainingActive.length - 1]);
-            } else {
-                setActivePage(remainingArchived[0]);
-            }
-            setPages(nextPages);
-        }
-    };
 
     const fetchNotes = async (isInitialLoad = false) => {
         setIsLoading(true);
@@ -414,7 +348,7 @@ export function ProjectNotes({ mode = 'text', fillParent = false }: { mode?: 'te
                             </button>
                         </div>
 
-                        {archivedPages.length > 0 && isAdmin && (
+                        {archivedPages.length > 0 && (
                             <div className="flex items-center gap-2 mb-4 overflow-x-auto pb-2 scrollbar-thin scrollbar-thumb-zinc-700">
                                 <span className="text-xs text-zinc-500 font-bold uppercase mr-1">Archived:</span>
                                 {archivedPages.map(pageId => (
@@ -441,34 +375,7 @@ export function ProjectNotes({ mode = 'text', fillParent = false }: { mode?: 'te
                     <div className="flex flex-col sm:flex-row items-end sm:items-center gap-3">
                         
                         <div className="flex items-center gap-2">
-                            {isAdmin && (
-                                <div className="flex items-center gap-2 mr-2 border-r border-zinc-800 pr-4">
-                                    {activePage.startsWith('archived_') ? (
-                                        <button
-                                            onClick={handleUnarchive}
-                                            className="p-2 text-zinc-400 hover:text-emerald-400 bg-zinc-800/50 hover:bg-zinc-800 rounded-lg transition-colors border border-transparent hover:border-zinc-700/50"
-                                            title="Unarchive Page"
-                                        >
-                                            <ArchiveRestore className="w-5 h-5" />
-                                        </button>
-                                    ) : (
-                                        <button
-                                            onClick={handleArchive}
-                                            className="p-2 text-zinc-400 hover:text-amber-400 bg-zinc-800/50 hover:bg-zinc-800 rounded-lg transition-colors border border-transparent hover:border-zinc-700/50"
-                                            title="Archive Page"
-                                        >
-                                            <Archive className="w-5 h-5" />
-                                        </button>
-                                    )}
-                                    <button
-                                        onClick={handleDelete}
-                                        className="p-2 text-zinc-400 hover:text-red-400 bg-zinc-800/50 hover:bg-zinc-800 rounded-lg transition-colors border border-transparent hover:border-zinc-700/50"
-                                        title="Delete permanently"
-                                    >
-                                        <Trash2 className="w-5 h-5" />
-                                    </button>
-                                </div>
-                            )}
+
                             
                             {mode === 'text' && (
                                 <button

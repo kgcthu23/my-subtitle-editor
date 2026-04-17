@@ -2,52 +2,7 @@ import React, { useState } from 'react';
 import { Link as LinkIcon, MessageSquare, Film, Shield } from 'lucide-react';
 
 export const Guide: React.FC = () => {
-    const [issue, setIssue] = useState('');
-    const [isSubmitting, setIsSubmitting] = useState(false);
-    const [submitStatus, setSubmitStatus] = useState<'idle' | 'success' | 'error'>('idle');
-
     const driveLink = "https://drive.google.com/drive/u/0/folders/1l0q5ayt7zNnJ4RADIA3maPGzoh-AgobU";
-
-    const handleReportSubmit = async (e: React.FormEvent) => {
-        e.preventDefault();
-        if (!issue.trim()) return;
-
-        setIsSubmitting(true);
-        setSubmitStatus('idle');
-
-        // Access Key for 'knightkryptonian@gmail.com'
-        const accessKey = "d6be84f4-63ed-4347-b06c-fe7048ffa2ac";
-
-        try {
-            const response = await fetch("https://api.web3forms.com/submit", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                    Accept: "application/json",
-                },
-                body: JSON.stringify({
-                    access_key: accessKey,
-                    subject: `Toolkit Issue Report: Anonymous`,
-                    name: 'Anonymous',
-                    message: issue,
-                }),
-            });
-            const result = await response.json();
-            if (result.success) {
-                setSubmitStatus('success');
-                setIssue('');
-                setTimeout(() => setSubmitStatus('idle'), 5000);
-            } else {
-                console.error("Web3Forms Error:", result);
-                setSubmitStatus('error');
-            }
-        } catch (error) {
-            console.error("Submission Error:", error);
-            setSubmitStatus('error');
-        } finally {
-            setIsSubmitting(false);
-        }
-    };
 
     return (
         <div className="max-w-4xl mx-auto space-y-8 animate-fade-in">
@@ -69,43 +24,6 @@ export const Guide: React.FC = () => {
                         </div>
                     </a>
                 </div>
-            </div>
-
-            <div className="bg-zinc-900/40 backdrop-blur-xl p-6 sm:p-8 rounded-2xl shadow-xl border border-zinc-800/50">
-                <h2 className="text-2xl font-bold mb-6 text-zinc-100 flex items-center gap-3">
-                    <span className="bg-violet-500/10 text-violet-400 p-2.5 rounded-xl border border-violet-500/20 shadow-[0_0_15px_rgba(139,92,246,0.1)]">
-                        <MessageSquare className="w-6 h-6" />
-                    </span>
-                    Message me
-                </h2>
-                <form onSubmit={handleReportSubmit} className="space-y-4">
-                    <textarea
-                        value={issue}
-                        onChange={(e) => setIssue(e.target.value)}
-                        placeholder="If there is any problem, pls let me know!"
-                        className="w-full h-32 bg-zinc-950/50 border border-zinc-800/80 rounded-xl p-4 text-zinc-200 placeholder-zinc-500 focus:outline-none focus:border-violet-500/50 focus:ring-1 focus:ring-violet-500/50 resize-none transition-all"
-                        disabled={isSubmitting}
-                    />
-                    <div className="flex items-center justify-between">
-                        <button
-                            type="submit"
-                            disabled={isSubmitting || !issue.trim()}
-                            className="bg-violet-600 hover:bg-violet-500 text-white px-6 py-2.5 rounded-lg font-semibold transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 shadow-[0_0_15px_rgba(139,92,246,0.2)] hover:shadow-[0_0_20px_rgba(139,92,246,0.4)]"
-                        >
-                            {isSubmitting ? 'Sending...' : 'Submit Report'}
-                        </button>
-                        {submitStatus === 'success' && (
-                            <div className="text-sm text-emerald-400 font-bold animate-pulse flex items-center gap-2">
-                                Issue reported successfully!
-                            </div>
-                        )}
-                        {submitStatus === 'error' && (
-                            <div className="text-sm text-rose-400 font-bold flex items-center gap-2">
-                                Failed to send report. Please try again.
-                            </div>
-                        )}
-                    </div>
-                </form>
             </div>
 
             <div className="bg-zinc-900/40 backdrop-blur-xl p-6 sm:p-8 rounded-2xl shadow-xl border border-zinc-800/50">
