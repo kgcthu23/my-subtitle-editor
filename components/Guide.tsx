@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Link as LinkIcon, MessageSquare, Film, Shield } from 'lucide-react';
+import { Link as LinkIcon, Film } from 'lucide-react';
 
 export const Guide: React.FC = () => {
     const driveLink = "https://drive.google.com/drive/u/0/folders/1l0q5ayt7zNnJ4RADIA3maPGzoh-AgobU";
@@ -21,27 +21,6 @@ export const Guide: React.FC = () => {
                         <div>
                             <h3 className="font-bold text-lg text-zinc-100 group-hover:text-indigo-400 transition-colors">Open Toolkit Drive</h3>
                             <p className="text-sm text-zinc-400 mt-1">Essential apps, installers, and tutorial documentation (Updated 2026)</p>
-                        </div>
-                    </a>
-                </div>
-            </div>
-
-            <div className="bg-zinc-900/40 backdrop-blur-xl p-6 sm:p-8 rounded-2xl shadow-xl border border-zinc-800/50">
-                <h2 className="text-2xl font-bold mb-6 text-zinc-100 flex items-center gap-3">
-                    <span className="bg-emerald-500/10 text-emerald-400 p-2.5 rounded-xl border border-emerald-500/20 shadow-[0_0_15px_rgba(16,185,129,0.1)]">
-                        <Shield className="w-6 h-6" />
-                    </span>
-                    VPN
-                </h2>
-
-                <div className="grid grid-cols-1 gap-4">
-                    <a href="https://t.me/+WTuWX1N0ryszZjU9" target="_blank" rel="noopener noreferrer" className="flex items-center p-5 bg-gradient-to-r from-emerald-950/30 to-teal-950/30 rounded-xl hover:from-emerald-900/40 hover:to-teal-900/40 transition-all duration-300 group border border-zinc-800/80 hover:border-emerald-500/30">
-                        <div className="bg-gradient-to-br from-emerald-500 to-teal-500 text-white p-3.5 rounded-xl mr-5 shadow-[0_0_20px_rgba(16,185,129,0.4)] group-hover:scale-110 transition-transform">
-                            <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.64 6.8c-.15 1.58-.8 5.42-1.13 7.19-.14.75-.42 1-.68 1.03-.58.05-1.02-.38-1.58-.75-.88-.58-1.38-.94-2.23-1.5-.99-.65-.35-1.01.22-1.59.15-.15 2.71-2.48 2.76-2.69.01-.03.01-.14-.07-.19-.08-.05-.19-.02-.27 0-.12.03-1.98 1.25-5.59 3.69-.53.36-1.01.54-1.44.53-.47-.01-1.38-.27-2.06-.49-.83-.27-1.49-.41-1.43-.87.03-.24.36-.49 1-.76 3.91-1.7 6.5-2.82 7.78-3.35 3.7-1.54 4.47-1.81 4.97-1.82.11 0 .36.03.49.14.11.09.15.22.16.32-.01.05-.01.16-.02.24z" /></svg>
-                        </div>
-                        <div>
-                            <h3 className="font-bold text-lg text-zinc-100 group-hover:text-emerald-400 transition-colors">Join this channel</h3>
-                            <p className="text-sm text-zinc-400 mt-1">Telegram channel for VPN</p>
                         </div>
                     </a>
                 </div>

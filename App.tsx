@@ -19,12 +19,10 @@ import { FileUpload } from './components/FileUpload';
 const Preview = lazy(() => import('./components/Preview').then(module => ({ default: module.Preview })));
 const IncomeTracker = lazy(() => import('./components/IncomeTracker').then(module => ({ default: module.IncomeTracker })));
 const Guide = lazy(() => import('./components/Guide').then(module => ({ default: module.Guide })));
-const ProjectNotes = lazy(() => import('./components/ProjectNotes').then(module => ({ default: module.ProjectNotes })));
 const DopamineDispenser = lazy(() => import('./components/DopamineDispenser').then(module => ({ default: module.DopamineDispenser })));
 const CanvaMailModal = lazy(() => import('./components/CanvaMailModal').then(module => ({ default: module.CanvaMailModal })));
 
 import { useSrtCleaner } from './hooks/useSrtCleaner';
-import { useSecretClick } from './hooks/useSecretClick';
 
 // --- Main Application ---
 export default function App() {
@@ -32,7 +30,6 @@ export default function App() {
     type AppView = 'cleaner' | 'tracker' | 'guide' | 'notes' | 'canvas' | 'gallery';
     const [appState, setAppState] = useState<AppState>('idle');
     const [activeView, setActiveView] = useState<AppView>('cleaner');
-    const [showNotesTab, setShowNotesTab] = useState(false);
 
     const [isAppUnlocked, setIsAppUnlocked] = useState(true);
     const [loginUser, setLoginUser] = useState('');
@@ -64,7 +61,6 @@ export default function App() {
         setShowCanvaModal(false);
     };
 
-    const { loveEffects, handleSecretClick } = useSecretClick(() => setShowNotesTab(true));
     const { 
         originalContent, cleanedContent, summary, foreignReport, 
         handleFileSelect: onFileSelect, handleDownload, resetCleaner 
@@ -130,13 +126,6 @@ export default function App() {
 
     return (
         <div className="min-h-screen bg-[#09090b] text-zinc-100 font-sans selection:bg-indigo-500/30 selection:text-white transition-colors duration-300 relative overflow-hidden">
-            {/* Love Effects */}
-            {loveEffects.map(effect => (
-                <div key={effect.id} className="fixed pointer-events-none animate-float-up text-pink-500 text-4xl z-50 drop-shadow-[0_0_15px_rgba(236,72,153,0.5)]" style={{ left: effect.x - 20, top: effect.y - 20 }}>
-                    ❤️
-                </div>
-            ))}
-
             {/* Background Orbs */}
             <div className="fixed top-[-10%] left-[-10%] w-[40%] h-[40%] rounded-full bg-indigo-500/10 blur-[120px] pointer-events-none animate-blob"></div>
             <div className="fixed bottom-[-10%] right-[-10%] w-[40%] h-[40%] rounded-full bg-purple-500/10 blur-[120px] pointer-events-none animate-blob animation-delay-2000"></div>
@@ -152,7 +141,8 @@ export default function App() {
                     </button>
                     <div className="flex-1 w-full h-full min-h-0 relative z-10 flex flex-col">
                         <Suspense fallback={<div className="flex justify-center items-center h-full w-full"><div className="w-8 h-8 rounded-full border-4 border-emerald-500/20 border-t-emerald-500 animate-spin"></div></div>}>
-                            <ProjectNotes mode="canvas" fillParent={true} />
+                            {/* Canvas notes temporarily removed */}
+                            <div className="text-zinc-500 text-center mt-20">Canvas Component Removed</div>
                         </Suspense>
                     </div>
                 </div>
@@ -170,9 +160,8 @@ export default function App() {
                             {([
                                 { id: 'cleaner', label: 'Cleaner', icon: <LayoutDashboard className="w-4 h-4 sm:w-4 sm:h-4" /> },
                                 { id: 'tracker', label: 'Tracker', icon: <Calculator className="w-4 h-4 sm:w-4 sm:h-4" /> },
-                                { id: 'guide', label: 'Guide', icon: <BookOpen className="w-4 h-4 sm:w-4 sm:h-4" /> },
-                                { id: 'notes', label: 'Notes', icon: <MessageSquare className="w-4 h-4 sm:w-4 sm:h-4" /> }
-                            ].filter(tab => tab.id !== 'notes' || showNotesTab) as { id: AppView, label: string, icon: React.ReactNode }[]).map(({ id, label, icon }) => (
+                                { id: 'guide', label: 'Guide', icon: <BookOpen className="w-4 h-4 sm:w-4 sm:h-4" /> }
+                            ] as { id: AppView, label: string, icon: React.ReactNode }[]).map(({ id, label, icon }) => (
                                 <button
                                     key={id}
                                     onClick={() => setActiveView(id)}
@@ -220,11 +209,7 @@ export default function App() {
                                                 <Guide />
                                             </motion.div>
                                         )}
-                                        {activeView === 'notes' && (
-                                            <motion.div key="notes" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} transition={{ duration: 0.2 }}>
-                                                <ProjectNotes mode="text" />
-                                            </motion.div>
-                                        )}
+
                                         {/* {activeView === 'gallery' && (
                                             <motion.div key="gallery" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} transition={{ duration: 0.2 }}>
                                                 <ProjectNotes mode="gallery" />
@@ -238,11 +223,8 @@ export default function App() {
                         Translator's Toolkit &copy; 2026
                     </p>
                     <p className="mt-2 text-sm text-zinc-500">
-                        Made for <span onClick={handleSecretClick} className="relative inline-block transition-colors duration-300 hover:text-pink-400 cursor-pointer group font-bold select-none py-1">
+                        Made for <span className="relative inline-block transition-colors duration-300 hover:text-pink-400 group font-bold select-none py-1">
                             Thu Zue Zue San
-                            <span className="demo2-heart1 absolute -top-1 left-[10%] text-pink-500 text-[10px] opacity-0 pointer-events-none">❤️</span>
-                            <span className="demo2-heart2 absolute top-1 left-[40%] text-purple-500 text-[14px] opacity-0 pointer-events-none">💖</span>
-                            <span className="demo2-heart3 absolute -top-2 left-[70%] text-rose-500 text-[12px] opacity-0 pointer-events-none">💕</span>
                         </span>
                     </p>
                 </footer>
