@@ -1,6 +1,7 @@
 import React, { useMemo } from 'react';
-import { Sparkles, CheckCircle2, AlertTriangle, FileCode } from 'lucide-react';
+import { Sparkles, CheckCircle2, AlertTriangle, FileCode, Copy } from 'lucide-react';
 import type { ChangeSummary, ForeignLanguageReport, DetectedLanguageInfo } from '../types';
+import { toast } from '../hooks/useToast';
 
 export const ChangeSummaryDisplay: React.FC<{ summary: ChangeSummary }> = ({ summary }) => {
     const items = [
@@ -128,7 +129,19 @@ export const Preview: React.FC<{ originalContent: string; cleanedContent: string
                             <span className="w-1.5 h-1.5 rounded-full bg-indigo-500 animate-pulse shadow-[0_0_8px_rgba(99,102,241,0.8)]"></span>
                             Refined Subtitle
                         </span>
-                        <span className="text-[10px] font-mono text-indigo-500/80 uppercase">Preview</span>
+                        <div className="flex items-center gap-3">
+                            <button 
+                                onClick={() => {
+                                    navigator.clipboard.writeText(cleanedContent);
+                                    toast.success('Cleaned subtitle copied!');
+                                }}
+                                className="text-[10px] flex items-center gap-1.5 px-2.5 py-1 bg-indigo-500/10 hover:bg-indigo-500/20 text-indigo-400 rounded-lg transition-colors border border-indigo-500/20 cursor-pointer"
+                                title="Copy to clipboard"
+                            >
+                                <Copy className="w-3 h-3" /> Copy
+                            </button>
+                            <span className="text-[10px] font-mono text-indigo-500/80 uppercase">Preview</span>
+                        </div>
                     </div>
                     <div className="p-5 overflow-auto custom-scrollbar flex-1 font-mono text-xs text-indigo-200/90 leading-relaxed bg-zinc-950/10">
                         {cleanedLines.map((line, i) => (

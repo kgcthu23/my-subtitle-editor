@@ -2,10 +2,12 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { Calculator, Trash2, LineChart, Plus } from 'lucide-react';
 import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from 'recharts';
 import type { IncomeData, IncomeEntry } from '../types';
+import { toast } from '../hooks/useToast';
 
 export const IncomeTracker: React.FC = () => {
     const [lines, setLines] = useState('');
-    const [rate, setRate] = useState('');
+    const [rate, setRate] = useState(() => localStorage.getItem('defaultIncomeRate') || '');
+    const [saveDefaultRate, setSaveDefaultRate] = useState(true);
     const [incomeData, setIncomeData] = useState<IncomeData>({});
 
     useEffect(() => {
@@ -47,10 +49,14 @@ export const IncomeTracker: React.FC = () => {
         updatedData[currentMonthKey].entries.unshift(entry);
         updatedData[currentMonthKey].total += entry.amount;
 
+        if (saveDefaultRate) {
+            localStorage.setItem('defaultIncomeRate', rate);
+        }
+
         setIncomeData(updatedData);
         localStorage.setItem('incomeTrackerData', JSON.stringify(updatedData));
         setLines(''); 
-        setRate('');
+        toast.success(`Logged ${numLines} lines successfully!`);
     };
 
     const handleDeleteEntry = (id: string) => {
@@ -69,9 +75,20 @@ export const IncomeTracker: React.FC = () => {
 
         setIncomeData(updatedData);
         localStorage.setItem('incomeTrackerData', JSON.stringify(updatedData));
+        toast.info('Entry removed.');
     };
 
     const currentMonthData = incomeData[currentMonthKey] ?? { total: 0, entries: [] };
+
+    const allTimeTotal = useMemo(() => {
+        return Object.values(incomeData).reduce((sum, month: any) => sum + month.total, 0);
+    }, [incomeData]);
+
+    const avgDailyEarnings = useMemo(() => {
+        if (!currentMonthData || currentMonthData.entries.length === 0) return 0;
+        const uniqueDays = new Set(currentMonthData.entries.map((e: IncomeEntry) => e.date)).size;
+        return currentMonthData.total / uniqueDays;
+    }, [currentMonthData]);
 
     const chartData = useMemo(() => {
         const sorted = [...currentMonthData.entries].reverse();
@@ -131,6 +148,16 @@ export const IncomeTracker: React.FC = () => {
                             placeholder="e.g. 1.5" 
                             required 
                         />
+                        <div className="mt-2.5 flex items-center gap-2">
+                            <input 
+                                type="checkbox" 
+                                id="saveDefault"
+                                checked={saveDefaultRate}
+                                onChange={e => setSaveDefaultRate(e.target.checked)}
+                                className="w-3.5 h-3.5 rounded bg-zinc-900 border-zinc-800 text-indigo-500 focus:ring-indigo-500/30 accent-indigo-500"
+                            />
+                            <label htmlFor="saveDefault" className="text-[10px] text-zinc-500 select-none cursor-pointer">Save as default rate</label>
+                        </div>
                     </div>
                     
                     <button 
@@ -156,11 +183,25 @@ export const IncomeTracker: React.FC = () => {
                         </div>
                     </div>
 
-                    <div className="bg-emerald-500/5 px-4.5 py-2 rounded-xl border border-emerald-500/20 flex flex-col items-start sm:items-end shadow-[0_0_15px_rgba(16,185,129,0.02)]">
-                        <span className="text-[9px] font-bold text-emerald-400/80 uppercase tracking-widest">Monthly Earnings</span>
-                        <span className="text-xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-teal-400 mt-0.5">
-                            {currentMonthData.total.toLocaleString()} MMK
-                        </span>
+                    <div className="flex flex-wrap gap-3 mt-4 sm:mt-0 justify-start sm:justify-end">
+                        <div className="bg-emerald-500/5 px-4 py-2 rounded-xl border border-emerald-500/20 flex flex-col shadow-[0_0_15px_rgba(16,185,129,0.02)] flex-1 min-w-[120px]">
+                            <span className="text-[9px] font-bold text-emerald-400/80 uppercase tracking-widest">Monthly</span>
+                            <span className="text-lg font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-teal-400 mt-0.5">
+                                {currentMonthData.total.toLocaleString(undefined, { maximumFractionDigits: 0 })} MMK
+                            </span>
+                        </div>
+                        <div className="bg-blue-500/5 px-4 py-2 rounded-xl border border-blue-500/20 flex flex-col shadow-[0_0_15px_rgba(59,130,246,0.02)] flex-1 min-w-[120px]">
+                            <span className="text-[9px] font-bold text-blue-400/80 uppercase tracking-widest">Avg Daily</span>
+                            <span className="text-lg font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-cyan-400 mt-0.5">
+                                {avgDailyEarnings.toLocaleString(undefined, { maximumFractionDigits: 0 })} MMK
+                            </span>
+                        </div>
+                        <div className="bg-indigo-500/5 px-4 py-2 rounded-xl border border-indigo-500/20 flex flex-col shadow-[0_0_15px_rgba(99,102,241,0.02)] flex-1 min-w-[120px]">
+                            <span className="text-[9px] font-bold text-indigo-400/80 uppercase tracking-widest">All-Time</span>
+                            <span className="text-lg font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-purple-400 mt-0.5">
+                                {allTimeTotal.toLocaleString(undefined, { maximumFractionDigits: 0 })} MMK
+                            </span>
+                        </div>
                     </div>
                 </div>
 

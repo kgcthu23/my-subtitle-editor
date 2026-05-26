@@ -1,14 +1,9 @@
 import React, { useState, useCallback, lazy, Suspense } from 'react';
 import { LayoutDashboard, Calculator } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { clsx, type ClassValue } from 'clsx';
-import { twMerge } from 'tailwind-merge';
-
-function cn(...inputs: ClassValue[]) {
-    return twMerge(clsx(inputs));
-}
-
+import { cn } from './lib/utils';
 import { FileUpload } from './components/FileUpload';
+import { ToastContainer } from './components/Toast';
 const Preview = lazy(() => import('./components/Preview').then(module => ({ default: module.Preview })));
 const IncomeTracker = lazy(() => import('./components/IncomeTracker').then(module => ({ default: module.IncomeTracker })));
 
@@ -37,6 +32,7 @@ export default function App() {
 
     return (
         <div className="min-h-screen bg-[#030712] text-zinc-100 font-sans selection:bg-indigo-500/30 selection:text-white transition-colors duration-300 relative overflow-hidden">
+            <ToastContainer />
             {/* Background Tech Grid */}
             <div className="absolute inset-0 bg-[linear-gradient(to_right,#1f293710_1px,transparent_1px),linear-gradient(to_bottom,#1f293710_1px,transparent_1px)] bg-[size:24px_24px] pointer-events-none"></div>
             
