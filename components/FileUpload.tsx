@@ -1,22 +1,50 @@
 import React, { useState, useCallback } from 'react';
-import { UploadCloud, FileText } from 'lucide-react';
+import { UploadCloud, FileText, Sparkles, CheckCircle, Shield, Zap, RefreshCw } from 'lucide-react';
+import { toast } from '../hooks/useToast';
 
-export const FileUpload: React.FC<{ onFileSelect: (content: string, fileName: string) => void; disabled: boolean }> = ({ onFileSelect, disabled }) => {
+interface FileUploadProps {
+    onFilesSelect: (files: { name: string; content: string }[]) => void;
+    onLoadSample: () => void;
+    disabled: boolean;
+}
+
+export const FileUpload: React.FC<FileUploadProps> = ({ onFilesSelect, onLoadSample, disabled }) => {
     const [isDragging, setIsDragging] = useState(false);
 
-    const processFile = useCallback((file: File) => {
-        if (!file.name.toLowerCase().endsWith('.srt')) {
-            alert('Please upload an SRT file.');
+    const processFilesList = useCallback((files: FileList | File[]) => {
+        const srtFiles = Array.from(files).filter(f => f.name.toLowerCase().endsWith('.srt'));
+        if (srtFiles.length === 0) {
+            toast.error('Invalid format! Please upload .SRT subtitle files.');
             return;
         }
-        const reader = new FileReader();
-        reader.onload = (e) => onFileSelect(e.target?.result as string, file.name);
-        reader.readAsText(file, 'UTF-8');
-    }, [onFileSelect]);
+
+        const readResults: { name: string; content: string }[] = [];
+        let readCount = 0;
+
+        srtFiles.forEach(file => {
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                const content = e.target?.result as string;
+                if (content && content.trim()) {
+                    readResults.push({ name: file.name, content });
+                }
+                readCount++;
+                if (readCount === srtFiles.length) {
+                    if (readResults.length === 0) {
+                        toast.error('Selected files are empty.');
+                    } else {
+                        onFilesSelect(readResults);
+                        toast.success(`Loaded ${readResults.length} SRT file${readResults.length > 1 ? 's' : ''} successfully!`);
+                    }
+                }
+            };
+            reader.readAsText(file, 'UTF-8');
+        });
+    }, [onFilesSelect]);
 
     const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-        const file = event.target.files?.[0];
-        if (file) processFile(file);
+        const files = event.target.files;
+        if (files && files.length > 0) processFilesList(files);
     };
 
     const handleDragOver = useCallback((e: React.DragEvent) => {
@@ -38,76 +66,139 @@ export const FileUpload: React.FC<{ onFileSelect: (content: string, fileName: st
         setIsDragging(false);
         if (disabled) return;
         
-        const file = e.dataTransfer.files?.[0];
-        if (file) processFile(file);
-    }, [disabled, processFile]);
+        const files = e.dataTransfer.files;
+        if (files && files.length > 0) processFilesList(files);
+    }, [disabled, processFilesList]);
 
     return (
-        <div className="w-full max-w-2xl mx-auto space-y-6">
-            <div className={`relative group overflow-hidden rounded-2xl p-[1px] transition-all duration-300 shadow-2xl ${
-                isDragging 
-                    ? 'bg-gradient-to-b from-indigo-500 via-indigo-400 to-indigo-600 scale-[1.02]' 
-                    : 'bg-gradient-to-b from-zinc-800 via-zinc-800 to-indigo-500/30 hover:bg-gradient-to-b hover:from-indigo-500/30 hover:via-zinc-800 hover:to-indigo-500'
-            }`}>
-                <label 
-                    htmlFor="file-upload" 
-                    onDragOver={handleDragOver}
-                    onDragLeave={handleDragLeave}
-                    onDrop={handleDrop}
-                    className={`relative cursor-pointer backdrop-blur-xl rounded-2xl flex flex-col items-center justify-center p-14 sm:p-20 transition-all duration-300 group ${
-                        isDragging ? 'bg-indigo-950/40' : 'bg-zinc-950/80 hover:bg-zinc-900/50'
-                    }`}
-                >
-                    <div className={`w-16 h-16 rounded-2xl border flex items-center justify-center mb-6 transition-all duration-300 ${
-                        isDragging 
-                            ? 'bg-indigo-500/20 border-indigo-400/50 scale-110 shadow-[0_0_30px_rgba(99,102,241,0.2)]' 
-                            : 'bg-indigo-600/10 border-indigo-500/20 group-hover:scale-105 group-hover:border-indigo-400/30 group-hover:bg-indigo-600/15 shadow-[0_0_20px_rgba(99,102,241,0.05)]'
-                    }`}>
-                        <UploadCloud className={`w-8 h-8 transition-colors drop-shadow-[0_0_10px_rgba(99,102,241,0.3)] ${
-                            isDragging ? 'text-indigo-200' : 'text-indigo-400 group-hover:text-indigo-300'
-                        }`} />
-                    </div>
-                    
-                    <span className="text-xl font-bold text-zinc-100 group-hover:text-white transition-colors text-center">
-                        {isDragging ? 'Drop subtitle here!' : 'Upload Subtitle File'}
-                    </span>
-                    <span className="text-sm text-zinc-400 mt-2 text-center">
-                        Drag and drop your subtitle or click to browse
-                    </span>
-                    
-                    <div className="mt-6 flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-zinc-900 border border-zinc-800 text-xs text-zinc-400 font-mono">
-                        <FileText className="w-3.5 h-3.5 text-indigo-400" />
-                        SRT format only
-                    </div>
-
-                    <input 
-                        id="file-upload" 
-                        type="file" 
-                        className="sr-only" 
-                        accept=".srt" 
-                        onChange={handleFileChange} 
-                        disabled={disabled} 
-                    />
-                </label>
+        <div className="w-full max-w-4xl mx-auto space-y-8">
+            {/* Header Banner */}
+            <div className="text-center space-y-3">
+                <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-indigo-500/10 border border-indigo-500/20 text-indigo-300 text-xs font-semibold tracking-wide shadow-[0_0_20px_rgba(99,102,241,0.1)]">
+                    <Zap className="w-3.5 h-3.5 text-indigo-400 fill-indigo-400" />
+                    Multi-File SRT Subtitle Refinement Engine
+                </div>
+                <h2 className="text-3xl sm:text-4xl font-extrabold text-white tracking-tight">
+                    Clean & Format Subtitles in Seconds
+                </h2>
+                <p className="text-zinc-400 text-sm sm:text-base max-w-xl mx-auto leading-relaxed">
+                    Upload single or multiple SRT files. Output names are automatically appended with <code className="text-indigo-300 font-mono font-bold">-mmsub</code> (e.g. <span className="font-mono text-zinc-300">Ep01-mmsub.srt</span>).
+                </p>
             </div>
 
-            {/* Quick Process Steps */}
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-center sm:text-left">
-                {[
-                    { title: "Upload Subtitle", desc: "Select any standard SRT format file." },
-                    { title: "Auto-Refinement", desc: "Instantly fixes formatting and flags foreign lines." },
-                    { title: "Review & Save", desc: "Inspect changes side-by-side and download." }
-                ].map((step, index) => (
-                    <div key={index} className="p-4 rounded-xl bg-zinc-900/20 border border-zinc-900 flex flex-col sm:flex-row items-center sm:items-start gap-3">
-                        <div className="w-6 h-6 rounded-full bg-zinc-900 border border-zinc-800 text-zinc-400 flex items-center justify-center text-xs font-bold flex-shrink-0">
-                            {index + 1}
+            {/* Drop Zone Box */}
+            <div className="relative group">
+                <div className={`absolute -inset-1 rounded-3xl blur-xl transition duration-500 opacity-60 ${
+                    isDragging 
+                        ? 'bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 opacity-90' 
+                        : 'bg-gradient-to-r from-indigo-500/30 via-purple-500/20 to-indigo-500/30 group-hover:opacity-100'
+                }`}></div>
+
+                <div className={`relative overflow-hidden rounded-3xl border transition-all duration-300 ${
+                    isDragging 
+                        ? 'bg-indigo-950/50 border-indigo-400 scale-[1.01] shadow-[0_0_40px_rgba(99,102,241,0.25)]' 
+                        : 'bg-zinc-950/80 border-zinc-800/90 group-hover:border-zinc-700/80'
+                }`}>
+                    <label 
+                        htmlFor="file-upload" 
+                        onDragOver={handleDragOver}
+                        onDragLeave={handleDragLeave}
+                        onDrop={handleDrop}
+                        className="relative cursor-pointer p-10 sm:p-16 flex flex-col items-center justify-center text-center transition-all"
+                    >
+                        <div className={`w-20 h-20 rounded-2xl border flex items-center justify-center mb-6 transition-all duration-300 ${
+                            isDragging 
+                                ? 'bg-indigo-500/20 border-indigo-400 scale-110 shadow-[0_0_30px_rgba(99,102,241,0.4)]' 
+                                : 'bg-indigo-600/10 border-indigo-500/20 group-hover:scale-105 group-hover:bg-indigo-600/20 group-hover:border-indigo-400/40 shadow-[0_0_20px_rgba(99,102,241,0.1)]'
+                        }`}>
+                            <UploadCloud className={`w-10 h-10 transition-colors drop-shadow-[0_0_12px_rgba(99,102,241,0.5)] ${
+                                isDragging ? 'text-white' : 'text-indigo-400 group-hover:text-indigo-200'
+                            }`} />
                         </div>
-                        <div>
-                            <h4 className="text-xs font-bold text-zinc-200 uppercase tracking-wider">{step.title}</h4>
-                            <p className="text-[11px] text-zinc-400 mt-1 leading-relaxed">{step.desc}</p>
+                        
+                        <h3 className="text-xl sm:text-2xl font-bold text-white mb-2">
+                            {isDragging ? 'Drop your SRT file(s) here!' : 'Drop one or multiple .SRT files here or browse'}
+                        </h3>
+                        <p className="text-xs sm:text-sm text-zinc-400 max-w-sm mb-6">
+                            Upload single or multiple files at once. All cleaning rules apply automatically with <span className="text-indigo-300 font-mono font-bold">-mmsub</span> naming.
+                        </p>
+
+                        <div className="flex flex-wrap items-center justify-center gap-3">
+                            <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-zinc-900 border border-zinc-800 text-xs font-mono text-zinc-300">
+                                <FileText className="w-3.5 h-3.5 text-indigo-400" />
+                                Single & Batch SRT Upload
+                            </div>
+                            <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-zinc-900 border border-zinc-800 text-xs font-mono text-zinc-300">
+                                <Shield className="w-3.5 h-3.5 text-emerald-400" />
+                                100% Private (Client-Side)
+                            </div>
                         </div>
+
+                        <input 
+                            id="file-upload" 
+                            type="file" 
+                            className="sr-only" 
+                            accept=".srt" 
+                            multiple
+                            onChange={handleFileChange} 
+                            disabled={disabled} 
+                        />
+                    </label>
+
+                    {/* Quick Demo Button */}
+                    <div className="bg-zinc-900/60 border-t border-zinc-800/80 px-6 py-4 flex flex-col sm:flex-row items-center justify-between gap-3">
+                        <span className="text-xs text-zinc-400 font-medium">Don't have an SRT file handy? Try our test suite sample:</span>
+                        <button
+                            type="button"
+                            onClick={(e) => {
+                                e.preventDefault();
+                                onLoadSample();
+                                toast.info('Loaded demo subtitle sample!');
+                            }}
+                            className="px-4 py-2 bg-indigo-500/10 hover:bg-indigo-500/20 text-indigo-300 hover:text-white border border-indigo-500/30 rounded-xl text-xs font-semibold transition-all flex items-center gap-2 cursor-pointer shadow-sm"
+                        >
+                            <RefreshCw className="w-3.5 h-3.5 text-indigo-400" />
+                            Try Demo Sample SRT
+                        </button>
                     </div>
-                ))}
+                </div>
+            </div>
+
+            {/* Feature Cards Grid */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+                {[
+                    {
+                        title: "Timestamp & Syntax Fix",
+                        desc: "Repairs merged lines, missing blank line separators, backslash escape issues, and HTML tag brackets.",
+                        icon: Sparkles,
+                        color: "text-indigo-400"
+                    },
+                    {
+                        title: "Myanmar & Speaker Cleanup",
+                        desc: "Strips speaker names (စကားပြောသူ/Speaker 1:), bracketed noise labels [Laughs], and stray Burmese full stops.",
+                        icon: CheckCircle,
+                        color: "text-emerald-400"
+                    },
+                    {
+                        title: "Foreign Script Inspector",
+                        desc: "Flags Thai, Japanese, Chinese, Korean, and Hindi character occurrences line-by-line for fast verification.",
+                        icon: Shield,
+                        color: "text-amber-400"
+                    }
+                ].map((item, idx) => {
+                    const Icon = item.icon;
+                    return (
+                        <div key={idx} className="bg-zinc-950/60 backdrop-blur-xl p-5 rounded-2xl border border-zinc-800/80 shadow-xl space-y-2 hover:border-zinc-700/80 transition-all">
+                            <div className="flex items-center gap-2.5">
+                                <div className="p-2 rounded-lg bg-zinc-900 border border-zinc-800">
+                                    <Icon className={`w-4 h-4 ${item.color}`} />
+                                </div>
+                                <h4 className="text-sm font-bold text-zinc-100">{item.title}</h4>
+                            </div>
+                            <p className="text-xs text-zinc-400 leading-relaxed">{item.desc}</p>
+                        </div>
+                    );
+                })}
             </div>
         </div>
     );

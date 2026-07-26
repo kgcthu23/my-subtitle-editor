@@ -1,4 +1,5 @@
-import type { ForeignLanguageReport, ChangeSummary } from '../types';
+import type { ForeignLanguageReport, ChangeSummary, CleanerOptions } from '../types';
+import { DEFAULT_CLEANER_OPTIONS } from '../types';
 
 const languagePatterns: { [key: string]: RegExp } = {
     'Thai': /[ก-๙]/,
@@ -34,7 +35,7 @@ export const detectForeignLanguages = (content: string): ForeignLanguageReport =
     return detectedLines;
 };
 
-const fixSrtFormat = (content: string): { fixedContent: string, count: number } => {
+const fixSrtFormat = (content: string): { fixedContent: string; count: number } => {
     const lines = content.split('\n');
     const formattedLines: string[] = [];
     let fixesCount = 0;
@@ -43,9 +44,6 @@ const fixSrtFormat = (content: string): { fixedContent: string, count: number } 
     while (i < lines.length) {
         const line = lines[i].trim();
         
-        // Helper to check if we need to insert a separator before a new block.
-        // This prevents "stacking" by ensuring there is at least one blank line 
-        // before a new number block starts (unless it's the very first line).
         const ensureBlockSeparator = () => {
              if (formattedLines.length > 0 && formattedLines[formattedLines.length - 1] !== '') {
                  formattedLines.push('');
@@ -74,11 +72,9 @@ const fixSrtFormat = (content: string): { fixedContent: string, count: number } 
                 const [, timestamp, text] = tsMatch;
                 
                 if (text.trim()) {
-                    // Text is on the timestamp line - this is a fix
                     fixesCount++;
                     formattedLines.push(line, timestamp.trim(), text.trim());
                 } else {
-                    // Standard format: Number \n Timestamp
                     formattedLines.push(line, timestamp.trim());
                 }
 
@@ -87,79 +83,108 @@ const fixSrtFormat = (content: string): { fixedContent: string, count: number } 
             }
         }
         
-        // Push the line (trimmed to avoid whitespace issues)
         formattedLines.push(line);
         i++;
     }
     
-    // Join with newlines and normalize multiple blank lines to a single blank line
     const fixedContent = formattedLines.join('\n').replace(/(\r\n|\n|\r){3,}/g, '\n\n').trim();
     return { fixedContent, count: fixesCount };
 };
 
+export const cleanSrtContent = (content: string, options: CleanerOptions = DEFAULT_CLEANER_OPTIONS): string => {
+    let cleaned = content;
 
-export const cleanSrtContent = (content: string): string => {
-    // 1. Fix major SRT format issues first
-    let { fixedContent: cleaned } = fixSrtFormat(content);
+    // 1. Fix major SRT format issues
+    if (options.fixTimestamps) {
+        const { fixedContent } = fixSrtFormat(cleaned);
+        cleaned = fixedContent;
+    }
     
     // 2. Remove backslashes from timestamps and HTML tags
-    cleaned = cleaned.replace(/--\\>/g, '-->');
-    cleaned = cleaned.replace(/<([^>]+)\\>/g, '<$1>');
-    cleaned = cleaned.replace(/\\(.)/g, '$1');
+    if (options.removeBackslashes) {
+        cleaned = cleaned.replace(/--\\>/g, '-->');
+        cleaned = cleaned.replace(/<([^>]+)\\>/g, '<$1>');
+        cleaned = cleaned.replace(/\\(.)/g, '$1');
+    }
 
     // 3. Remove text between square brackets and parentheses
-    cleaned = cleaned.replace(/\[[^\]]*\]/g, '');
-    cleaned = cleaned.replace(/\([^)]*\)/g, '');
+    if (options.stripBrackets) {
+        cleaned = cleaned.replace(/\[[^\]]*\]/g, '');
+    }
+    if (options.stripParens) {
+        cleaned = cleaned.replace(/\([^)]*\)/g, '');
+    }
 
-    // 4. Remove Myanmar character
-    cleaned = cleaned.replace(/။/g, '');
+    // 4. Remove Myanmar punctuation characters (|| ။ and | ၊)
+    if (options.removeMyanmarSpecialChars) {
+        cleaned = cleaned.replace(/[။၊]/g, '');
+    }
 
-    // 5. Remove speaker labels with more specific rules
-    const speakerCleanedLines = cleaned.split('\n').map(line => {
-        // Skip timestamp and number lines
-        if (/^\d+$/.test(line.trim()) || /-->/.test(line.trim())) {
-            return line;
-        }
-        let cleanedLine = line;
-        // Burmese patterns: ကြေညာသူ (announcer), စကားပြောသူ (speaker), အသံ (voice), ဇာတ်ဆောင် (actor)
-        cleanedLine = cleanedLine.replace(/^(ကြေညာသူ|စကားပြောသူ|အသံ|ဇာတ်ဆောင်)\s*[၀-၉]+\s*:\s*/, '');
-        // English patterns from Python script
-        cleanedLine = cleanedLine.replace(/^(Speaker\s*\d+|Narrator|Actor\s*\d+|Voice\s*\d+|Man|Woman|Boy|Girl):\s*/i, '');
-        // Generic pattern from old file as a final catch-all for other cases like "JOHN:"
-        cleanedLine = cleanedLine.replace(/^(?!.*\s-->\s)[^:\n]{1,30}:\s?/, '');
-        return cleanedLine;
-    });
-    cleaned = speakerCleanedLines.join('\n');
+    // 4.5 Remove Exclamation marks (!) and Question marks (?)
+    if (options.removeExclamationAndQuestion) {
+        cleaned = cleaned.replace(/[!?！？]/g, '');
+    }
+
+    // 5. Remove speaker labels
+    if (options.removeSpeakerLabels) {
+        const speakerCleanedLines = cleaned.split('\n').map(line => {
+            if (/^\d+$/.test(line.trim()) || /-->/.test(line.trim())) {
+                return line;
+            }
+            let cleanedLine = line;
+            cleanedLine = cleanedLine.replace(/^(ကြေညာသူ|စကားပြောသူ|အသံ|ဇာတ်ဆောင်)\s*[၀-၉]*\s*:\s*/, '');
+            cleanedLine = cleanedLine.replace(/^(Speaker\s*\d+|Narrator|Actor\s*\d+|Voice\s*\d+|Man|Woman|Boy|Girl):\s*/i, '');
+            cleanedLine = cleanedLine.replace(/^(?!.*\s-->\s)[^:\n]{1,30}:\s?/, '');
+            return cleanedLine;
+        });
+        cleaned = speakerCleanedLines.join('\n');
+    }
 
     // 6. Split multiple dialogues on the same line
-    const dialogueSplitLines: string[] = [];
-    cleaned.split('\n').forEach(line => {
-        const strippedLine = line.trim();
-        if (strippedLine.startsWith('-') && strippedLine.includes(' -')) {
-            const dialogues = strippedLine.split(' -').map((d, i) => (i > 0 ? `-${d.trim()}` : d.trim()));
-            dialogueSplitLines.push(...dialogues);
-        } else {
-            dialogueSplitLines.push(line);
-        }
-    });
-    cleaned = dialogueSplitLines.join('\n');
+    if (options.splitDialogues) {
+        const dialogueSplitLines: string[] = [];
+        cleaned.split('\n').forEach(line => {
+            const strippedLine = line.trim();
+            if (strippedLine.startsWith('-') && strippedLine.includes(' -')) {
+                const dialogues = strippedLine.split(' -').map((d, i) => (i > 0 ? `-${d.trim()}` : d.trim()));
+                dialogueSplitLines.push(...dialogues);
+            } else {
+                dialogueSplitLines.push(line);
+            }
+        });
+        cleaned = dialogueSplitLines.join('\n');
+    }
     
+    // 6.5 Remove untranslated English lines
+    if (options.removeUntranslatedEnglish) {
+        const noEnglishLines = cleaned.split('\n').filter(line => {
+            if (/^\d+$/.test(line.trim()) || /-->/.test(line.trim())) {
+                return true;
+            }
+            const hasEnglish = /[a-zA-Z]/.test(line);
+            const hasMyanmar = /[\u1000-\u109F]/.test(line);
+            if (hasEnglish && !hasMyanmar) {
+                return false;
+            }
+            return true;
+        });
+        cleaned = noEnglishLines.join('\n');
+    }
+
     // 7. Remove lines containing ONLY hyphens
-    cleaned = cleaned.replace(/^[-\s]*$/gm, '');
+    if (options.removeEmptyHyphens) {
+        cleaned = cleaned.replace(/^[-\s]*$/gm, '');
+    }
 
     // 7.5. Safety: Remove empty lines immediately following a timestamp
-    // This fixes issues where a blank line is improperly inserted between timestamp and text
     const lines = cleaned.split('\n');
     const compactLines: string[] = [];
     for (let i = 0; i < lines.length; i++) {
         const currentLine = lines[i];
         const prevLine = i > 0 ? lines[i-1] : '';
         
-        // If current line is empty (or whitespace only)
         if (!currentLine.trim()) {
-            // Check if previous line was a timestamp
             if (prevLine.includes('-->')) {
-                // Skip this empty line
                 continue;
             }
         }
@@ -173,25 +198,30 @@ export const cleanSrtContent = (content: string): string => {
     return cleaned.trim();
 };
 
-export const getChangeSummary = (originalContent: string): ChangeSummary => {
-    const cleanedContent = cleanSrtContent(originalContent);
+export const getChangeSummary = (originalContent: string, options: CleanerOptions = DEFAULT_CLEANER_OPTIONS): ChangeSummary => {
+    const cleanedContent = cleanSrtContent(originalContent, options);
     const foreignLanguages = detectForeignLanguages(cleanedContent);
     
     const { count: formatFixesCount } = fixSrtFormat(originalContent);
     
-    // Calculate speaker labels removed by checking original content
-    const burmeseSpeakerPattern = /^(ကြေညာသူ|စကားပြောသူ|အသံ|ဇာတ်ဆောင်)\s*[၀-၉]+\s*:\s*/gm;
+    const burmeseSpeakerPattern = /^(ကြေညာသူ|စကားပြောသူ|အသံ|ဇာတ်ဆောင်)\s*[၀-၉]*\s*:\s*/gm;
     const englishSpeakerPattern = /^(Speaker\s*\d+|Narrator|Actor\s*\d+|Voice\s*\d+|Man|Woman|Boy|Girl):\s*/gim;
     const genericSpeakerPattern = /^(?!.*\s-->\s)[^:\n]{1,30}:\s?/gm;
 
     const burmeseMatches = (originalContent.match(burmeseSpeakerPattern) || []).length;
     const englishMatches = (originalContent.match(englishSpeakerPattern) || []).length;
     
-    // Avoid double-counting by removing specific matches before checking for generic ones
     let tempContent = originalContent.replace(burmeseSpeakerPattern, '').replace(englishSpeakerPattern, '');
     const genericMatches = (tempContent.match(genericSpeakerPattern) || []).length;
 
     const speakerLabelsRemoved = burmeseMatches + englishMatches + genericMatches;
+
+    const englishLinesRemoved = originalContent.split('\n').filter(line => {
+        if (/^\d+$/.test(line.trim()) || /-->/.test(line.trim())) return false;
+        const hasEnglish = /[a-zA-Z]/.test(line);
+        const hasMyanmar = /[\u1000-\u109F]/.test(line);
+        return hasEnglish && !hasMyanmar;
+    }).length;
 
     return {
         formatFixes: formatFixesCount,
@@ -202,8 +232,37 @@ export const getChangeSummary = (originalContent: string): ChangeSummary => {
         parensRemoved: (originalContent.match(/\([^)]*\)/g) || []).length,
         speakerLabelsRemoved,
         hyphensRemoved: (originalContent.match(/^[-\s]*$/gm) || []).length,
-        myanmarCharsRemoved: (originalContent.match(/။/g) || []).length,
+        myanmarCharsRemoved: (originalContent.match(/[။၊]/g) || []).length,
+        exclamationAndQuestionsRemoved: (originalContent.match(/[!?！？]/g) || []).length,
         dialoguesSplit: (originalContent.match(/^.* -.*$/gm) || []).length,
+        englishLinesRemoved,
         foreignLinesCount: Object.keys(foreignLanguages).length,
     };
 };
+
+export const SAMPLE_SRT_CONTENT = `1
+00:00:01,200 --\> 00:00:04,500
+Speaker 1: မင်္ဂလာပါ ခင်ဗျာ! [Laughs] ဒီနေ့တော့ Subtitle Cleaner ကို စမ်းသပ်ကြည့်ကြမလား?
+
+2 00:00:05,100 --\> 00:00:08,300 (Door opens loudly)
+စကားပြောသူ ၁: ကျွန်တော်တို့ Subtitle တွေကို၊ သန့်ရှင်းအောင် ပြုလုပ်ပေးပါတယ်။
+
+3
+00:00:09,000 --> 00:00:12,400
+This is an untranslated English subtitle line that should be filtered out!
+
+4
+00:00:13,100 --> 00:00:16,800
+- နေကောင်းလား ခင်ဗျာ? - နေကောင်းပါတယ် ခင်ဗျာ!
+
+5
+00:00:17,200 --> 00:00:20,000
+-
+
+6
+00:00:20,500 --> 00:00:24,100
+<b><i>အထူးကျေးဇူးတင်ရှိပါသည်၊</i>\></b> ကျွန်တော်တို့ရဲ့ Toolkit ကို အသုံးပြုပေးတဲ့အတွက် ဝမ်းသာပါတယ်!
+
+7
+00:00:25,000 --> 00:00:28,500
+สวัสดีครับ (Thai greeting line test) ဤသည်မှာ ပုံမှန်စာကြောင်းဖြစ်ပါသည်။`;

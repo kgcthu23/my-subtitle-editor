@@ -5,8 +5,17 @@ export interface DetectedLanguageInfo {
 }
 
 export interface ForeignLanguageReport {
-  // FIX: Changed index signature from `number` to `string`. This allows for correct type inference with `Object.entries` in consuming components.
   [lineNumber: string]: DetectedLanguageInfo;
+}
+
+export interface CleanedFileItem {
+  id: string;
+  originalName: string;
+  outputName: string;
+  originalContent: string;
+  cleanedContent: string;
+  summary: ChangeSummary;
+  foreignReport: ForeignLanguageReport;
 }
 
 export interface ChangeSummary {
@@ -18,19 +27,50 @@ export interface ChangeSummary {
   speakerLabelsRemoved: number;
   hyphensRemoved: number;
   myanmarCharsRemoved: number;
+  exclamationAndQuestionsRemoved: number;
   dialoguesSplit: number;
+  englishLinesRemoved: number;
   foreignLinesCount: number;
   formatFixes: number;
 }
 
-// New types for Income Tracker
+export interface CleanerOptions {
+  removeBackslashes: boolean;
+  fixTimestamps: boolean;
+  normalizeHtml: boolean;
+  stripBrackets: boolean;
+  stripParens: boolean;
+  removeSpeakerLabels: boolean;
+  removeUntranslatedEnglish: boolean;
+  removeMyanmarSpecialChars: boolean;
+  removeExclamationAndQuestion: boolean;
+  splitDialogues: boolean;
+  removeEmptyHyphens: boolean;
+}
+
+export const DEFAULT_CLEANER_OPTIONS: CleanerOptions = {
+  removeBackslashes: true,
+  fixTimestamps: true,
+  normalizeHtml: true,
+  stripBrackets: true,
+  stripParens: true,
+  removeSpeakerLabels: true,
+  removeUntranslatedEnglish: true,
+  removeMyanmarSpecialChars: true,
+  removeExclamationAndQuestion: true,
+  splitDialogues: true,
+  removeEmptyHyphens: true,
+};
+
+// Types for Income Tracker
 export interface IncomeEntry {
   id: string;
   date: string; // YYYY-MM-DD
-  timestamp: string; // ISO timestamp for exact time
+  timestamp: string; // ISO timestamp
   lines: number;
   rate: number;
   amount: number;
+  note?: string;
 }
 
 export interface MonthData {
